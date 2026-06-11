@@ -1,0 +1,39 @@
+/** Postgres 연결 + 부팅 시 스키마 부트스트랩 (마이그레이션 도구 없이 운영 단순화) */
+
+import pg from 'pg';
+
+export const pool = process.env.DATABASE_URL
+  ? new pg.Pool({ connectionString: process.env.DATABASE_URL, max: 5 })
+  : null;
+
+export async function bootstrap() {
+  if (!pool) {
+    console.warn('DATABASE_URL 없음 — DB 기능 비활성화 (로컬 개발 모드)');
+    return;
+  }
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS classes (
+      code TEXT PRIMARY KEY,
+      name TEXT NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE TABLE IF NOT EXISTS students (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      class_code TEXT NOT NULL REFERENCES classes(code),
+      nickname TEXT NOT NULL,
+      pin_hash TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      UNIQUE (class_code, nickname)
+    );
+    CREATE TABLE IF NOT EXISTS progress (
+      student_id UUID PRIMARY KEY REFERENCES students(id) ON DELETE CASCADE,
+      xp INT NOT NULL DEFAULT 0,
+      stages JSONB NOT NULL DEFAULT '{}',
+      skill_stats JSONB NOT NULL DEFAULT '{}',
+      card_count INT NOT NULL DEFAULT 0,
+      streak INT NOT NULL DEFAULT 0,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+  `);
+  console.log('DB 스키마 준비 완료');
+}

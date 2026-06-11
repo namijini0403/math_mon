@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Jua', 'Pretendard', system-ui, sans-serif;
+  /* 매스몬 팔레트: 밤하늘 던전 + 형광 포인트 */
+  --color-night-950: #0f0d29;
+  --color-night-900: #1e1b4b;
+  --color-night-800: #2b2768;
+  --color-night-700: #3b3585;
+  --color-glow: #a3e635; /* 정답·XP */
+  --color-coin: #fbbf24; /* 별·보상 */
+  --color-hurt: #fb7185; /* 오답·하트 */
+  --color-mana: #60a5fa; /* 보조 포인트 */
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-display);
+  background: var(--color-night-950);
+  color: #f5f3ff;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  overscroll-behavior: none;
+}
+
+/* 듀오링고풍 3D 버튼: 아래 테두리 + 누르면 가라앉음 */
+.btn-3d {
+  border-bottom-width: 4px;
+  transition:
+    transform 0.05s,
+    border-bottom-width 0.05s,
+    margin-top 0.05s;
+}
+.btn-3d:active:not(:disabled) {
+  border-bottom-width: 0px;
+  margin-top: 4px;
+  transform: translateY(0);
+}

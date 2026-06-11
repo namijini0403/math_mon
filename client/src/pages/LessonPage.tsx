@@ -1,0 +1,457 @@
+/**
+ * 레슨/보스전 플레이어
+ * - 레슨: 듀오링고식 한 문제씩 + 하단 피드백 시트, 하트 3개
+ * - 보스전: 문제가 위에서 떨어진다(제한시간). 시간 초과·오답이면 바닥에 블록이 쌓이고,
+ *   3개 쌓이면 패배. 정답이면 보스에게 데미지. 격파 시 보스 카드 획득.
+ */
+
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { getStage } from '../game/stages';
+import { nextProblem, type Served } from '../game/lesson';
+import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
+import { useGame, type EarnedCard } from '../game/store';
+import { sfx } from '../game/sounds';
+import { XP_BOSS_CLEAR, XP_LESSON_CLEAR, XP_PERFECT_BONUS, XP_PER_CORRECT } from '../game/xp';
+import { MathView } from '../components/MathView';
+import { CardView } from '../components/CardView';
+import { ChoiceView } from '../components/problem/ChoiceView';
+import { ComparisonView } from '../components/problem/ComparisonView';
+import { FractionInputView } from '../components/problem/FractionInputView';
+import { FillBlanksView } from '../components/problem/FillBlanksView';
+import { MatchingView } from '../components/problem/MatchingView';
+
+type Phase = 'answering' | 'feedback' | 'result' | 'failed';
+const MAX_MISSES = 3;
+
+export default function LessonPage() {
+  // stageId가 바뀌면 모든 진행 상태를 리셋해야 하므로 key로 강제 리마운트
+  const { stageId = '' } = useParams();
+  return <LessonRunner key={stageId} stageId={stageId} />;
+}
+
+function LessonRunner({ stageId }: { stageId: string }) {
+  const stage = useMemo(() => getStage(stageId), [stageId]);
+  const navigate = useNavigate();
+  const { skillStats, nickname, recordAnswer, addXp, addBossCard, completeStage } = useGame();
+
+  const total = stage.problemCount;
+  const isBoss = stage.type === 'boss';
+
+  const [served, setServed] = useState<Served>(() =>
+    nextProblem(stage, skillStats, 0, useGame.getState().recentWrong),
+  );
+  const [answer, setAnswer] = useState<UserAnswer | null>(null);
+  const [phase, setPhase] = useState<Phase>('answering');
+  const [lastCorrect, setLastCorrect] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
+  const [done, setDone] = useState(0);
+  const [misses, setMisses] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [wrongCount, setWrongCount] = useState(0);
+  const [hitFx, setHitFx] = useState(0);
+  const [timeLeft, setTimeLeft] = useState<number | null>(served.timeLimit);
+  const [result, setResult] = useState<{ stars: number; xp: number; cards: EarnedCard[] } | null>(null);
+
+  const problem = served.problem;
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+
+  // ── 보스전 타이머: 0이 되면 시간 초과 처리 ──
+  useEffect(() => {
+    if (!isBoss || phase !== 'answering' || served.timeLimit === null) return;
+    const startedAt = Date.now();
+    const id = setInterval(() => {
+      const left = served.timeLimit! - (Date.now() - startedAt) / 1000;
+      if (left <= 0) {
+        clearInterval(id);
+        if (phaseRef.current === 'answering') miss(true);
+      } else {
+        setTimeLeft(left);
+      }
+    }, 100);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [problem.id, phase === 'answering']);
+
+  const miss = (timeout: boolean) => {
+    recordAnswer(problem.skillId, false);
+    setLastCorrect(false);
+    setTimedOut(timeout);
+    setMisses((m) => m + 1);
+    setCombo(0);
+    setWrongCount((w) => w + 1);
+    sfx.wrong();
+    setPhase('feedback');
+  };
+
+  const confirm = (forced?: UserAnswer) => {
+    const a = forced ?? answer;
+    if (!a) return;
+    const correct = checkAnswer(problem, a);
+    if (!correct) {
+      miss(false);
+      return;
+    }
+    recordAnswer(problem.skillId, true);
+    setLastCorrect(true);
+    setTimedOut(false);
+    setDone((d) => d + 1);
+    setCombo((c) => c + 1);
+    if (isBoss) {
+      setHitFx((h) => h + 1);
+      sfx.bossHit();
+    } else {
+      sfx.correct();
+      if (combo + 1 >= 3) sfx.combo(combo + 1);
+    }
+    setPhase('feedback');
+  };
+
+  const next = () => {
+    if (!lastCorrect && misses >= MAX_MISSES) {
+      setPhase('failed');
+      return;
+    }
+    if (done >= total) {
+      finish();
+      return;
+    }
+    const s = useGame.getState();
+    const nextServed = nextProblem(stage, s.skillStats, done, s.recentWrong);
+    setServed(nextServed);
+    setTimeLeft(nextServed.timeLimit);
+    setAnswer(null);
+    setPhase('answering');
+  };
+
+  const finish = () => {
+    const perfect = wrongCount === 0;
+    const stars = perfect ? 3 : wrongCount <= 2 ? 2 : 1;
+    const xp =
+      done * XP_PER_CORRECT +
+      (isBoss ? XP_BOSS_CLEAR : XP_LESSON_CLEAR) +
+      (perfect ? XP_PERFECT_BONUS : 0);
+    const cards = [...addXp(xp)];
+    if (isBoss) cards.push(addBossCard(stage.id));
+    completeStage(stage.id, stars, perfect);
+    sfx.fanfare();
+    if (cards.length > 0) setTimeout(() => sfx.levelUp(), 600);
+    setResult({ stars, xp, cards });
+    setPhase('result');
+  };
+
+  const restart = () => {
+    setMisses(0);
+    setDone(0);
+    setCombo(0);
+    setWrongCount(0);
+    const s = useGame.getState();
+    const nextServed = nextProblem(stage, s.skillStats, 0, s.recentWrong);
+    setServed(nextServed);
+    setTimeLeft(nextServed.timeLimit);
+    setAnswer(null);
+    setPhase('answering');
+  };
+
+  // ── 결과 화면 ──
+  if (phase === 'result' && result) {
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6 text-center">
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
+          <div className="text-7xl mb-2">{isBoss ? '🏆' : '🎉'}</div>
+          <h1 className="text-3xl text-glow">{isBoss ? `${stage.boss?.name} 격파!` : '레슨 완료!'}</h1>
+        </motion.div>
+        <div className="flex gap-2 text-5xl">
+          {[1, 2, 3].map((i) => (
+            <motion.span
+              key={i}
+              initial={{ scale: 0, rotate: -30 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.3 + i * 0.25, type: 'spring' }}
+              className={i <= result.stars ? '' : 'opacity-20 grayscale'}
+            >
+              ⭐
+            </motion.span>
+          ))}
+        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2 }}
+          className="rounded-2xl bg-night-800 px-8 py-4 text-xl"
+        >
+          <span className="text-coin">+{result.xp} XP</span>
+        </motion.div>
+
+        {result.cards.length > 0 && (
+          <motion.div
+            initial={{ rotateY: 180, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            transition={{ delay: 1.6, duration: 0.8 }}
+            className="flex flex-col items-center gap-2"
+          >
+            <div className="text-coin text-lg">
+              {isBoss ? '⚔️ 보스 카드 획득! ⚔️' : '✨ 레벨업! 새 카드 획득 ✨'}
+            </div>
+            <CardView card={result.cards[result.cards.length - 1]} nickname={nickname ?? '모험가'} className="w-44" />
+            <div className="text-xs opacity-60">프로필에서 PNG로 저장할 수 있어요</div>
+          </motion.div>
+        )}
+
+        <button
+          onClick={() => navigate('/')}
+          className="btn-3d mt-2 rounded-2xl bg-glow border-glow border-b-lime-600 px-10 py-3 text-xl text-night-950"
+        >
+          계속하기
+        </button>
+      </div>
+    );
+  }
+
+  // ── 실패 화면 ──
+  if (phase === 'failed') {
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6 text-center">
+        <div className="text-7xl">{isBoss ? '🧱' : '💔'}</div>
+        <h1 className="text-2xl">{isBoss ? '문제가 다 쌓여버렸어요!' : '하트를 다 잃었어요...'}</h1>
+        <p className="opacity-70">
+          {isBoss ? `${stage.boss?.name}이(가) 아직 버티고 있어요. 다시 도전!` : '괜찮아요, 다시 해 봐요!'}
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={restart}
+            className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-8 py-3 text-lg text-night-950"
+          >
+            다시 도전
+          </button>
+          <Link to="/" className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-8 py-3 text-lg">
+            지도로
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const locked = phase === 'feedback';
+  const timeRatio = served.timeLimit && timeLeft !== null ? Math.max(0, timeLeft / served.timeLimit) : 1;
+
+  return (
+    <div className="min-h-dvh flex flex-col max-w-xl mx-auto">
+      {/* ── 상단 바 ── */}
+      <div className="flex items-center gap-3 p-4">
+        <Link to="/" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">
+          ✕
+        </Link>
+        {isBoss && stage.boss ? (
+          <div className="flex-1 flex items-center gap-2">
+            <motion.span
+              key={hitFx}
+              animate={hitFx > 0 ? { x: [0, -6, 6, -4, 0], rotate: [0, -8, 6, 0] } : {}}
+              className="text-4xl"
+            >
+              {stage.boss.emoji}
+            </motion.span>
+            <div className="flex-1">
+              <div className="text-xs text-hurt mb-1">
+                {stage.boss.name} {done === 0 && `· "${stage.boss.taunt}"`}
+              </div>
+              <div className="h-4 rounded-full bg-night-800 overflow-hidden border border-night-700">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-hurt to-rose-600"
+                  animate={{ width: `${((total - done) / total) * 100}%` }}
+                />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 h-4 rounded-full bg-night-800 overflow-hidden border border-night-700">
+            <motion.div
+              className="h-full bg-gradient-to-r from-glow to-lime-500"
+              animate={{ width: `${(done / total) * 100}%` }}
+            />
+          </div>
+        )}
+        {!isBoss && (
+          <div className="flex items-center gap-1 text-xl" aria-label={`하트 ${MAX_MISSES - misses}개`}>
+            {[0, 1, 2].map((i) => (
+              <span key={i} className={i < MAX_MISSES - misses ? '' : 'opacity-20 grayscale'}>
+                ❤️
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 보스전: 제한시간 바 (문제가 떨어지는 높이) */}
+      {isBoss && phase === 'answering' && (
+        <div className="px-4">
+          <div className="h-2.5 rounded-full bg-night-800 overflow-hidden">
+            <div
+              className={`h-full transition-[width] duration-100 ${timeRatio > 0.35 ? 'bg-gradient-to-r from-mana to-sky-400' : 'bg-gradient-to-r from-hurt to-rose-500'}`}
+              style={{ width: `${timeRatio * 100}%` }}
+            />
+          </div>
+          <div className="text-right text-xs mt-0.5 opacity-60">⏱ {Math.ceil(timeLeft ?? 0)}초</div>
+        </div>
+      )}
+
+      {/* 배지: 콤보 / 복습 */}
+      <div className="flex justify-center gap-2 min-h-8 mt-1">
+        <AnimatePresence>
+          {served.isReview && phase === 'answering' && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              className="rounded-full bg-mana/20 text-mana px-4 py-1 text-sm"
+            >
+              📌 아까 틀렸던 유형이에요!
+            </motion.div>
+          )}
+          {combo >= 3 && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              className="rounded-full bg-coin/20 text-coin px-4 py-1 text-sm"
+            >
+              🔥 {combo} 연속 정답!
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* ── 문제 영역 ── */}
+      <div className="flex-1 flex flex-col items-center justify-start gap-6 px-5 pb-44 pt-2 relative">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={problem.id}
+            initial={isBoss ? { y: -40, opacity: 0 } : { x: 60, opacity: 0 }}
+            animate={
+              isBoss && phase === 'answering' && served.timeLimit
+                ? { y: [0, 110], opacity: 1, x: 0 }
+                : { x: 0, y: isBoss ? 110 : 0, opacity: 1 }
+            }
+            exit={isBoss ? { y: 200, opacity: 0 } : { x: -60, opacity: 0 }}
+            transition={
+              isBoss && phase === 'answering' && served.timeLimit
+                ? { y: { duration: served.timeLimit, ease: 'linear' }, opacity: { duration: 0.2 } }
+                : { duration: 0.25 }
+            }
+            className="w-full flex flex-col items-center gap-6"
+          >
+            <h2 className="text-xl text-center opacity-90">{problem.prompt}</h2>
+            {problem.expr && problem.format !== 'fill-blanks' && (
+              <div className="rounded-3xl bg-night-900 border border-night-700 px-6 py-6 w-full text-center">
+                <MathView expr={problem.expr} size="lg" />
+              </div>
+            )}
+
+            {problem.format === 'choice' && (
+              <ChoiceView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
+            )}
+            {problem.format === 'comparison' && (
+              <ComparisonView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
+            )}
+            {problem.format === 'fraction-input' && (
+              <FractionInputView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
+            )}
+            {problem.format === 'fill-blanks' && (
+              <div className="rounded-3xl bg-night-900 border border-night-700 px-6 py-8 w-full">
+                <FillBlanksView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
+              </div>
+            )}
+            {problem.format === 'matching' && (
+              <MatchingView
+                problem={problem}
+                locked={locked}
+                onComplete={(mistakes) => confirm({ kind: 'matching', mistakes })}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* 보스전: 쌓인 블록 */}
+      {isBoss && (
+        <div className="fixed bottom-24 left-0 right-0 pointer-events-none">
+          <div className="max-w-xl mx-auto px-5 flex gap-1.5 items-end">
+            {Array.from({ length: misses }).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{ y: -30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="flex-1 h-9 rounded-lg bg-gradient-to-b from-stone-500 to-stone-700 border-b-4 border-stone-800 flex items-center justify-center text-sm"
+              >
+                🧱
+              </motion.div>
+            ))}
+            {Array.from({ length: MAX_MISSES - misses }).map((_, i) => (
+              <div key={`e${i}`} className="flex-1 h-9 rounded-lg border-2 border-dashed border-night-700 opacity-40" />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 하단: 확인 버튼 / 피드백 시트 ── */}
+      <div className="fixed bottom-0 left-0 right-0 z-10">
+        <div className="max-w-xl mx-auto">
+          <AnimatePresence>
+            {phase === 'feedback' ? (
+              <motion.div
+                key="feedback"
+                initial={{ y: 200 }}
+                animate={{ y: 0 }}
+                exit={{ y: 200 }}
+                transition={{ type: 'spring', damping: 22 }}
+                className={`rounded-t-3xl p-5 pb-7 ${lastCorrect ? 'bg-lime-950' : 'bg-rose-950'}`}
+              >
+                <div className={`text-2xl mb-1 ${lastCorrect ? 'text-glow' : 'text-hurt'}`}>
+                  {lastCorrect
+                    ? isBoss
+                      ? ['치명타! ⚔️', '명중! 🏹', '강력한 한 방! 💥'][done % 3]
+                      : ['정답이에요! 🎉', '완벽해요! ✨', '대단해요! 💪'][done % 3]
+                    : timedOut
+                      ? '💥 시간 초과! 문제가 쌓였어요!'
+                      : isBoss
+                        ? '빗나갔어요! 문제가 쌓였어요! 🧱'
+                        : '아쉬워요! 😢'}
+                </div>
+                {!lastCorrect && (
+                  <div className="text-sm leading-relaxed opacity-90 mb-1">
+                    <MathView expr={problem.explanation} size="md" className="justify-start" />
+                  </div>
+                )}
+                <button
+                  onClick={next}
+                  autoFocus
+                  className={`btn-3d w-full mt-3 rounded-2xl py-3.5 text-xl text-night-950 ${
+                    lastCorrect
+                      ? 'bg-glow border-glow border-b-lime-600'
+                      : 'bg-hurt border-hurt border-b-rose-600'
+                  }`}
+                >
+                  계속하기
+                </button>
+              </motion.div>
+            ) : (
+              problem.format !== 'matching' && (
+                <motion.div key="confirm" className="p-4 bg-night-950/90 backdrop-blur">
+                  <button
+                    onClick={() => confirm()}
+                    disabled={!isAnswerReady(problem, answer)}
+                    className="btn-3d w-full rounded-2xl py-3.5 text-xl bg-glow border-glow border-b-lime-600 text-night-950 disabled:opacity-30 disabled:cursor-not-allowed"
+                  >
+                    확인
+                  </button>
+                </motion.div>
+              )
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
