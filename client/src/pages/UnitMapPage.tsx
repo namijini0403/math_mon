@@ -38,8 +38,9 @@ function StageNode({ stage, index, unlocked, stars }: { stage: StageDef; index: 
       >
         {stage.emoji}
       </div>
+      {/* 별은 절대배치 없이 일반 흐름으로 — 어떤 글씨와도 겹치지 않게 */}
       {stars > 0 && (
-        <div className="absolute -bottom-2 flex text-sm drop-shadow">
+        <div className="flex text-sm drop-shadow mt-1">
           {[1, 2, 3].map((i) => (
             <span key={i} className={i <= stars ? '' : 'opacity-25 grayscale'}>
               ⭐
@@ -47,8 +48,7 @@ function StageNode({ stage, index, unlocked, stars }: { stage: StageDef; index: 
           ))}
         </div>
       )}
-      {/* 별이 노드 아래로 튀어나오므로 제목과 겹치지 않게 여백 확보 */}
-      <div className={`${stars > 0 ? 'mt-6' : 'mt-3'} text-sm text-center opacity-90 max-w-28`}>
+      <div className="mt-1.5 text-sm text-center opacity-90 max-w-28">
         {stage.title}
       </div>
     </motion.div>
@@ -205,7 +205,7 @@ export default function UnitMapPage() {
         >
           <div className="text-3xl mb-1">🌌</div>
           <div className="text-sm">심화 연습</div>
-          <div className="text-[0.65rem] opacity-50">최고 수준 무한 모드</div>
+          <div className="text-[0.65rem] opacity-50">고난도 문제 무한 모드</div>
         </Link>
         <Link
           to="/exam"

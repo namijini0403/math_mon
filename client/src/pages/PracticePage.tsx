@@ -45,7 +45,7 @@ const MODES = {
   challenge: {
     title: '심화 연습',
     emoji: '🌌',
-    desc: '최고 수준 도전!',
+    desc: '고난도 문제 도전!',
     pool: () => {
       const scoped = semesterScopedSkills();
       const ch = scoped.filter((s) => s.challenge === true);

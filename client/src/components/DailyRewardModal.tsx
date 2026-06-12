@@ -229,7 +229,7 @@ export default function DailyRewardModal() {
                     transition={{ delay: 0.5 }}
                     className="rounded-2xl bg-night-800 border border-coin/40 px-4 py-2 text-sm text-coin text-center"
                   >
-                    🃏 레벨업 카드도 획득했어요!
+                    🏵️ 레벨업 메달도 획득했어요!
                   </motion.div>
                 )}
 

@@ -183,14 +183,18 @@ function LessonRunner({ stageId }: { stageId: string }) {
       (perfect ? XP_PERFECT_BONUS : 0) +
       comboBonus;
     const isFirstLesson = game.records.lessonsCompleted === 0;
+    // 보물 카드·격파 메달은 첫 클리어에만 — 재도전은 XP·별만 (카드는 드물어야 가치 있다!)
+    const isFirstClear = (game.stages[stage.id]?.stars ?? 0) === 0;
     const cards = [...addXp(xp)];
-    if (isBoss) {
+    if (isBoss && isFirstClear) {
       cards.push(addBossCard(stage.id));
       treasures.push({ ...game.drawTreasureCard(), label: '보스 격파 보상' });
     }
     if (isChallenge) {
       game.recordChallengeClear();
-      treasures.push({ ...useGame.getState().drawTreasureCard(), label: '심화 탐험 보상' });
+      if (isFirstClear) {
+        treasures.push({ ...useGame.getState().drawTreasureCard(), label: '심화 탐험 보상' });
+      }
     }
     game.reportCombo(maxComboRef.current);
     completeStage(stage.id, stars, perfect);
@@ -227,9 +231,10 @@ function LessonRunner({ stageId }: { stageId: string }) {
   };
 
   // ── 결과 화면 ──
+  // justify-center는 내용이 화면보다 길어지면(보물 연출 등) 위가 잘리며 겹쳐 보이므로 상단 정렬 + 여백
   if (phase === 'result' && result) {
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6 text-center">
+      <div className="min-h-dvh flex flex-col items-center gap-6 p-6 pt-16 pb-12 text-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
           <div className="text-7xl mb-2">{isBoss ? '🏆' : isChallenge ? '🌌' : '🎉'}</div>
           <h1 className="text-3xl text-glow">
@@ -304,12 +309,24 @@ function LessonRunner({ stageId }: { stageId: string }) {
           </motion.div>
         )}
 
-        <button
-          onClick={() => navigate('/')}
-          className="btn-3d mt-2 rounded-2xl bg-glow border-glow border-b-lime-600 px-10 py-3 text-xl text-night-950"
-        >
-          계속하기
-        </button>
+        <div className="flex gap-3 mt-2">
+          <button
+            onClick={() => {
+              setResult(null);
+              restart();
+            }}
+            className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-7 py-3 text-xl"
+          >
+            🔄 한 번 더!
+          </button>
+          <button
+            onClick={() => navigate('/')}
+            className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-10 py-3 text-xl text-night-950"
+          >
+            계속하기
+          </button>
+        </div>
+        <div className="text-xs opacity-50">깬 스테이지도 언제든 다시 도전할 수 있어요 — 문제는 매번 새로 나와요!</div>
       </div>
     );
   }
