@@ -64,9 +64,10 @@ function checkCommon(p: Problem, skillId: string, seed: number) {
   expect(p.explanation.length).toBeGreaterThan(0);
 
   // 수 범위: 분모 양수·상한, 분자 0 이상, 자연수부 0 이상
+  // (10/100/1000/10000은 소수 자릿값 설명용 분수라 허용)
   for (const f of collectFracs(p)) {
     expect(f.d).toBeGreaterThan(0);
-    expect(f.d).toBeLessThanOrEqual(MAX_DENOM);
+    if (![10, 100, 1000, 10000].includes(f.d)) expect(f.d).toBeLessThanOrEqual(MAX_DENOM);
     expect(f.n).toBeGreaterThanOrEqual(0);
     expect(Number.isInteger(f.n) && Number.isInteger(f.d)).toBe(true);
     if (f.whole !== undefined) {
@@ -90,6 +91,12 @@ function checkFormat(p: Problem) {
         return Number.isNaN(n) ? `t:${c.kind === 'text' ? c.text : ''}` : `n:${n.toFixed(9)}`;
       });
       expect(new Set(keys).size).toBe(4);
+      break;
+    }
+    case 'decimal-input': {
+      expect(p.answer).toBeGreaterThan(0);
+      // 소수점 이하 4자리 안에서 정확히 표현되는 값이어야 함
+      expect(Math.abs(p.answer * 10000 - Math.round(p.answer * 10000))).toBeLessThan(1e-6);
       break;
     }
     case 'fraction-input': {
@@ -241,13 +248,13 @@ describe.each(SKILLS.map((s) => [s.id, s] as const))('%s', (skillId, skill) => {
     }
   });
 
-  it('다양한 문제가 나온다 (1000개 중 고유 문제 60개 이상)', () => {
+  it('다양한 문제가 나온다 (스킬별 다양성 하한 충족)', () => {
     const set = new Set<string>();
     for (let i = 0; i < SAMPLES; i++) {
       const p = skill.generate(i * 31 + 7);
       const { id, seed, ...rest } = p;
       set.add(JSON.stringify(rest));
     }
-    expect(set.size).toBeGreaterThanOrEqual(60);
+    expect(set.size).toBeGreaterThanOrEqual(skill.minVariety ?? 60);
   });
 });

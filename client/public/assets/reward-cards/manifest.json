@@ -1,0 +1,22 @@
+[
+  { "id": "reward-common-01", "rarity": "common", "title": "Astral Compass", "src": "assets/reward-cards/reward-common-01.png" },
+  { "id": "reward-common-02", "rarity": "common", "title": "Moonlit Abacus", "src": "assets/reward-cards/reward-common-02.png" },
+  { "id": "reward-common-03", "rarity": "common", "title": "Crystal Polygon Garden", "src": "assets/reward-cards/reward-common-03.png" },
+  { "id": "reward-common-04", "rarity": "common", "title": "Fraction Chalice", "src": "assets/reward-cards/reward-common-04.png" },
+  { "id": "reward-common-05", "rarity": "common", "title": "The Silent Spellbook", "src": "assets/reward-cards/reward-common-05.png" },
+  { "id": "reward-common-06", "rarity": "common", "title": "Geometric Gate", "src": "assets/reward-cards/reward-common-06.png" },
+  { "id": "reward-common-07", "rarity": "common", "title": "Starlit Hourglass", "src": "assets/reward-cards/reward-common-07.png" },
+  { "id": "reward-common-08", "rarity": "common", "title": "Mystic Ruler", "src": "assets/reward-cards/reward-common-08.png" },
+  { "id": "reward-common-09", "rarity": "common", "title": "Aurora Library", "src": "assets/reward-cards/reward-common-09.png" },
+  { "id": "reward-common-10", "rarity": "common", "title": "Prism Orchard", "src": "assets/reward-cards/reward-common-10.png" },
+  { "id": "reward-common-11", "rarity": "common", "title": "Golden Ratio Shell", "src": "assets/reward-cards/reward-common-11.png" },
+  { "id": "reward-common-12", "rarity": "common", "title": "Lantern Labyrinth", "src": "assets/reward-cards/reward-common-12.png" },
+  { "id": "reward-rare-01", "rarity": "rare", "title": "Celestial Sage", "src": "assets/reward-cards/reward-rare-01.png" },
+  { "id": "reward-rare-02", "rarity": "rare", "title": "Fraction Crown Knight", "src": "assets/reward-cards/reward-rare-02.png" },
+  { "id": "reward-rare-03", "rarity": "rare", "title": "Infinity Observatory", "src": "assets/reward-cards/reward-rare-03.png" },
+  { "id": "reward-rare-04", "rarity": "rare", "title": "Sapphire Dragon Scholar", "src": "assets/reward-cards/reward-rare-04.png" },
+  { "id": "reward-rare-05", "rarity": "rare", "title": "Sun-Moon Equation Altar", "src": "assets/reward-cards/reward-rare-05.png" },
+  { "id": "reward-rare-06", "rarity": "rare", "title": "Arcane Lotus", "src": "assets/reward-cards/reward-rare-06.png" },
+  { "id": "reward-legendary-01", "rarity": "legendary", "title": "Radiant Geometer", "src": "assets/reward-cards/reward-legendary-01.png" },
+  { "id": "reward-legendary-02", "rarity": "legendary", "title": "Crown of Infinite Stars", "src": "assets/reward-cards/reward-legendary-02.png" }
+]

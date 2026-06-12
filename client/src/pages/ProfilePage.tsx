@@ -1,4 +1,4 @@
-/** 프로필 — 통계 + 인증카드 컬렉션 + PNG 다운로드 */
+/** 프로필 — 통계 + 배지 컬렉션 + 인증카드 컬렉션 + PNG 다운로드 */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -7,12 +7,21 @@ import { useGame, type EarnedCard } from '../game/store';
 import { levelFromXp } from '../game/xp';
 import { CardView } from '../components/CardView';
 import { downloadCardPng } from '../card/renderCardPng';
+import { BADGES, type BadgeDef } from '../game/badges';
+
+/** 희귀도별 테두리 + glow 스타일 */
+function rarityStyle(rarity: 1 | 2 | 3): string {
+  if (rarity === 3) return 'border-coin shadow-[0_0_10px_2px_rgba(251,191,36,0.55)]';
+  if (rarity === 2) return 'border-[#c0c0c0] shadow-[0_0_8px_1px_rgba(192,192,192,0.45)]';
+  return 'border-[#cd7f32] shadow-[0_0_6px_1px_rgba(205,127,50,0.35)]';
+}
 
 export default function ProfilePage() {
-  const { nickname, xp, cards, streak, skillStats, resetAll } = useGame();
+  const { nickname, xp, cards, streak, skillStats, badges, resetAll } = useGame();
   const { level } = levelFromXp(xp);
   const [selected, setSelected] = useState<EarnedCard | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState<BadgeDef | null>(null);
 
   const totalCorrect = Object.values(skillStats).reduce((s, v) => s + v.c, 0);
 
@@ -41,6 +50,93 @@ export default function ProfilePage() {
           <div className="text-2xl">🎯</div>
           <div className="text-xs opacity-70">{totalCorrect}문제</div>
         </div>
+      </div>
+
+      {/* ── 배지 컬렉션 ── */}
+      <h2 className="mt-7 mb-3 text-lg flex items-center gap-2">
+        🏅 배지{' '}
+        <span className="text-sm opacity-60">
+          ({badges.length}/{BADGES.length})
+        </span>
+      </h2>
+      <div className="rounded-3xl bg-night-900 border border-night-700 p-4">
+        <div className="grid grid-cols-4 gap-3">
+          {BADGES.map((b) => {
+            const owned = badges.includes(b.id);
+            return (
+              <motion.button
+                key={b.id}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setSelectedBadge(selectedBadge?.id === b.id ? null : b)}
+                aria-label={owned ? `${b.name}: ${b.desc}` : '잠긴 배지'}
+                className={`flex flex-col items-center rounded-2xl border-2 p-2 gap-1 transition-all ${
+                  owned
+                    ? rarityStyle(b.rarity)
+                    : 'border-night-700 opacity-30 grayscale'
+                } ${selectedBadge?.id === b.id ? 'ring-2 ring-white/40' : ''}`}
+              >
+                <span className="text-2xl leading-none">
+                  {owned ? b.emoji : '🔒'}
+                </span>
+                <span className="text-[9px] leading-tight text-center line-clamp-2 opacity-80">
+                  {owned ? b.name : '???'}
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {/* 배지 상세 — 탭한 배지 하단에 표시 */}
+        <AnimatePresence>
+          {selectedBadge && (
+            <motion.div
+              key={selectedBadge.id}
+              initial={{ opacity: 0, y: -8, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -8, height: 0 }}
+              transition={{ duration: 0.22 }}
+              className="overflow-hidden"
+            >
+              <div
+                className={`mt-4 rounded-2xl border-2 p-4 flex items-center gap-3 ${
+                  badges.includes(selectedBadge.id)
+                    ? rarityStyle(selectedBadge.rarity)
+                    : 'border-night-700 opacity-50'
+                } bg-night-800`}
+              >
+                <span className="text-4xl">
+                  {badges.includes(selectedBadge.id) ? selectedBadge.emoji : '🔒'}
+                </span>
+                <div className="flex-1">
+                  <div className="font-bold text-sm">
+                    {badges.includes(selectedBadge.id) ? selectedBadge.name : '???'}
+                  </div>
+                  <div className="text-xs opacity-70 mt-0.5">
+                    {badges.includes(selectedBadge.id)
+                      ? selectedBadge.desc
+                      : '아직 획득하지 못한 배지예요. 계속 도전해 보세요!'}
+                  </div>
+                  {badges.includes(selectedBadge.id) && (
+                    <div className="text-[10px] mt-1 opacity-50">
+                      {selectedBadge.rarity === 3
+                        ? '✨ 골드 — 최고 등급 배지!'
+                        : selectedBadge.rarity === 2
+                          ? '🥈 실버 배지'
+                          : '🥉 브론즈 배지'}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSelectedBadge(null)}
+                  className="opacity-40 text-xl px-1"
+                  aria-label="닫기"
+                >
+                  ×
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <h2 className="mt-7 mb-3 text-lg">

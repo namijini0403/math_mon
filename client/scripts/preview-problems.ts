@@ -23,6 +23,9 @@ function show(p: Problem): string {
       lines.push(`    정답: ${a.whole !== undefined ? `${a.whole} ` : ''}${a.n}/${a.d}`);
       break;
     }
+    case 'decimal-input':
+      lines.push(`    정답: ${p.answer}${p.unit ?? ''}`);
+      break;
     case 'comparison':
       lines.push(`    ${exprToText(p.left)} [${p.answer}] ${exprToText(p.right)}`);
       break;

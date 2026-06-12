@@ -2,6 +2,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import DailyRewardModal from '../components/DailyRewardModal';
 import { STAGES, UNIT_ORDER, UNIT_TITLES, type StageDef } from '../game/stages';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
@@ -115,6 +116,7 @@ export default function UnitMapPage() {
 
   return (
     <div className="max-w-xl mx-auto px-5 pb-16">
+      <DailyRewardModal />
       {/* ── 헤더 ── */}
       <div className="sticky top-0 z-10 bg-night-950/90 backdrop-blur py-3 flex items-center gap-3">
         <Link to="/profile" className="flex items-center gap-2" aria-label="프로필">
@@ -166,6 +168,12 @@ export default function UnitMapPage() {
       {/* ── 유닛맵 ── */}
       {UNIT_ORDER.map((unitId) => (
         <section key={unitId} className="mt-8">
+          {unitId === 'unitMix' && (
+            <div className="mb-4 text-center text-coin text-xl tracking-widest">🌱 1학기 🌱</div>
+          )}
+          {unitId === 'unitRange' && (
+            <div className="mb-4 mt-14 text-center text-coin text-xl tracking-widest">🍁 2학기 🍁</div>
+          )}
           <div className="rounded-2xl bg-night-800 border border-night-700 px-5 py-3 text-center text-lg">
             {UNIT_TITLES[unitId]}
           </div>

@@ -38,6 +38,15 @@ export interface ChoiceProblem extends ProblemBase {
   answerIndex: number;
 }
 
+/** 소수 직접 입력 (소수의 곱셈 등) */
+export interface DecimalInputProblem extends ProblemBase {
+  format: 'decimal-input';
+  /** 정답 — 소수점 이하 최대 4자리의 정확한 십진수 */
+  answer: number;
+  /** 입력 칸 뒤에 붙는 단위 (예: 'cm') */
+  unit?: string;
+}
+
 /** 분수 직접 입력 (mixed=true면 자연수 칸 포함) */
 export interface FractionInputProblem extends ProblemBase {
   format: 'fraction-input';
@@ -71,6 +80,7 @@ export interface MatchingProblem extends ProblemBase {
 export type Problem =
   | ChoiceProblem
   | FractionInputProblem
+  | DecimalInputProblem
   | ComparisonProblem
   | FillBlanksProblem
   | MatchingProblem;
@@ -88,6 +98,11 @@ export interface SkillDef {
   difficulty: 1 | 2 | 3;
   /** 문장제 여부 (연습 모드 분류용) */
   word?: boolean;
+  /**
+   * 다양성 하한 (1000샘플 중 고유 문제 수). 기본 60.
+   * 개념 암기형 스킬(예: 직육면체 면 개수)은 가짓수가 본질적으로 적으므로 낮게 지정.
+   */
+  minVariety?: number;
   generate: (seed: number) => Problem;
 }
 

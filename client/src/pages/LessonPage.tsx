@@ -14,11 +14,13 @@ import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { useGame, type EarnedCard } from '../game/store';
 import { sfx } from '../game/sounds';
 import { XP_BOSS_CLEAR, XP_LESSON_CLEAR, XP_PERFECT_BONUS, XP_PER_CORRECT } from '../game/xp';
+import { COMBO_BONUS, type BadgeDef } from '../game/badges';
 import { MathView } from '../components/MathView';
 import { CardView } from '../components/CardView';
 import { ChoiceView } from '../components/problem/ChoiceView';
 import { ComparisonView } from '../components/problem/ComparisonView';
 import { FractionInputView } from '../components/problem/FractionInputView';
+import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
 
@@ -52,7 +54,15 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const [wrongCount, setWrongCount] = useState(0);
   const [hitFx, setHitFx] = useState(0);
   const [timeLeft, setTimeLeft] = useState<number | null>(served.timeLimit);
-  const [result, setResult] = useState<{ stars: number; xp: number; cards: EarnedCard[] } | null>(null);
+  const [comboBonus, setComboBonus] = useState(0);
+  const [bonusToast, setBonusToast] = useState<string | null>(null);
+  const [result, setResult] = useState<{
+    stars: number;
+    xp: number;
+    cards: EarnedCard[];
+    badges: BadgeDef[];
+  } | null>(null);
+  const maxComboRef = useRef(0);
 
   const problem = served.problem;
   const phaseRef = useRef(phase);
@@ -98,7 +108,16 @@ function LessonRunner({ stageId }: { stageId: string }) {
     setLastCorrect(true);
     setTimedOut(false);
     setDone((d) => d + 1);
-    setCombo((c) => c + 1);
+    const newCombo = combo + 1;
+    setCombo(newCombo);
+    maxComboRef.current = Math.max(maxComboRef.current, newCombo);
+    // 콤보 마일스톤 보너스 XP (5/10/20 도달 순간)
+    const bonus = COMBO_BONUS[newCombo];
+    if (bonus) {
+      setComboBonus((b) => b + bonus);
+      setBonusToast(`🔥 ${newCombo}콤보 보너스 +${bonus} XP!`);
+      setTimeout(() => setBonusToast(null), 2200);
+    }
     if (isBoss) {
       setHitFx((h) => h + 1);
       sfx.bossHit();
@@ -132,13 +151,17 @@ function LessonRunner({ stageId }: { stageId: string }) {
     const xp =
       done * XP_PER_CORRECT +
       (isBoss ? XP_BOSS_CLEAR : XP_LESSON_CLEAR) +
-      (perfect ? XP_PERFECT_BONUS : 0);
+      (perfect ? XP_PERFECT_BONUS : 0) +
+      comboBonus;
     const cards = [...addXp(xp)];
     if (isBoss) cards.push(addBossCard(stage.id));
+    const game = useGame.getState();
+    game.reportCombo(maxComboRef.current);
     completeStage(stage.id, stars, perfect);
+    const badges = useGame.getState().evaluateBadges();
     sfx.fanfare();
-    if (cards.length > 0) setTimeout(() => sfx.levelUp(), 600);
-    setResult({ stars, xp, cards });
+    if (cards.length > 0 || badges.length > 0) setTimeout(() => sfx.levelUp(), 600);
+    setResult({ stars, xp, cards, badges });
     setPhase('result');
   };
 
@@ -147,6 +170,8 @@ function LessonRunner({ stageId }: { stageId: string }) {
     setDone(0);
     setCombo(0);
     setWrongCount(0);
+    setComboBonus(0);
+    maxComboRef.current = 0;
     const s = useGame.getState();
     const nextServed = nextProblem(stage, s.skillStats, 0, s.recentWrong);
     setServed(nextServed);
@@ -183,7 +208,27 @@ function LessonRunner({ stageId }: { stageId: string }) {
           className="rounded-2xl bg-night-800 px-8 py-4 text-xl"
         >
           <span className="text-coin">+{result.xp} XP</span>
+          {comboBonus > 0 && <span className="text-sm opacity-70 ml-2">(콤보 보너스 +{comboBonus} 포함)</span>}
         </motion.div>
+
+        {result.badges.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 1.4, type: 'spring' }}
+            className="flex flex-col items-center gap-2"
+          >
+            <div className="text-mana text-lg">🏅 새 배지 획득!</div>
+            <div className="flex gap-3 flex-wrap justify-center">
+              {result.badges.map((b) => (
+                <div key={b.id} className="rounded-2xl bg-night-800 border border-mana/40 px-4 py-3 text-center">
+                  <div className="text-3xl">{b.emoji}</div>
+                  <div className="text-sm text-mana">{b.name}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {result.cards.length > 0 && (
           <motion.div
@@ -310,15 +355,27 @@ function LessonRunner({ stageId }: { stageId: string }) {
               📌 아까 틀렸던 유형이에요!
             </motion.div>
           )}
-          {combo >= 3 && (
+          {bonusToast ? (
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              key="bonus"
+              initial={{ scale: 0, y: -8 }}
+              animate={{ scale: 1.1, y: 0 }}
               exit={{ scale: 0 }}
-              className="rounded-full bg-coin/20 text-coin px-4 py-1 text-sm"
+              className="rounded-full bg-coin text-night-950 px-4 py-1 text-sm font-bold shadow-lg shadow-coin/40"
             >
-              🔥 {combo} 연속 정답!
+              {bonusToast}
             </motion.div>
+          ) : (
+            combo >= 3 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
+                className="rounded-full bg-coin/20 text-coin px-4 py-1 text-sm"
+              >
+                🔥 {combo} 연속 정답!
+              </motion.div>
+            )
           )}
         </AnimatePresence>
       </div>
@@ -357,6 +414,9 @@ function LessonRunner({ stageId }: { stageId: string }) {
             )}
             {problem.format === 'fraction-input' && (
               <FractionInputView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
+            )}
+            {problem.format === 'decimal-input' && (
+              <DecimalInputView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
             )}
             {problem.format === 'fill-blanks' && (
               <div className="rounded-3xl bg-night-900 border border-night-700 px-6 py-8 w-full">

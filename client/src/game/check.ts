@@ -6,6 +6,7 @@ import type { Problem } from '../generator/types';
 export type UserAnswer =
   | { kind: 'choice'; index: number }
   | { kind: 'fraction'; whole: number | null; n: number | null; d: number | null }
+  | { kind: 'decimal'; text: string }
   | { kind: 'comparison'; symbol: '<' | '=' | '>' }
   | { kind: 'blanks'; values: (number | null)[] }
   | { kind: 'matching'; mistakes: number };
@@ -25,6 +26,13 @@ export function checkAnswer(p: Problem, a: UserAnswer): boolean {
     case 'matching':
       // 매칭은 뷰에서 완주 — 한 번도 틀리지 않아야 정답 처리
       return a.kind === 'matching' && a.mistakes === 0;
+    case 'decimal-input': {
+      if (a.kind !== 'decimal') return false;
+      const v = Number(a.text);
+      if (!Number.isFinite(v)) return false;
+      // 부동소수점 오차 회피: 만 배 정수로 비교
+      return Math.round(v * 10000) === Math.round(p.answer * 10000);
+    }
     case 'fraction-input': {
       if (a.kind !== 'fraction' || a.n === null || a.d === null || a.d === 0) return false;
       const input = { whole: a.whole ?? 0, n: a.n, d: a.d };
@@ -49,6 +57,8 @@ export function isAnswerReady(p: Problem, a: UserAnswer | null): boolean {
       return true;
     case 'fraction':
       return a.n !== null && a.d !== null && (p.format !== 'fraction-input' || !p.mixed || a.whole !== null);
+    case 'decimal':
+      return a.text.length > 0 && Number.isFinite(Number(a.text));
     case 'blanks':
       return a.values.every((v) => v !== null);
     case 'matching':

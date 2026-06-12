@@ -6,10 +6,16 @@ import { unitMixSkills } from './units/unitMix';
 import { unitDivSkills } from './units/unitDiv';
 import { unitPatternSkills } from './units/unitPattern';
 import { unitPolySkills } from './units/unitPoly';
+import { unitRangeSkills } from './units/unitRange';
+import { unitFracMulSkills } from './units/unitFracMul';
+import { unitSymSkills } from './units/unitSym';
+import { unitDecMulSkills } from './units/unitDecMul';
+import { unitCuboidSkills } from './units/unitCuboid';
+import { unitAvgSkills } from './units/unitAvg';
 import type { Problem, SkillDef, UnitDef } from './types';
 import { randomSeed } from './rng';
 
-/** 2022 개정교육과정 5-1 단원 순서 */
+/** 2022 개정교육과정 5학년 단원 순서 (1학기 → 2학기) */
 export const SKILLS: SkillDef[] = [
   ...unitMixSkills,
   ...unitDivSkills,
@@ -17,6 +23,12 @@ export const SKILLS: SkillDef[] = [
   ...unit1Skills,
   ...unit2Skills,
   ...unitPolySkills,
+  ...unitRangeSkills,
+  ...unitFracMulSkills,
+  ...unitSymSkills,
+  ...unitDecMulSkills,
+  ...unitCuboidSkills,
+  ...unitAvgSkills,
 ];
 
 const skillMap = new Map(SKILLS.map((s) => [s.id, s]));
@@ -28,6 +40,12 @@ export const UNITS: UnitDef[] = [
   { id: 'unit1', title: '4. 약분과 통분', skillIds: unit1Skills.map((s) => s.id) },
   { id: 'unit2', title: '5. 분수의 덧셈과 뺄셈', skillIds: unit2Skills.map((s) => s.id) },
   { id: 'unitPoly', title: '6. 다각형의 둘레와 넓이', skillIds: unitPolySkills.map((s) => s.id) },
+  { id: 'unitRange', title: '2학기 1. 수의 범위와 어림하기', skillIds: unitRangeSkills.map((s) => s.id) },
+  { id: 'unitFracMul', title: '2학기 2. 분수의 곱셈', skillIds: unitFracMulSkills.map((s) => s.id) },
+  { id: 'unitSym', title: '2학기 3. 합동과 대칭', skillIds: unitSymSkills.map((s) => s.id) },
+  { id: 'unitDecMul', title: '2학기 4. 소수의 곱셈', skillIds: unitDecMulSkills.map((s) => s.id) },
+  { id: 'unitCuboid', title: '2학기 5. 직육면체', skillIds: unitCuboidSkills.map((s) => s.id) },
+  { id: 'unitAvg', title: '2학기 6. 평균과 가능성', skillIds: unitAvgSkills.map((s) => s.id) },
 ];
 
 export function getSkill(skillId: string): SkillDef {

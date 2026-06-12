@@ -68,4 +68,11 @@ export const BOSS_CARDS: Record<string, BossCardDef> = {
   'sd-boss': { name: '골렘 파괴자', subtitle: 'GOLEM BREAKER', colors: ['#0c4a6e', '#0ea5e9'], accent: '#bae6fd', emoji: '🤖' },
   'sp-boss': { name: '미로의 정복자', subtitle: 'MAZE MASTER', colors: ['#3f2d12', '#d97706'], accent: '#fde68a', emoji: '🦉' },
   'sg-boss': { name: '거미여왕 토벌자', subtitle: 'QUEEN SLAYER', colors: ['#172554', '#7c3aed'], accent: '#ddd6fe', emoji: '🕷️' },
+  // ── 5-2 보스 ──
+  'sr-boss': { name: '안개를 걷는 자', subtitle: 'MIST WALKER', colors: ['#1e293b', '#94a3b8'], accent: '#e2e8f0', emoji: '🧙' },
+  'sf-boss': { name: '타이탄 슬레이어', subtitle: 'TITAN SLAYER', colors: ['#451a03', '#f472b6'], accent: '#fce7f3', emoji: '🍰' },
+  'sy-boss': { name: '거울 파괴자', subtitle: 'MIRROR BREAKER', colors: ['#0f172a', '#22d3ee'], accent: '#cffafe', emoji: '🪞' },
+  'sdm-boss': { name: '닌자 사냥꾼', subtitle: 'NINJA HUNTER', colors: ['#18181b', '#ef4444'], accent: '#fecaca', emoji: '🥷' },
+  'scb-boss': { name: '큐브 정복자', subtitle: 'CUBE CONQUEROR', colors: ['#14532d', '#34d399'], accent: '#d1fae5', emoji: '🎲' },
+  'sa-boss': { name: '운명의 승부사', subtitle: 'FATE GAMBLER', colors: ['#2e1065', '#f59e0b'], accent: '#fef3c7', emoji: '🔮' },
 };

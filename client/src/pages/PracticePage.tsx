@@ -15,6 +15,7 @@ import { MathView } from '../components/MathView';
 import { ChoiceView } from '../components/problem/ChoiceView';
 import { ComparisonView } from '../components/problem/ComparisonView';
 import { FractionInputView } from '../components/problem/FractionInputView';
+import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
 
@@ -145,6 +146,9 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
             )}
             {problem.format === 'fraction-input' && (
               <FractionInputView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
+            )}
+            {problem.format === 'decimal-input' && (
+              <DecimalInputView problem={problem} answer={answer} onChange={setAnswer} locked={locked} />
             )}
             {problem.format === 'fill-blanks' && (
               <div className="rounded-3xl bg-night-900 border border-night-700 px-6 py-8 w-full">
