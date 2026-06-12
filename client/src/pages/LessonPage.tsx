@@ -16,6 +16,7 @@ import { sfx } from '../game/sounds';
 import { XP_BOSS_CLEAR, XP_LESSON_CLEAR, XP_PERFECT_BONUS, XP_PER_CORRECT } from '../game/xp';
 import { COMBO_BONUS, type BadgeDef } from '../game/badges';
 import { RARITY_COLOR, RARITY_LABEL, type RewardCardDef } from '../game/rewardCards';
+import { answerToText } from '../generator/render-text';
 import { MathView } from '../components/MathView';
 import { CardView } from '../components/CardView';
 import { ChoiceView } from '../components/problem/ChoiceView';
@@ -37,7 +38,8 @@ export default function LessonPage() {
 function LessonRunner({ stageId }: { stageId: string }) {
   const stage = useMemo(() => getStage(stageId), [stageId]);
   const navigate = useNavigate();
-  const { skillStats, nickname, recordAnswer, addXp, addBossCard, completeStage } = useGame();
+  const { skillStats, nickname, showAnswers, recordAnswer, addXp, addBossCard, completeStage } =
+    useGame();
 
   const total = stage.problemCount;
   const isBoss = stage.type === 'boss';
@@ -453,6 +455,11 @@ function LessonRunner({ stageId }: { stageId: string }) {
             className="w-full flex flex-col items-center gap-6"
           >
             <h2 className="text-xl text-center opacity-90">{problem.prompt}</h2>
+            {showAnswers && (
+              <div className="rounded-full bg-coin/15 text-coin px-4 py-1 text-xs">
+                🔑 [교사용] 정답: {answerToText(problem)}
+              </div>
+            )}
             {problem.expr && problem.format !== 'fill-blanks' && (
               <div className="rounded-3xl bg-night-900 border border-night-700 px-6 py-6 w-full text-center">
                 <MathView expr={problem.expr} size="lg" />

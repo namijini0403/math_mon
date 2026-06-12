@@ -99,6 +99,11 @@ interface GameState {
   claimMission: (missionId: number) => EarnedCard[];
   /** 연습 모드 등에서 수동 서버 동기화 */
   syncNow: () => void;
+  /** [교사용] 정답 미리보기 표시 여부 */
+  showAnswers: boolean;
+  toggleShowAnswers: () => void;
+  /** [교사용] 모든 스테이지 잠금 해제 (체험·시연용) */
+  devUnlockAll: (stageIds: string[]) => void;
   resetAll: () => void;
 }
 
@@ -389,6 +394,17 @@ export const useGame = create<GameState>()(
       syncNow: () => {
         void pushProgress(get());
       },
+
+      showAnswers: false,
+      toggleShowAnswers: () => set((s) => ({ showAnswers: !s.showAnswers })),
+
+      devUnlockAll: (stageIds) =>
+        set((s) => ({
+          stages: {
+            ...Object.fromEntries(stageIds.map((id) => [id, { stars: 1 }])),
+            ...s.stages,
+          },
+        })),
 
       claimMission: (missionId) => {
         const s = get();

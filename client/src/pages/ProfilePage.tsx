@@ -9,6 +9,7 @@ import { CardView } from '../components/CardView';
 import { downloadCardPng } from '../card/renderCardPng';
 import { BADGES, type BadgeDef } from '../game/badges';
 import { dragonEmoji } from '../game/dragon';
+import { STAGES } from '../game/stages';
 import { RARITY_COLOR, REWARD_CARDS } from '../game/rewardCards';
 
 /** 희귀도별 테두리 + glow 스타일 */
@@ -19,7 +20,11 @@ function rarityStyle(rarity: 1 | 2 | 3): string {
 }
 
 export default function ProfilePage() {
-  const { nickname, xp, cards, streak, skillStats, badges, rewardCards, dragon, resetAll } = useGame();
+  const {
+    nickname, xp, cards, streak, skillStats, badges, rewardCards, dragon,
+    showAnswers, toggleShowAnswers, devUnlockAll, dragonGain, resetAll,
+  } = useGame();
+  const [devOpen, setDevOpen] = useState(false);
   const { level } = levelFromXp(xp);
   const [selected, setSelected] = useState<EarnedCard | null>(null);
   const [saving, setSaving] = useState(false);
@@ -192,11 +197,57 @@ export default function ProfilePage() {
         </div>
       )}
 
+      {/* ── 교사용 체험 도구 (확인 코드 필요) ── */}
+      <div className="mt-12 flex flex-col gap-2">
+        <button
+          onClick={() => {
+            if (devOpen) {
+              setDevOpen(false);
+              return;
+            }
+            const code = window.prompt('교사 확인 코드를 입력하세요');
+            if (code === '0403') setDevOpen(true);
+            else if (code !== null) window.alert('코드가 맞지 않아요.');
+          }}
+          className="text-xs opacity-40 underline self-start"
+        >
+          🧑‍🏫 교사용 체험 도구
+        </button>
+        {devOpen && (
+          <div className="rounded-2xl border border-coin/40 bg-night-900 p-4 flex flex-col gap-2">
+            <button
+              onClick={() => {
+                devUnlockAll(STAGES.map((s) => s.id));
+                window.alert('모든 스테이지가 열렸어요! 지도에서 보스전까지 바로 들어갈 수 있어요.');
+              }}
+              className="btn-3d rounded-xl bg-night-800 border-night-800 border-b-night-700 px-4 py-2 text-sm text-left"
+            >
+              🔓 모든 스테이지 잠금 해제 (보스전 바로 체험)
+            </button>
+            <button
+              onClick={toggleShowAnswers}
+              className="btn-3d rounded-xl bg-night-800 border-night-800 border-b-night-700 px-4 py-2 text-sm text-left"
+            >
+              🔑 문제 화면에 정답 표시: {showAnswers ? '켜짐 ✅' : '꺼짐'}
+            </button>
+            <button
+              onClick={() => dragonGain({ gp: 100 })}
+              className="btn-3d rounded-xl bg-night-800 border-night-800 border-b-night-700 px-4 py-2 text-sm text-left"
+            >
+              🐲 드래곤 성장 +100 (성장 단계 미리 보기)
+            </button>
+            <div className="text-[10px] opacity-50">
+              체험·시연용 도구예요. 학생 계정에서는 사용하지 마세요!
+            </div>
+          </div>
+        )}
+      </div>
+
       <button
         onClick={() => {
           if (window.confirm('정말 모든 진행을 지우고 처음부터 시작할까요?')) resetAll();
         }}
-        className="mt-12 text-xs opacity-40 underline"
+        className="mt-4 text-xs opacity-40 underline"
       >
         진행 초기화
       </button>

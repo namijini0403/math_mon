@@ -43,7 +43,10 @@ function StageNode({ stage, index, unlocked, stars }: { stage: StageDef; index: 
           ))}
         </div>
       )}
-      <div className="mt-3 text-sm text-center opacity-90 max-w-28">{stage.title}</div>
+      {/* 별이 노드 아래로 튀어나오므로 제목과 겹치지 않게 여백 확보 */}
+      <div className={`${stars > 0 ? 'mt-6' : 'mt-3'} text-sm text-center opacity-90 max-w-28`}>
+        {stage.title}
+      </div>
     </motion.div>
   );
 
@@ -114,6 +117,17 @@ export default function UnitMapPage() {
   const selectSemester = (id: string) => {
     setSemesterId(id);
     localStorage.setItem('mathmon-semester', id);
+  };
+  // 펼친 단원 (탭한 단원만 스테이지 표시 — 지도가 너무 길어지지 않게)
+  const [openUnitRaw, setOpenUnitRaw] = useState<string | null>(
+    () => localStorage.getItem('mathmon-unit'),
+  );
+  const openUnit = semester.units.includes(openUnitRaw ?? '') ? openUnitRaw : null;
+  const toggleUnit = (id: string) => {
+    const next = openUnit === id ? null : id;
+    setOpenUnitRaw(next);
+    if (next) localStorage.setItem('mathmon-unit', next);
+    else localStorage.removeItem('mathmon-unit');
   };
 
   // 단원별 잠금: 각 단원의 첫 스테이지는 항상 열려 있고, 단원 안에서는 순차 해제
@@ -199,21 +213,43 @@ export default function UnitMapPage() {
         ))}
       </div>
 
-      {/* ── 유닛맵 ── */}
-      {semester.units.map((unitId) => (
-        <section key={unitId} className="mt-8">
-          <div className="rounded-2xl bg-night-800 border border-night-700 px-5 py-3 text-center text-lg">
-            {UNIT_TITLES[unitId]}
-          </div>
-          <div className="flex flex-col items-center gap-9 py-9">
-            {nodes
-              .filter((n) => n.stage.unitId === unitId)
-              .map((n, idx) => (
-                <StageNode key={n.stage.id} stage={n.stage} index={idx} unlocked={n.unlocked} stars={n.stars} />
-              ))}
-          </div>
-        </section>
-      ))}
+      {/* ── 유닛맵: 단원을 탭하면 그 단원의 스테이지만 펼쳐진다 ── */}
+      {semester.units.map((unitId) => {
+        const unitNodes = nodes.filter((n) => n.stage.unitId === unitId);
+        const cleared = unitNodes.filter((n) => n.stars > 0).length;
+        const starsSum = unitNodes.reduce((a, n) => a + n.stars, 0);
+        const isOpen = openUnit === unitId;
+        return (
+          <section key={unitId} className="mt-3">
+            <button
+              onClick={() => toggleUnit(unitId)}
+              className={`w-full rounded-2xl border px-5 py-3.5 flex items-center gap-3 text-left transition-colors ${
+                isOpen ? 'bg-night-800 border-coin/50' : 'bg-night-900 border-night-700 hover:bg-night-800'
+              }`}
+            >
+              <span className="flex-1 text-lg">{UNIT_TITLES[unitId]}</span>
+              <span className="text-xs opacity-60">
+                {cleared}/{unitNodes.length}
+                {starsSum > 0 && ` · ⭐${starsSum}`}
+              </span>
+              <span className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}>▾</span>
+            </button>
+            {isOpen && (
+              <div className="flex flex-col items-center gap-9 py-9">
+                {unitNodes.map((n, idx) => (
+                  <StageNode
+                    key={n.stage.id}
+                    stage={n.stage}
+                    index={idx}
+                    unlocked={n.unlocked}
+                    stars={n.stars}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        );
+      })}
     </div>
   );
 }

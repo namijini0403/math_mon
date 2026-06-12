@@ -10,6 +10,7 @@ import { SKILLS, generateProblem, randomSeed } from '../generator';
 import { SEMESTERS } from '../game/stages';
 import type { Problem, SkillDef } from '../generator/types';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
+import { answerToText } from '../generator/render-text';
 import { useGame } from '../game/store';
 import { sfx } from '../game/sounds';
 import { MathView } from '../components/MathView';
@@ -69,7 +70,7 @@ export default function PracticePage() {
 }
 
 function PracticeRunner({ mode }: { mode: PracticeMode }) {
-  const { recordAnswer, addXp, syncNow } = useGame();
+  const { recordAnswer, addXp, syncNow, showAnswers } = useGame();
   const [problem, setProblem] = useState<Problem>(() => pickProblem(mode, useGame.getState().skillStats));
   const [answer, setAnswer] = useState<UserAnswer | null>(null);
   const [phase, setPhase] = useState<'answering' | 'feedback'>('answering');
@@ -151,6 +152,11 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
             className="w-full flex flex-col items-center gap-7"
           >
             <h2 className="text-xl text-center opacity-90">{problem.prompt}</h2>
+            {showAnswers && (
+              <div className="rounded-full bg-coin/15 text-coin px-4 py-1 text-xs">
+                🔑 [교사용] 정답: {answerToText(problem)}
+              </div>
+            )}
             {problem.expr && problem.format !== 'fill-blanks' && (
               <div className="rounded-3xl bg-night-900 border border-night-700 px-6 py-6 w-full text-center">
                 <MathView expr={problem.expr} size="lg" />

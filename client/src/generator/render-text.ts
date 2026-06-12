@@ -36,3 +36,23 @@ export function choiceToText(c: ChoiceValue): string {
       return c.text;
   }
 }
+
+/** 문제의 정답을 한 줄 텍스트로 (교사용 정답 미리보기) */
+export function answerToText(p: import('./types').Problem): string {
+  switch (p.format) {
+    case 'choice':
+      return choiceToText(p.choices[p.answerIndex]);
+    case 'fraction-input':
+      return p.answer.whole !== undefined
+        ? `${p.answer.whole} ${p.answer.n}/${p.answer.d}`
+        : `${p.answer.n}/${p.answer.d}`;
+    case 'decimal-input':
+      return `${p.answer}${p.unit ?? ''}`;
+    case 'comparison':
+      return p.answer;
+    case 'fill-blanks':
+      return p.blankAnswers.join(', ');
+    case 'matching':
+      return '같은 값끼리 짝짓기';
+  }
+}
