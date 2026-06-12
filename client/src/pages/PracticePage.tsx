@@ -34,13 +34,24 @@ const MODES = {
     title: '기초 연산 연습',
     emoji: '🏋️',
     desc: '계산 문제만 무한으로!',
-    pool: () => semesterScopedSkills().filter((s) => !s.word && s.difficulty <= 2),
+    pool: () => semesterScopedSkills().filter((s) => !s.word && !s.challenge && s.difficulty <= 2),
   },
   word: {
     title: '문장제 연습',
     emoji: '📖',
     desc: '줄글 문제만 모아서 연습!',
-    pool: () => semesterScopedSkills().filter((s) => s.word === true),
+    pool: () => semesterScopedSkills().filter((s) => s.word === true && !s.challenge),
+  },
+  challenge: {
+    title: '심화 연습',
+    emoji: '🌌',
+    desc: '최고 수준 도전!',
+    pool: () => {
+      const scoped = semesterScopedSkills();
+      const ch = scoped.filter((s) => s.challenge === true);
+      // 심화 스킬이 아직 없는 학기는 도전 난이도 문제로 대체
+      return ch.length > 0 ? ch : scoped.filter((s) => s.difficulty === 3);
+    },
   },
 } as const;
 

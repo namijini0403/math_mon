@@ -13,7 +13,7 @@ export interface StageDef {
   id: string;
   unitId: string;
   title: string;
-  type: 'lesson' | 'boss';
+  type: 'lesson' | 'boss' | 'challenge';
   emoji: string;
   /** 이 스테이지에서 출제되는 스킬 */
   skillIds: string[];
@@ -403,6 +403,24 @@ export const STAGES: StageDef[] = [
     boss: { name: '회전목마 왕', emoji: '🎠', hp: 12, image: 'assets/boss/carousel.png', taunt: '돌고 도는 내 왕국에서 길을 잃어 보렴!' },
   },
 ];
+
+// ── 심화 탐험 (선택 트랙): 단원마다 1개, 10문제 중 8개 이상 맞히면 클리어 + 보물 카드 ──
+// skillIds는 비워두고 런타임에 해당 단원의 challenge 스킬로 채운다 (lesson.ts)
+const ALL_UNIT_IDS = [...new Set(STAGES.map((s) => s.unitId))];
+export const CHALLENGE_STAGES: StageDef[] = ALL_UNIT_IDS.map((unitId) => ({
+  id: `ch-${unitId}`,
+  unitId,
+  title: '심화 탐험 (선택)',
+  type: 'challenge',
+  emoji: '🌌',
+  skillIds: [],
+  reviewSkillIds: [],
+  problemCount: 10,
+}));
+STAGES.push(...CHALLENGE_STAGES);
+
+/** 심화 클리어 기준: 10문제 중 8개 이상 */
+export const CHALLENGE_PASS = 8;
 
 /** 학기별 단원 구성 (2022 개정교육과정) — 유닛맵 탭 */
 export interface SemesterDef {

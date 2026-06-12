@@ -8,17 +8,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { getStage } from '../game/stages';
+import { CHALLENGE_PASS, getStage } from '../game/stages';
 import { nextProblem, type Served } from '../game/lesson';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { useGame, type EarnedCard } from '../game/store';
 import { sfx } from '../game/sounds';
 import { XP_BOSS_CLEAR, XP_LESSON_CLEAR, XP_PERFECT_BONUS, XP_PER_CORRECT } from '../game/xp';
 import { COMBO_BONUS, type BadgeDef } from '../game/badges';
-import { RARITY_COLOR, RARITY_LABEL, type RewardCardDef } from '../game/rewardCards';
+import { type RewardCardDef } from '../game/rewardCards';
+import { TreasureReveal } from '../components/TreasureReveal';
+import { MedalView } from '../components/MedalView';
 import { answerToText } from '../generator/render-text';
 import { MathView } from '../components/MathView';
-import { CardView } from '../components/CardView';
 import { ChoiceView } from '../components/problem/ChoiceView';
 import { ComparisonView } from '../components/problem/ComparisonView';
 import { FractionInputView } from '../components/problem/FractionInputView';
@@ -38,11 +39,12 @@ export default function LessonPage() {
 function LessonRunner({ stageId }: { stageId: string }) {
   const stage = useMemo(() => getStage(stageId), [stageId]);
   const navigate = useNavigate();
-  const { skillStats, nickname, showAnswers, recordAnswer, addXp, addBossCard, completeStage } =
-    useGame();
+  const { skillStats, showAnswers, recordAnswer, addXp, addBossCard, completeStage } = useGame();
 
   const total = stage.problemCount;
   const isBoss = stage.type === 'boss';
+  // 심화 탐험: 하트 없음, 10문제를 전부 풀고 8개 이상 맞히면 클리어
+  const isChallenge = stage.type === 'challenge';
 
   const [served, setServed] = useState<Served>(() =>
     nextProblem(stage, skillStats, 0, useGame.getState().recentWrong),
@@ -60,12 +62,13 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const [comboBonus, setComboBonus] = useState(0);
   const [bonusToast, setBonusToast] = useState<string | null>(null);
   const [bossImgOk, setBossImgOk] = useState(true);
+  const [correctCount, setCorrectCount] = useState(0);
   const [result, setResult] = useState<{
     stars: number;
     xp: number;
     cards: EarnedCard[];
     badges: BadgeDef[];
-    treasure: { drawn: RewardCardDef; duplicate: boolean } | null;
+    treasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[];
   } | null>(null);
   const maxComboRef = useRef(0);
 
@@ -94,7 +97,12 @@ function LessonRunner({ stageId }: { stageId: string }) {
     recordAnswer(problem.skillId, false);
     setLastCorrect(false);
     setTimedOut(timeout);
-    setMisses((m) => m + 1);
+    if (isChallenge) {
+      // 심화: 틀려도 다음 문제로 (하트 없음, 10문제 전부 풀기)
+      setDone((d) => d + 1);
+    } else {
+      setMisses((m) => m + 1);
+    }
     setCombo(0);
     setWrongCount((w) => w + 1);
     sfx.wrong();
@@ -113,6 +121,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     setLastCorrect(true);
     setTimedOut(false);
     setDone((d) => d + 1);
+    setCorrectCount((c) => c + 1);
     const newCombo = combo + 1;
     setCombo(newCombo);
     maxComboRef.current = Math.max(maxComboRef.current, newCombo);
@@ -134,7 +143,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
   };
 
   const next = () => {
-    if (!lastCorrect && misses >= MAX_MISSES) {
+    if (!isChallenge && !lastCorrect && misses >= MAX_MISSES) {
       setPhase('failed');
       return;
     }
@@ -151,26 +160,53 @@ function LessonRunner({ stageId }: { stageId: string }) {
   };
 
   const finish = () => {
-    const perfect = wrongCount === 0;
-    const stars = perfect ? 3 : wrongCount <= 2 ? 2 : 1;
+    const game = useGame.getState();
+    const treasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[] = [];
+
+    // 심화 탐험: 10문제 중 8개 이상이어야 클리어
+    if (isChallenge && correctCount < CHALLENGE_PASS) {
+      setPhase('failed');
+      return;
+    }
+
+    const perfect = isChallenge ? correctCount === total : wrongCount === 0;
+    const stars = isChallenge
+      ? Math.min(3, correctCount - CHALLENGE_PASS + 1) // 8→1, 9→2, 10→3
+      : perfect
+        ? 3
+        : wrongCount <= 2
+          ? 2
+          : 1;
     const xp =
       done * XP_PER_CORRECT +
-      (isBoss ? XP_BOSS_CLEAR : XP_LESSON_CLEAR) +
+      (isBoss ? XP_BOSS_CLEAR : isChallenge ? 25 : XP_LESSON_CLEAR) +
       (perfect ? XP_PERFECT_BONUS : 0) +
       comboBonus;
+    const isFirstLesson = game.records.lessonsCompleted === 0;
     const cards = [...addXp(xp)];
-    let treasure: { drawn: RewardCardDef; duplicate: boolean } | null = null;
     if (isBoss) {
       cards.push(addBossCard(stage.id));
-      treasure = useGame.getState().drawTreasureCard();
+      treasures.push({ ...game.drawTreasureCard(), label: '보스 격파 보상' });
     }
-    const game = useGame.getState();
+    if (isChallenge) {
+      game.recordChallengeClear();
+      treasures.push({ ...useGame.getState().drawTreasureCard(), label: '심화 탐험 보상' });
+    }
     game.reportCombo(maxComboRef.current);
     completeStage(stage.id, stars, perfect);
+    if (isFirstLesson) {
+      treasures.push({ ...useGame.getState().drawTreasureCard(), label: '첫 모험 기념' });
+    }
+    // 히든 미션: 조건이 갖춰진 순간 깜짝 카드
+    for (const h of useGame.getState().checkHiddenMissions()) {
+      treasures.push({ drawn: h.drawn, duplicate: h.duplicate, label: `히든 미션: ${h.mission.name}` });
+    }
+    useGame.getState().evaluateDragonItems();
     const badges = useGame.getState().evaluateBadges();
     sfx.fanfare();
-    if (cards.length > 0 || badges.length > 0) setTimeout(() => sfx.levelUp(), 600);
-    setResult({ stars, xp, cards, badges, treasure });
+    if (cards.length > 0 || badges.length > 0 || treasures.length > 0)
+      setTimeout(() => sfx.levelUp(), 600);
+    setResult({ stars, xp, cards, badges, treasures });
     setPhase('result');
   };
 
@@ -180,6 +216,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     setCombo(0);
     setWrongCount(0);
     setComboBonus(0);
+    setCorrectCount(0);
     maxComboRef.current = 0;
     const s = useGame.getState();
     const nextServed = nextProblem(stage, s.skillStats, 0, s.recentWrong);
@@ -194,8 +231,14 @@ function LessonRunner({ stageId }: { stageId: string }) {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6 text-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
-          <div className="text-7xl mb-2">{isBoss ? '🏆' : '🎉'}</div>
-          <h1 className="text-3xl text-glow">{isBoss ? `${stage.boss?.name} 격파!` : '레슨 완료!'}</h1>
+          <div className="text-7xl mb-2">{isBoss ? '🏆' : isChallenge ? '🌌' : '🎉'}</div>
+          <h1 className="text-3xl text-glow">
+            {isBoss
+              ? `${stage.boss?.name} 격파!`
+              : isChallenge
+                ? `심화 탐험 정복! (${correctCount}/${total})`
+                : '레슨 완료!'}
+          </h1>
         </motion.div>
         <div className="flex gap-2 text-5xl">
           {[1, 2, 3].map((i) => (
@@ -220,30 +263,9 @@ function LessonRunner({ stageId }: { stageId: string }) {
           {comboBonus > 0 && <span className="text-sm opacity-70 ml-2">(콤보 보너스 +{comboBonus} 포함)</span>}
         </motion.div>
 
-        {result.treasure && (
-          <motion.div
-            initial={{ rotateY: 180, opacity: 0 }}
-            animate={{ rotateY: 0, opacity: 1 }}
-            transition={{ delay: 1.3, duration: 0.7 }}
-            className="flex flex-col items-center gap-1.5"
-          >
-            <div className="text-sm opacity-80">🎴 보물 카드 획득!</div>
-            <img
-              src={result.treasure.drawn.src}
-              alt={result.treasure.drawn.name}
-              className="w-32 rounded-2xl border-4"
-              style={{
-                borderColor: RARITY_COLOR[result.treasure.drawn.rarity],
-                boxShadow: `0 0 20px 3px ${RARITY_COLOR[result.treasure.drawn.rarity]}66`,
-              }}
-            />
-            <div className="text-sm font-bold">{result.treasure.drawn.name}</div>
-            <div className="text-xs" style={{ color: RARITY_COLOR[result.treasure.drawn.rarity] }}>
-              {RARITY_LABEL[result.treasure.drawn.rarity]}
-              {result.treasure.duplicate && ' · 중복이라 +10 XP!'}
-            </div>
-          </motion.div>
-        )}
+        {result.treasures.map((t, i) => (
+          <TreasureReveal key={i} drawn={t.drawn} duplicate={t.duplicate} label={t.label} delay={1.3 + i * 0.5} />
+        ))}
 
         {result.badges.length > 0 && (
           <motion.div
@@ -272,10 +294,13 @@ function LessonRunner({ stageId }: { stageId: string }) {
             className="flex flex-col items-center gap-2"
           >
             <div className="text-coin text-lg">
-              {isBoss ? '⚔️ 보스 카드 획득! ⚔️' : '✨ 레벨업! 새 카드 획득 ✨'}
+              {isBoss ? '🎖️ 격파 메달 획득!' : '✨ 레벨업! 인증 메달 획득 ✨'}
             </div>
-            <CardView card={result.cards[result.cards.length - 1]} nickname={nickname ?? '모험가'} className="w-44" />
-            <div className="text-xs opacity-60">프로필에서 PNG로 저장할 수 있어요</div>
+            <div className="flex gap-4">
+              {result.cards.slice(-2).map((c, i) => (
+                <MedalView key={i} card={c} size="lg" />
+              ))}
+            </div>
           </motion.div>
         )}
 
@@ -293,10 +318,20 @@ function LessonRunner({ stageId }: { stageId: string }) {
   if (phase === 'failed') {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6 text-center">
-        <div className="text-7xl">{isBoss ? '🧱' : '💔'}</div>
-        <h1 className="text-2xl">{isBoss ? '문제가 다 쌓여버렸어요!' : '하트를 다 잃었어요...'}</h1>
+        <div className="text-7xl">{isBoss ? '🧱' : isChallenge ? '🌫️' : '💔'}</div>
+        <h1 className="text-2xl">
+          {isBoss
+            ? '문제가 다 쌓여버렸어요!'
+            : isChallenge
+              ? `${correctCount}/${total} — 아깝다!`
+              : '하트를 다 잃었어요...'}
+        </h1>
         <p className="opacity-70">
-          {isBoss ? `${stage.boss?.name}이(가) 아직 버티고 있어요. 다시 도전!` : '괜찮아요, 다시 해 봐요!'}
+          {isBoss
+            ? `${stage.boss?.name}이(가) 아직 버티고 있어요. 다시 도전!`
+            : isChallenge
+              ? `심화 탐험은 10문제 중 ${CHALLENGE_PASS}개 이상 맞혀야 해요. 다시 도전!`
+              : '괜찮아요, 다시 해 봐요!'}
         </p>
         <div className="flex gap-3">
           <button
@@ -373,14 +408,20 @@ function LessonRunner({ stageId }: { stageId: string }) {
             />
           </div>
         )}
-        {!isBoss && (
-          <div className="flex items-center gap-1 text-xl" aria-label={`하트 ${MAX_MISSES - misses}개`}>
-            {[0, 1, 2].map((i) => (
-              <span key={i} className={i < MAX_MISSES - misses ? '' : 'opacity-20 grayscale'}>
-                ❤️
-              </span>
-            ))}
+        {isChallenge ? (
+          <div className="text-sm text-mana">
+            ✨ {correctCount}/{CHALLENGE_PASS} 목표
           </div>
+        ) : (
+          !isBoss && (
+            <div className="flex items-center gap-1 text-xl" aria-label={`하트 ${MAX_MISSES - misses}개`}>
+              {[0, 1, 2].map((i) => (
+                <span key={i} className={i < MAX_MISSES - misses ? '' : 'opacity-20 grayscale'}>
+                  ❤️
+                </span>
+              ))}
+            </div>
+          )
         )}
       </div>
 

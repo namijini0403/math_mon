@@ -6,6 +6,7 @@ import { levelFromXp, tierForLevel, XP_MISSION_REWARD } from './xp';
 import { emptyDaily, todayStr, type DailyCounters } from './missions';
 import { dailyRewardXp, newlyEarned, type BadgeDef, type BadgeStats } from './badges';
 import { drawRewardCard, DUPLICATE_XP, type RewardCardDef } from './rewardCards';
+import { newlyCompletedHidden, type HiddenMissionDef } from './hiddenMissions';
 import {
   AFFINITY_SOURCES,
   DRAGON_ITEMS,
@@ -54,14 +55,32 @@ interface GameState {
   attendance: { lastClaim: string; totalDays: number };
   /** 획득한 배지 id */
   badges: string[];
-  /** 모은 출석 보상 카드 id (중복 없음) */
+  /** 모은 보물 카드 id (중복 없음, 종류 기준) */
   rewardCards: string[];
+  /** 보물 카드 보유 수 (중복 포함 — 갤러리 ×n 표시용) */
+  rewardCardCounts: Record<string, number>;
+  /** 완료한 히든 미션 id */
+  hiddenDone: string[];
+  /** 명예의 시험 응시 횟수 */
+  examCount: number;
   /** 통산 기록 (배지 조건용) */
-  records: { bestCombo: number; perfectLessons: number; lessonsCompleted: number };
+  records: {
+    bestCombo: number;
+    perfectLessons: number;
+    lessonsCompleted: number;
+    challengeCleared: number;
+  };
   /** 드래곤 육성 상태 */
   dragon: DragonState;
   /** 연습 모드 누적 (10문제 = 1세트) */
-  practice: { basicAnswered: number; wordAnswered: number; basicSets: number; wordSets: number };
+  practice: {
+    basicAnswered: number;
+    wordAnswered: number;
+    basicSets: number;
+    wordSets: number;
+    challengeAnswered: number;
+    challengeSets: number;
+  };
 
   setProfile: (p: { nickname: string; classCode?: string; studentId?: string }) => void;
   recordAnswer: (skillId: string, correct: boolean) => void;
@@ -73,13 +92,7 @@ interface GameState {
   /** 레슨에서 도달한 최고 콤보 보고 (배지 조건) */
   reportCombo: (combo: number) => void;
   /** 오늘 출석 보상 수령. 이미 받았으면 null, 아니면 보상 내역 반환 */
-  claimDailyReward: () => {
-    xp: number;
-    day: number;
-    cards: EarnedCard[];
-    drawn: RewardCardDef;
-    duplicate: boolean;
-  } | null;
+  claimDailyReward: () => { xp: number; day: number; cards: EarnedCard[] } | null;
   /** 배지 조건 재평가 — 새로 얻은 배지 반환 */
   evaluateBadges: () => BadgeDef[];
   /** 드래곤 성장 포인트·속성·과일 지급 (내부 공용) */
@@ -90,12 +103,18 @@ interface GameState {
   }) => void;
   /** 먹이 주기. 성공 시 true (과일이 없으면 false) */
   feedDragon: (fruitId: string) => boolean;
-  /** 연습 1문제 기록 — 10문제마다 세트 완성 (세트 완성 시 'basic'|'word' 반환) */
-  addPracticeAnswer: (mode: 'basic' | 'word') => 'basic' | 'word' | null;
+  /** 연습 1문제 기록 — 10문제마다 세트 완성 */
+  addPracticeAnswer: (mode: 'basic' | 'word' | 'challenge') => 'basic' | 'word' | 'challenge' | null;
   /** 드래곤 아이템 조건 재평가 — 새로 얻은 아이템 반환 (아이템당 +20 GP) */
   evaluateDragonItems: () => DragonItemDef[];
-  /** 보물 카드 1장 뽑기 (보스 격파 보상용). 중복이면 +10 XP */
+  /** 보물 카드 1장 뽑기. 중복이면 ×n 카운트 + 보너스 XP */
   drawTreasureCard: () => { drawn: RewardCardDef; duplicate: boolean };
+  /** 심화 스테이지 클리어 기록 */
+  recordChallengeClear: () => void;
+  /** 명예의 시험 응시 기록 */
+  recordExam: () => void;
+  /** 히든 미션 재평가 — 새로 달성한 미션마다 카드 1장씩 뽑아 반환 */
+  checkHiddenMissions: () => { mission: HiddenMissionDef; drawn: RewardCardDef; duplicate: boolean }[];
   claimMission: (missionId: number) => EarnedCard[];
   /** 연습 모드 등에서 수동 서버 동기화 */
   syncNow: () => void;
@@ -139,9 +158,19 @@ export const useGame = create<GameState>()(
       attendance: { lastClaim: '', totalDays: 0 },
       badges: [],
       rewardCards: [],
-      records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0 },
+      rewardCardCounts: {},
+      hiddenDone: [],
+      examCount: 0,
+      records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0 },
       dragon: emptyDragon(),
-      practice: { basicAnswered: 0, wordAnswered: 0, basicSets: 0, wordSets: 0 },
+      practice: {
+        basicAnswered: 0,
+        wordAnswered: 0,
+        basicSets: 0,
+        wordSets: 0,
+        challengeAnswered: 0,
+        challengeSets: 0,
+      },
 
       setProfile: ({ nickname, classCode, studentId }) =>
         set({ nickname, classCode: classCode ?? null, studentId: studentId ?? null }),
@@ -244,31 +273,57 @@ export const useGame = create<GameState>()(
           s.streak.last === today
             ? s.streak
             : { last: today, count: s.streak.last === yesterday ? s.streak.count + 1 : 1 };
-        // 보상 카드 뽑기 — 중복이면 카드 대신 보너스 XP
-        const drawn = drawRewardCard(streak.count);
-        const duplicate = s.rewardCards.includes(drawn.id);
+        // 카드 남발 방지: 출석 보상은 XP + 과일 + 드래곤 성장만 (카드는 희귀 이벤트 전용)
         set({
           attendance: { lastClaim: today, totalDays: s.attendance.totalDays + 1 },
           streak,
-          rewardCards: duplicate ? s.rewardCards : [...s.rewardCards, drawn.id],
         });
-        const xp = dailyRewardXp(streak.count) + (duplicate ? DUPLICATE_XP : 0);
+        const xp = dailyRewardXp(streak.count);
         const cards = get().addXp(xp);
-        get().dragonGain({ gp: GP_REWARDS.attendance, affinity: AFFINITY_SOURCES.attendance });
+        get().dragonGain({ gp: GP_REWARDS.attendance, fruits: 1, affinity: AFFINITY_SOURCES.attendance });
         get().evaluateDragonItems();
-        return { xp, day: streak.count, cards, drawn, duplicate };
+        return { xp, day: streak.count, cards };
       },
 
       drawTreasureCard: () => {
         const s = get();
         const drawn = drawRewardCard(s.streak.count);
         const duplicate = s.rewardCards.includes(drawn.id);
-        if (duplicate) {
-          get().addXp(DUPLICATE_XP);
-        } else {
-          set({ rewardCards: [...s.rewardCards, drawn.id] });
-        }
+        set({
+          rewardCards: duplicate ? s.rewardCards : [...s.rewardCards, drawn.id],
+          rewardCardCounts: {
+            ...s.rewardCardCounts,
+            [drawn.id]: (s.rewardCardCounts[drawn.id] ?? 0) + 1,
+          },
+        });
+        if (duplicate) get().addXp(DUPLICATE_XP);
         return { drawn, duplicate };
+      },
+
+      recordChallengeClear: () =>
+        set((s) => ({
+          records: { ...s.records, challengeCleared: s.records.challengeCleared + 1 },
+        })),
+
+      recordExam: () => set((s) => ({ examCount: s.examCount + 1 })),
+
+      checkHiddenMissions: () => {
+        const s = get();
+        const stats = {
+          streakDays: s.streak.count,
+          lessonsCompleted: s.records.lessonsCompleted,
+          basicSets: s.practice.basicSets,
+          wordSets: s.practice.wordSets,
+          challengeSets: s.practice.challengeSets,
+          examCount: s.examCount,
+          perfectLessons: s.records.perfectLessons,
+          feedCount: s.dragon.feedCount,
+          challengeCleared: s.records.challengeCleared,
+        };
+        const earned = newlyCompletedHidden(stats, s.hiddenDone);
+        if (earned.length === 0) return [];
+        set({ hiddenDone: [...s.hiddenDone, ...earned.map((m) => m.id)] });
+        return earned.map((mission) => ({ mission, ...get().drawTreasureCard() }));
       },
 
       dragonGain: ({ gp = 0, affinity = {}, fruits = 0 }) => {
@@ -322,25 +377,36 @@ export const useGame = create<GameState>()(
       addPracticeAnswer: (mode) => {
         const s = get();
         const p = { ...s.practice };
-        let completed: 'basic' | 'word' | null = null;
+        let completed: 'basic' | 'word' | 'challenge' | null = null;
         if (mode === 'basic') {
           p.basicAnswered += 1;
           if (p.basicAnswered % 10 === 0) {
             p.basicSets += 1;
             completed = 'basic';
           }
-        } else {
+        } else if (mode === 'word') {
           p.wordAnswered += 1;
           if (p.wordAnswered % 10 === 0) {
             p.wordSets += 1;
             completed = 'word';
+          }
+        } else {
+          p.challengeAnswered += 1;
+          if (p.challengeAnswered % 10 === 0) {
+            p.challengeSets += 1;
+            completed = 'challenge';
           }
         }
         set({ practice: p });
         if (completed) {
           get().dragonGain({
             gp: GP_REWARDS.practiceSet,
-            affinity: completed === 'basic' ? AFFINITY_SOURCES.basicSet : AFFINITY_SOURCES.wordSet,
+            affinity:
+              completed === 'basic'
+                ? AFFINITY_SOURCES.basicSet
+                : completed === 'word'
+                  ? AFFINITY_SOURCES.wordSet
+                  : { moon: 1, star: 1 }, // 심화는 지혜+탐구 균형
           });
         }
         return completed;
@@ -355,6 +421,9 @@ export const useGame = create<GameState>()(
           ).length,
           basicSets: s.practice.basicSets,
           wordSets: s.practice.wordSets,
+          challengeSets: s.practice.challengeSets,
+          examCount: s.examCount,
+          challengeCleared: s.records.challengeCleared,
           attendanceDays: s.attendance.totalDays,
           feedCount: s.dragon.feedCount,
           rewardCardCount: s.rewardCards.length,
@@ -430,9 +499,19 @@ export const useGame = create<GameState>()(
           attendance: { lastClaim: '', totalDays: 0 },
           badges: [],
           rewardCards: [],
-          records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0 },
+          rewardCardCounts: {},
+          hiddenDone: [],
+          examCount: 0,
+          records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0 },
           dragon: emptyDragon(),
-          practice: { basicAnswered: 0, wordAnswered: 0, basicSets: 0, wordSets: 0 },
+          practice: {
+            basicAnswered: 0,
+            wordAnswered: 0,
+            basicSets: 0,
+            wordSets: 0,
+            challengeAnswered: 0,
+            challengeSets: 0,
+          },
         }),
     }),
     { name: 'math-mon-save' },

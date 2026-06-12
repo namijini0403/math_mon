@@ -1,16 +1,15 @@
-/** 프로필 — 통계 + 배지 컬렉션 + 인증카드 컬렉션 + PNG 다운로드 */
+/** 프로필 — 통계 + 배지 컬렉션 + 인증 메달 + 보물 카드 도감 링크 */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useGame, type EarnedCard } from '../game/store';
+import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
-import { CardView } from '../components/CardView';
-import { downloadCardPng } from '../card/renderCardPng';
+import { MedalView } from '../components/MedalView';
 import { BADGES, type BadgeDef } from '../game/badges';
 import { dragonEmoji } from '../game/dragon';
 import { STAGES } from '../game/stages';
-import { RARITY_COLOR, REWARD_CARDS } from '../game/rewardCards';
+import { REWARD_CARDS } from '../game/rewardCards';
 
 /** 희귀도별 테두리 + glow 스타일 */
 function rarityStyle(rarity: 1 | 2 | 3): string {
@@ -26,8 +25,6 @@ export default function ProfilePage() {
   } = useGame();
   const [devOpen, setDevOpen] = useState(false);
   const { level } = levelFromXp(xp);
-  const [selected, setSelected] = useState<EarnedCard | null>(null);
-  const [saving, setSaving] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<BadgeDef | null>(null);
 
   const totalCorrect = Object.values(skillStats).reduce((s, v) => s + v.c, 0);
@@ -146,53 +143,33 @@ export default function ProfilePage() {
         </AnimatePresence>
       </div>
 
-      {/* ── 출석 보상 카드 컬렉션 ── */}
-      <h2 className="mt-7 mb-3 text-lg">
-        🎴 보물 카드{' '}
-        <span className="text-sm opacity-60">
-          ({rewardCards.length}/{REWARD_CARDS.length}) · 매일 출석하면 모을 수 있어요
-        </span>
-      </h2>
-      <div className="rounded-3xl bg-night-900 border border-night-700 p-4 grid grid-cols-4 gap-3">
-        {REWARD_CARDS.map((c) => {
-          const owned = rewardCards.includes(c.id);
-          return owned ? (
-            <div key={c.id} className="flex flex-col items-center gap-1">
-              <img
-                src={c.src}
-                alt={c.name}
-                className="rounded-xl border-2 w-full"
-                style={{
-                  borderColor: RARITY_COLOR[c.rarity],
-                  boxShadow: `0 0 8px 1px ${RARITY_COLOR[c.rarity]}55`,
-                }}
-              />
-              <span className="text-[9px] text-center leading-tight opacity-80">{c.name}</span>
-            </div>
-          ) : (
-            <div key={c.id} className="flex flex-col items-center gap-1 opacity-30">
-              <div className="w-full aspect-[3/5] rounded-xl border-2 border-dashed border-night-700 flex items-center justify-center text-2xl">
-                🔒
-              </div>
-              <span className="text-[9px] opacity-60">???</span>
-            </div>
-          );
-        })}
-      </div>
+      {/* ── 보물 카드 도감 바로가기 ── */}
+      <Link
+        to="/cards"
+        className="mt-7 btn-3d rounded-3xl bg-night-900 border-2 border-night-700 border-b-night-700 p-4 flex items-center gap-3 hover:bg-night-800"
+      >
+        <span className="text-3xl">🎴</span>
+        <div className="flex-1">
+          <div className="text-base">나의 보물 카드 도감</div>
+          <div className="text-xs opacity-60">
+            {rewardCards.length}/{REWARD_CARDS.length}장 수집 · 카드 이미지 저장은 여기서!
+          </div>
+        </div>
+        <span className="opacity-40 text-xl">›</span>
+      </Link>
 
+      {/* ── 인증 메달 ── */}
       <h2 className="mt-7 mb-3 text-lg">
-        🃏 인증카드 <span className="text-sm opacity-60">({cards.length}장)</span>
+        🏵️ 인증 메달 <span className="text-sm opacity-60">({cards.length}개)</span>
       </h2>
       {cards.length === 0 ? (
         <div className="rounded-3xl bg-night-900 border border-dashed border-night-700 p-10 text-center opacity-60">
-          레벨 2가 되면 첫 카드를 받아요!
+          레벨 2가 되면 첫 메달을 받아요!
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-3xl bg-night-900 border border-night-700 p-4 grid grid-cols-4 gap-4">
           {cards.map((c, i) => (
-            <button key={i} onClick={() => setSelected(c)} aria-label={`레벨 ${c.level} 카드 보기`}>
-              <CardView card={c} nickname={nickname ?? ''} className="hover:scale-105 transition-transform" />
-            </button>
+            <MedalView key={i} card={c} />
           ))}
         </div>
       )}
@@ -252,43 +229,6 @@ export default function ProfilePage() {
         진행 초기화
       </button>
 
-      {/* 카드 상세 모달 */}
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-night-950/90 backdrop-blur flex flex-col items-center justify-center gap-5 p-8"
-            onClick={() => setSelected(null)}
-          >
-            <motion.div
-              initial={{ rotateY: 90 }}
-              animate={{ rotateY: 0 }}
-              transition={{ duration: 0.4 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-64"
-            >
-              <CardView card={selected} nickname={nickname ?? ''} />
-            </motion.div>
-            <button
-              disabled={saving}
-              onClick={async (e) => {
-                e.stopPropagation();
-                setSaving(true);
-                await downloadCardPng(selected, nickname ?? '모험가');
-                setSaving(false);
-              }}
-              className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-8 py-3 text-lg text-night-950 disabled:opacity-50"
-            >
-              {saving ? '저장 중...' : '📥 PNG로 저장 (프사용)'}
-            </button>
-            <button onClick={() => setSelected(null)} className="opacity-60">
-              닫기
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

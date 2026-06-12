@@ -27,9 +27,13 @@ function StageNode({ stage, index, unlocked, stars }: { stage: StageDef; index: 
         className={`${isBoss ? 'w-24 h-24 text-5xl' : 'w-18 h-18 text-4xl'} rounded-full flex items-center justify-center border-b-8 ${
           isBoss
             ? 'bg-gradient-to-b from-rose-500 to-rose-700 border-rose-900'
-            : stars > 0
-              ? 'bg-gradient-to-b from-lime-400 to-lime-600 border-lime-800'
-              : 'bg-gradient-to-b from-violet-500 to-violet-700 border-violet-900'
+            : stage.type === 'challenge'
+              ? stars > 0
+                ? 'bg-gradient-to-b from-amber-300 to-amber-500 border-amber-700'
+                : 'bg-gradient-to-b from-indigo-400 to-indigo-700 border-indigo-900 ring-2 ring-coin/40'
+              : stars > 0
+                ? 'bg-gradient-to-b from-lime-400 to-lime-600 border-lime-800'
+                : 'bg-gradient-to-b from-violet-500 to-violet-700 border-violet-900'
         } shadow-xl`}
       >
         {stage.emoji}
@@ -135,6 +139,8 @@ export default function UnitMapPage() {
   const clearedByUnit = new Map<string, boolean>();
   const nodes = STAGES.map((stage, i) => {
     const stars = stages[stage.id]?.stars ?? 0;
+    // 심화 탐험은 선택 트랙 — 항상 열려 있고 잠금 체인에도 영향 없음
+    if (stage.type === 'challenge') return { stage, i, unlocked: true, stars };
     const unlocked = clearedByUnit.get(stage.unitId) ?? true;
     clearedByUnit.set(stage.unitId, stars > 0);
     return { stage, i, unlocked, stars };
@@ -175,7 +181,7 @@ export default function UnitMapPage() {
         <DragonWidget />
       </div>
 
-      {/* ── 연습 모드 ── */}
+      {/* ── 연습·시험 모드 ── */}
       <div className="mt-4 grid grid-cols-2 gap-3">
         <Link
           to="/practice/basic"
@@ -193,7 +199,32 @@ export default function UnitMapPage() {
           <div className="text-sm">문장제 연습</div>
           <div className="text-[0.65rem] opacity-50">무한 모드</div>
         </Link>
+        <Link
+          to="/practice/challenge"
+          className="btn-3d rounded-3xl bg-night-900 border-2 border-violet-700/60 border-b-violet-700/60 p-4 text-center hover:bg-night-800"
+        >
+          <div className="text-3xl mb-1">🌌</div>
+          <div className="text-sm">심화 연습</div>
+          <div className="text-[0.65rem] opacity-50">최고 수준 무한 모드</div>
+        </Link>
+        <Link
+          to="/exam"
+          className="btn-3d rounded-3xl bg-night-900 border-2 border-coin/50 border-b-coin/50 p-4 text-center hover:bg-night-800"
+        >
+          <div className="text-3xl mb-1">🏟️</div>
+          <div className="text-sm">명예의 시험장</div>
+          <div className="text-[0.65rem] opacity-50">단원 시험 10문제</div>
+        </Link>
       </div>
+
+      {/* ── 보물 카드 갤러리 ── */}
+      <Link
+        to="/cards"
+        className="mt-3 btn-3d rounded-3xl bg-night-900 border-2 border-night-700 border-b-night-700 p-3 text-center hover:bg-night-800 flex items-center justify-center gap-2"
+      >
+        <span className="text-2xl">🎴</span>
+        <span className="text-sm">나의 보물 카드 도감</span>
+      </Link>
 
       {/* ── 학기 선택 탭 ── */}
       <div className="mt-6 grid grid-cols-4 gap-1.5">

@@ -64,6 +64,11 @@ export function bossTimeLimit(difficulty: 1 | 2 | 3): number {
   return { 1: 15, 2: 25, 3: 45 }[difficulty];
 }
 
+/** 단원의 심화 스킬 (challenge: true) */
+export function challengeSkillsOf(unitId: string): SkillDef[] {
+  return SKILLS.filter((s) => s.unitId === unitId && s.challenge === true);
+}
+
 export function nextProblem(
   stage: StageDef,
   stats: Record<string, SkillStat>,
@@ -71,8 +76,31 @@ export function nextProblem(
   position: number,
   recentWrong: string[],
 ): Served {
+  // ── 심화 탐험: 해당 단원의 심화 스킬만 출제 (없으면 도전 난이도 스킬로 대체) ──
+  if (stage.type === 'challenge') {
+    let pool = challengeSkillsOf(stage.unitId);
+    if (pool.length === 0) {
+      pool = SKILLS.filter((s) => s.unitId === stage.unitId && s.difficulty === 3);
+    }
+    const skill = pool[Math.floor(Math.random() * pool.length)];
+    return { problem: generateProblem(skill.id, randomSeed()), isReview: false, timeLimit: null };
+  }
+
   const progress = position / stage.problemCount;
   const stageSkills = stage.skillIds.map(getSkill);
+
+  // ── 보스전 후반: 심화 문제 1~2개 혼합 (마지막 30% 구간에서 50% 확률) ──
+  if (stage.type === 'boss' && progress >= 0.7) {
+    const chPool = challengeSkillsOf(stage.unitId);
+    if (chPool.length > 0 && Math.random() < 0.5) {
+      const skill = chPool[Math.floor(Math.random() * chPool.length)];
+      return {
+        problem: generateProblem(skill.id, randomSeed()),
+        isReview: false,
+        timeLimit: 60, // 심화는 넉넉히
+      };
+    }
+  }
 
   // 오답 retrieval: 첫 문제 이후 25% 확률로 최근 틀린 유형 재출제
   if (position > 0 && recentWrong.length > 0 && Math.random() < 0.25) {

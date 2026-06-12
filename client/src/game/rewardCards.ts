@@ -50,17 +50,18 @@ export const RARITY_COLOR: Record<RewardRarity, string> = {
   legendary: '#fbbf24',
 };
 
-/** 중복 카드를 뽑았을 때 대신 받는 XP */
+/** 중복 카드를 뽑았을 때 추가로 받는 XP */
 export const DUPLICATE_XP = 10;
 
 /**
- * 오늘의 카드 뽑기 — 연속 출석일이 길수록 좋은 카드 확률이 올라간다.
- * 기본: 전설 3% / 레어 20%. 스트릭 1일당 전설 +0.5%p, 레어 +1%p (7일 상한).
+ * 카드 뽑기 — 연속 출석일이 길수록 좋은 카드 확률이 올라간다.
+ * 기본: 전설 5% / 레어 25%. 스트릭 1일당 전설 +0.5%p, 레어 +1%p (7일 상한).
+ * (카드는 희귀 이벤트에서만 나오므로 등급 확률은 너그럽게)
  */
 export function drawRewardCard(streakDays: number): RewardCardDef {
   const s = Math.min(Math.max(streakDays, 1), 7);
-  const legendary = 0.03 + s * 0.005;
-  const rare = 0.2 + s * 0.01;
+  const legendary = 0.05 + s * 0.005;
+  const rare = 0.25 + s * 0.01;
   const roll = Math.random();
   const rarity: RewardRarity = roll < legendary ? 'legendary' : roll < legendary + rare ? 'rare' : 'common';
   const pool = REWARD_CARDS.filter((c) => c.rarity === rarity);

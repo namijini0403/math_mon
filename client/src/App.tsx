@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import TeacherPage from './pages/TeacherPage';
 import PracticePage from './pages/PracticePage';
 import DragonPage from './pages/DragonPage';
+import ExamPage from './pages/ExamPage';
+import CardGalleryPage from './pages/CardGalleryPage';
 
 export default function App() {
   const nickname = useGame((s) => s.nickname);
@@ -21,6 +23,8 @@ export default function App() {
           <Route path="/practice/:mode" element={<PracticePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/dragon" element={<DragonPage />} />
+          <Route path="/exam" element={<ExamPage />} />
+          <Route path="/cards" element={<CardGalleryPage />} />
         </>
       ) : (
         <Route path="*" element={<Navigate to="/login" replace />} />

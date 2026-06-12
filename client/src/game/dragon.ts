@@ -106,6 +106,9 @@ export interface DragonItemStats {
   bossesCleared: number;
   basicSets: number;
   wordSets: number;
+  challengeSets: number;
+  examCount: number;
+  challengeCleared: number;
   attendanceDays: number;
   feedCount: number;
   rewardCardCount: number;
@@ -122,6 +125,9 @@ export const DRAGON_ITEMS: DragonItemDef[] = [
   { id: 'crown-seed', name: '왕관 새싹', emoji: '🌱', desc: '성체가 되면 피어날 왕관의 씨앗', hint: '10일 출석하면', earned: (s) => s.attendanceDays >= 10 },
   { id: 'treasure-pouch', name: '보물 주머니', emoji: '👝', desc: '보물 카드를 소중히 담는 주머니', hint: '보물 카드를 10장 모으면', earned: (s) => s.rewardCardCount >= 10 },
   { id: 'rainbow-ribbon', name: '무지개 리본', emoji: '🎀', desc: '완전한 성체를 축하하는 리본', hint: '보스를 6마리 물리치면', earned: (s) => s.bossesCleared >= 6 },
+  { id: 'challenge-gem', name: '심연의 보석', emoji: '💠', desc: '심화 탐험을 정복한 자의 증표', hint: '심화 탐험을 1번 클리어하면', earned: (s) => s.challengeCleared >= 1 },
+  { id: 'scholar-quill', name: '현자의 깃펜', emoji: '🪶', desc: '어려운 문제를 사랑하는 마음', hint: '심화 연습 3세트를 마치면', earned: (s) => s.challengeSets >= 3 },
+  { id: 'exam-medal', name: '명예의 메달', emoji: '🎖️', desc: '시험장을 누빈 용사의 메달', hint: '명예의 시험에 3번 도전하면', earned: (s) => s.examCount >= 3 },
 ];
 
 /** 드래곤 저장 상태 */
@@ -184,9 +190,9 @@ export function topAffinity(aff: Record<Affinity, number>): Affinity {
   return order.reduce((best, a) => (aff[a] > aff[best] ? a : best), 'sun' as Affinity);
 }
 
-/** 성체 형태 결정 — 보물 카드를 많이 모았으면 인간형, 아니면 드래곤형 */
+/** 성체 형태 결정 — 보물 카드(종류 기준)를 많이 모았으면 인간형, 아니면 드래곤형 */
 export function decideAdultForm(rewardCardCount: number): 'human' | 'dragon' {
-  return rewardCardCount >= 12 ? 'human' : 'dragon';
+  return rewardCardCount >= 10 ? 'human' : 'dragon';
 }
 
 /** 성체 이름 */
@@ -195,8 +201,8 @@ export function adultTitle(adult: { affinity: Affinity; form: 'human' | 'dragon'
   return adult.form === 'human' ? info.adultHuman : info.adultDragon;
 }
 
-/** 레어 엔딩 조건: 성체 + 보물 카드 30장 이상 */
-export const RARE_ENDING_CARDS = 30;
+/** 레어 엔딩 조건: 성체 + 보물 카드 15종 이상 (카드는 희귀 이벤트에서만 나옴) */
+export const RARE_ENDING_CARDS = 15;
 
 /** 현재 드래곤 모습 이모지 — 홈/프로필 아바타용 (알 → 성체로 아바타도 자란다) */
 export function dragonEmoji(d: DragonState): string {

@@ -24,6 +24,7 @@ import { unitSpaceSkills } from './units/unitSpace';
 import { unitProportionSkills } from './units/unitProportion';
 import { unitCircleSkills } from './units/unitCircle';
 import { unitRound3dSkills } from './units/unitRound3d';
+import { challengeG5S1Skills } from './units/challengeG5S1';
 import type { Problem, SkillDef, UnitDef } from './types';
 import { randomSeed } from './rng';
 
@@ -53,6 +54,8 @@ export const SKILLS: SkillDef[] = [
   ...unitProportionSkills,
   ...unitCircleSkills,
   ...unitRound3dSkills,
+  // 심화 (최고수준 2·3단계 유형화 — 단원 id에 귀속, challenge: true)
+  ...challengeG5S1Skills,
 ];
 
 const skillMap = new Map(SKILLS.map((s) => [s.id, s]));

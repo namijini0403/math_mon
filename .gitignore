@@ -12,3 +12,6 @@ dev-dist/
 !client/public/**/*.png
 
 .claude/settings.local.json
+
+# 참고문제 원본 (저작권 자료 — 커밋 금지)
+참고문제/
