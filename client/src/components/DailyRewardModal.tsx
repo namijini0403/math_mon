@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useGame } from '../game/store';
 import { dailyRewardXp } from '../game/badges';
+import { RARITY_COLOR, RARITY_LABEL, type RewardCardDef } from '../game/rewardCards';
 import { sfx } from '../game/sounds';
 import type { EarnedCard } from '../game/store';
 import type { BadgeDef } from '../game/badges';
@@ -65,7 +66,13 @@ export default function DailyRewardModal() {
   const shouldShow = attendance.lastClaim !== TODAY;
   const [visible, setVisible] = useState(shouldShow);
   const [opened, setOpened] = useState(false);
-  const [reward, setReward] = useState<{ xp: number; day: number; cards: EarnedCard[] } | null>(null);
+  const [reward, setReward] = useState<{
+    xp: number;
+    day: number;
+    cards: EarnedCard[];
+    drawn: RewardCardDef;
+    duplicate: boolean;
+  } | null>(null);
   const [newBadges, setNewBadges] = useState<BadgeDef[]>([]);
 
   // 스트릭: 아직 오늘 claimDailyReward 안 했으니 미리 계산 (어제 접속했으면 +1, 아니면 1)
@@ -193,15 +200,32 @@ export default function DailyRewardModal() {
                   </motion.span>
                 ))}
 
-                {/* 열린 상자 */}
-                <motion.div
-                  initial={{ scale: 0.4, rotate: -15 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: 'spring', stiffness: 260, damping: 16 }}
-                  className="text-8xl drop-shadow-lg"
-                >
-                  🌟
-                </motion.div>
+                {/* 뽑은 보상 카드 — 뒤집기 연출 */}
+                {reward && (
+                  <motion.div
+                    initial={{ rotateY: 180, scale: 0.6, opacity: 0 }}
+                    animate={{ rotateY: 0, scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.7, type: 'spring', stiffness: 160, damping: 18 }}
+                    className="flex flex-col items-center gap-1.5"
+                  >
+                    <img
+                      src={reward.drawn.src}
+                      alt={reward.drawn.name}
+                      className="w-40 rounded-2xl border-4 shadow-2xl"
+                      style={{
+                        borderColor: RARITY_COLOR[reward.drawn.rarity],
+                        boxShadow: `0 0 24px 4px ${RARITY_COLOR[reward.drawn.rarity]}66`,
+                      }}
+                    />
+                    <div className="text-base font-bold mt-1">{reward.drawn.name}</div>
+                    <div className="text-xs font-bold" style={{ color: RARITY_COLOR[reward.drawn.rarity] }}>
+                      {RARITY_LABEL[reward.drawn.rarity]}
+                    </div>
+                    {reward.duplicate && (
+                      <div className="text-xs opacity-70">이미 모은 카드라 보너스 XP로 받았어요!</div>
+                    )}
+                  </motion.div>
+                )}
 
                 {/* XP */}
                 <motion.div

@@ -56,6 +56,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const [timeLeft, setTimeLeft] = useState<number | null>(served.timeLimit);
   const [comboBonus, setComboBonus] = useState(0);
   const [bonusToast, setBonusToast] = useState<string | null>(null);
+  const [bossImgOk, setBossImgOk] = useState(true);
   const [result, setResult] = useState<{
     stars: number;
     xp: number;
@@ -294,9 +295,18 @@ function LessonRunner({ stageId }: { stageId: string }) {
             <motion.span
               key={hitFx}
               animate={hitFx > 0 ? { x: [0, -6, 6, -4, 0], rotate: [0, -8, 6, 0] } : {}}
-              className="text-4xl"
+              className="text-4xl flex-shrink-0"
             >
-              {stage.boss.emoji}
+              {bossImgOk && stage.boss.image ? (
+                <img
+                  src={stage.boss.image}
+                  alt={stage.boss.name}
+                  onError={() => setBossImgOk(false)}
+                  className="w-14 h-14 object-contain drop-shadow-lg"
+                />
+              ) : (
+                stage.boss.emoji
+              )}
             </motion.span>
             <div className="flex-1">
               <div className="text-xs text-hurt mb-1">

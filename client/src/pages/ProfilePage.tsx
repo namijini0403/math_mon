@@ -8,6 +8,7 @@ import { levelFromXp } from '../game/xp';
 import { CardView } from '../components/CardView';
 import { downloadCardPng } from '../card/renderCardPng';
 import { BADGES, type BadgeDef } from '../game/badges';
+import { RARITY_COLOR, REWARD_CARDS } from '../game/rewardCards';
 
 /** 희귀도별 테두리 + glow 스타일 */
 function rarityStyle(rarity: 1 | 2 | 3): string {
@@ -17,7 +18,7 @@ function rarityStyle(rarity: 1 | 2 | 3): string {
 }
 
 export default function ProfilePage() {
-  const { nickname, xp, cards, streak, skillStats, badges, resetAll } = useGame();
+  const { nickname, xp, cards, streak, skillStats, badges, rewardCards, resetAll } = useGame();
   const { level } = levelFromXp(xp);
   const [selected, setSelected] = useState<EarnedCard | null>(null);
   const [saving, setSaving] = useState(false);
@@ -137,6 +138,40 @@ export default function ProfilePage() {
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* ── 출석 보상 카드 컬렉션 ── */}
+      <h2 className="mt-7 mb-3 text-lg">
+        🎴 보물 카드{' '}
+        <span className="text-sm opacity-60">
+          ({rewardCards.length}/{REWARD_CARDS.length}) · 매일 출석하면 모을 수 있어요
+        </span>
+      </h2>
+      <div className="rounded-3xl bg-night-900 border border-night-700 p-4 grid grid-cols-4 gap-3">
+        {REWARD_CARDS.map((c) => {
+          const owned = rewardCards.includes(c.id);
+          return owned ? (
+            <div key={c.id} className="flex flex-col items-center gap-1">
+              <img
+                src={c.src}
+                alt={c.name}
+                className="rounded-xl border-2 w-full"
+                style={{
+                  borderColor: RARITY_COLOR[c.rarity],
+                  boxShadow: `0 0 8px 1px ${RARITY_COLOR[c.rarity]}55`,
+                }}
+              />
+              <span className="text-[9px] text-center leading-tight opacity-80">{c.name}</span>
+            </div>
+          ) : (
+            <div key={c.id} className="flex flex-col items-center gap-1 opacity-30">
+              <div className="w-full aspect-[3/5] rounded-xl border-2 border-dashed border-night-700 flex items-center justify-center text-2xl">
+                🔒
+              </div>
+              <span className="text-[9px] opacity-60">???</span>
+            </div>
+          );
+        })}
       </div>
 
       <h2 className="mt-7 mb-3 text-lg">
