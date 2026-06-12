@@ -75,4 +75,18 @@ export const BOSS_CARDS: Record<string, BossCardDef> = {
   'sdm-boss': { name: '닌자 사냥꾼', subtitle: 'NINJA HUNTER', colors: ['#18181b', '#ef4444'], accent: '#fecaca', emoji: '🥷' },
   'scb-boss': { name: '큐브 정복자', subtitle: 'CUBE CONQUEROR', colors: ['#14532d', '#34d399'], accent: '#d1fae5', emoji: '🎲' },
   'sa-boss': { name: '운명의 승부사', subtitle: 'FATE GAMBLER', colors: ['#2e1065', '#f59e0b'], accent: '#fef3c7', emoji: '🔮' },
+  // ── 6-1 보스 ──
+  'fd1-boss': { name: '심해의 항해사', subtitle: 'DEEP SEA NAVIGATOR', colors: ['#082f49', '#06b6d4'], accent: '#cffafe', emoji: '🐙' },
+  'pr-boss': { name: '수정 정령의 친구', subtitle: 'CRYSTAL FRIEND', colors: ['#1e1b4b', '#a78bfa'], accent: '#ede9fe', emoji: '💎' },
+  'dd1-boss': { name: '유랑단의 별', subtitle: 'STAR OF THE TROUPE', colors: ['#3f1d2e', '#f43f5e'], accent: '#ffe4e6', emoji: '🎩' },
+  'rt-boss': { name: '황금 저울의 주인', subtitle: 'GOLDEN SCALE MASTER', colors: ['#451a03', '#f59e0b'], accent: '#fef3c7', emoji: '🦊' },
+  'gr-boss': { name: '색깔의 지배자', subtitle: 'COLOR SOVEREIGN', colors: ['#14532d', '#84cc16'], accent: '#ecfccb', emoji: '🦎' },
+  'vl-boss': { name: '고래의 길잡이', subtitle: 'WHALE GUIDE', colors: ['#0c4a6e', '#38bdf8'], accent: '#e0f2fe', emoji: '🐋' },
+  // ── 6-2 보스 ──
+  'fd2-boss': { name: '마술사의 후계자', subtitle: 'MAGICIAN HEIR', colors: ['#312e81', '#c084fc'], accent: '#f3e8ff', emoji: '🎩' },
+  'dd2-boss': { name: '너구리의 맞수', subtitle: 'RACCOON RIVAL', colors: ['#292524', '#fb923c'], accent: '#ffedd5', emoji: '🦝' },
+  'spc-boss': { name: '설산의 친구', subtitle: 'YETI FRIEND', colors: ['#1e3a5f', '#e2e8f0'], accent: '#f8fafc', emoji: '☃️' },
+  'pp-boss': { name: '균형의 달인', subtitle: 'BALANCE MASTER', colors: ['#7c2d12', '#fbbf24'], accent: '#fef9c3', emoji: '🦀' },
+  'cir-boss': { name: '원의 현자', subtitle: 'SAGE OF CIRCLES', colors: ['#1e1b4b', '#22d3ee'], accent: '#cffafe', emoji: '🛞' },
+  'r3-boss': { name: '회전목마의 주인', subtitle: 'CAROUSEL KEEPER', colors: ['#4a044e', '#f0abfc'], accent: '#fae8ff', emoji: '🎠' },
 };

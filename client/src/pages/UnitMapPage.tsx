@@ -1,10 +1,11 @@
 /** 홈 — 유닛맵 (구불구불한 길 + 스테이지 노드) + 미션 패널 */
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DailyRewardModal from '../components/DailyRewardModal';
 import DragonWidget from '../components/DragonWidget';
-import { STAGES, UNIT_ORDER, UNIT_TITLES, type StageDef } from '../game/stages';
+import { SEMESTERS, STAGES, UNIT_TITLES, type StageDef } from '../game/stages';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
 import { DAILY_MISSIONS, todayStr } from '../game/missions';
@@ -104,6 +105,15 @@ export default function UnitMapPage() {
   const { nickname, xp, stages, streak } = useGame();
   const { level, into, need } = levelFromXp(xp);
   const streakActive = streak.last === todayStr();
+  // 학기 탭 (마지막 선택 기억)
+  const [semesterId, setSemesterId] = useState(
+    () => localStorage.getItem('mathmon-semester') ?? 'g5s1',
+  );
+  const semester = SEMESTERS.find((s) => s.id === semesterId) ?? SEMESTERS[0];
+  const selectSemester = (id: string) => {
+    setSemesterId(id);
+    localStorage.setItem('mathmon-semester', id);
+  };
 
   // 단원별 잠금: 각 단원의 첫 스테이지는 항상 열려 있고, 단원 안에서는 순차 해제
   // (교사가 진도에 맞는 단원부터 시작하게 할 수 있음)
@@ -170,15 +180,27 @@ export default function UnitMapPage() {
         </Link>
       </div>
 
+      {/* ── 학기 선택 탭 ── */}
+      <div className="mt-6 grid grid-cols-4 gap-1.5">
+        {SEMESTERS.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => selectSemester(s.id)}
+            className={`rounded-2xl py-2.5 text-xs leading-tight border-2 transition-colors ${
+              s.id === semesterId
+                ? 'bg-coin/20 border-coin text-coin'
+                : 'bg-night-900 border-night-700 opacity-60 hover:opacity-100'
+            }`}
+          >
+            <div className="text-lg">{s.emoji}</div>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       {/* ── 유닛맵 ── */}
-      {UNIT_ORDER.map((unitId) => (
+      {semester.units.map((unitId) => (
         <section key={unitId} className="mt-8">
-          {unitId === 'unitMix' && (
-            <div className="mb-4 text-center text-coin text-xl tracking-widest">🌱 1학기 🌱</div>
-          )}
-          {unitId === 'unitRange' && (
-            <div className="mb-4 mt-14 text-center text-coin text-xl tracking-widest">🍁 2학기 🍁</div>
-          )}
           <div className="rounded-2xl bg-night-800 border border-night-700 px-5 py-3 text-center text-lg">
             {UNIT_TITLES[unitId]}
           </div>

@@ -1,0 +1,22 @@
+[
+  { "id": "reward-female-common-01", "rarity": "common", "title": "Star Compass Maiden", "src": "assets/reward-cards-female/reward-female-common-01.png" },
+  { "id": "reward-female-common-02", "rarity": "common", "title": "Moonlit Abacus Priestess", "src": "assets/reward-cards-female/reward-female-common-02.png" },
+  { "id": "reward-female-common-03", "rarity": "common", "title": "Crystal Polygon Empress", "src": "assets/reward-cards-female/reward-female-common-03.png" },
+  { "id": "reward-female-common-04", "rarity": "common", "title": "Fraction Chalice Seer", "src": "assets/reward-cards-female/reward-female-common-04.png" },
+  { "id": "reward-female-common-05", "rarity": "common", "title": "Silent Spellbook Librarian", "src": "assets/reward-cards-female/reward-female-common-05.png" },
+  { "id": "reward-female-common-06", "rarity": "common", "title": "Geometric Gate Keeper", "src": "assets/reward-cards-female/reward-female-common-06.png" },
+  { "id": "reward-female-common-07", "rarity": "common", "title": "Starlit Hourglass Oracle", "src": "assets/reward-cards-female/reward-female-common-07.png" },
+  { "id": "reward-female-common-08", "rarity": "common", "title": "Mystic Ruler Cartographer", "src": "assets/reward-cards-female/reward-female-common-08.png" },
+  { "id": "reward-female-common-09", "rarity": "common", "title": "Aurora Library Maiden", "src": "assets/reward-cards-female/reward-female-common-09.png" },
+  { "id": "reward-female-common-10", "rarity": "common", "title": "Prism Orchard Druid", "src": "assets/reward-cards-female/reward-female-common-10.png" },
+  { "id": "reward-female-common-11", "rarity": "common", "title": "Golden Ratio Shell Siren", "src": "assets/reward-cards-female/reward-female-common-11.png" },
+  { "id": "reward-female-common-12", "rarity": "common", "title": "Lantern Labyrinth Guide", "src": "assets/reward-cards-female/reward-female-common-12.png" },
+  { "id": "reward-female-rare-01", "rarity": "rare", "title": "Celestial Sage Queen", "src": "assets/reward-cards-female/reward-female-rare-01.png" },
+  { "id": "reward-female-rare-02", "rarity": "rare", "title": "Fraction Crown Knightess", "src": "assets/reward-cards-female/reward-female-rare-02.png" },
+  { "id": "reward-female-rare-03", "rarity": "rare", "title": "Infinity Observatory Oracle", "src": "assets/reward-cards-female/reward-female-rare-03.png" },
+  { "id": "reward-female-rare-04", "rarity": "rare", "title": "Sapphire Dragon Scholar", "src": "assets/reward-cards-female/reward-female-rare-04.png" },
+  { "id": "reward-female-rare-05", "rarity": "rare", "title": "Sun-Moon Equation Altar", "src": "assets/reward-cards-female/reward-female-rare-05.png" },
+  { "id": "reward-female-rare-06", "rarity": "rare", "title": "Arcane Lotus Guardian", "src": "assets/reward-cards-female/reward-female-rare-06.png" },
+  { "id": "reward-female-legendary-01", "rarity": "legendary", "title": "Radiant Geometer Empress", "src": "assets/reward-cards-female/reward-female-legendary-01.png" },
+  { "id": "reward-female-legendary-02", "rarity": "legendary", "title": "Crown of Infinite Stars", "src": "assets/reward-cards-female/reward-female-legendary-02.png" }
+]

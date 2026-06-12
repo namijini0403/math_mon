@@ -1,0 +1,12 @@
+[
+  { "id": "reward-dragon-sacred-01", "rarity": "sacred", "title": "Moon Temple Dragon", "src": "assets/reward-cards-dragon/reward-dragon-sacred-01.png" },
+  { "id": "reward-dragon-sacred-02", "rarity": "sacred", "title": "Solar Pearl Dragon", "src": "assets/reward-cards-dragon/reward-dragon-sacred-02.png" },
+  { "id": "reward-dragon-sacred-03", "rarity": "sacred", "title": "Aurora Jade Dragon", "src": "assets/reward-cards-dragon/reward-dragon-sacred-03.png" },
+  { "id": "reward-dragon-sacred-04", "rarity": "sacred", "title": "Crystal Library Dragon", "src": "assets/reward-cards-dragon/reward-dragon-sacred-04.png" },
+  { "id": "reward-dragon-sacred-05", "rarity": "sacred", "title": "Lotus Shrine Dragon", "src": "assets/reward-cards-dragon/reward-dragon-sacred-05.png" },
+  { "id": "reward-dragon-sacred-06", "rarity": "sacred", "title": "Astral Gate Dragon", "src": "assets/reward-cards-dragon/reward-dragon-sacred-06.png" },
+  { "id": "reward-dragon-rare-01", "rarity": "rare", "title": "Seraphic Dawn Dragon", "src": "assets/reward-cards-dragon/reward-dragon-rare-01.png" },
+  { "id": "reward-dragon-rare-02", "rarity": "rare", "title": "Sapphire Oracle Dragon", "src": "assets/reward-cards-dragon/reward-dragon-rare-02.png" },
+  { "id": "reward-dragon-rare-03", "rarity": "rare", "title": "Rose-Gold Eclipse Dragon", "src": "assets/reward-cards-dragon/reward-dragon-rare-03.png" },
+  { "id": "reward-dragon-legendary-01", "rarity": "legendary", "title": "Crowned Dragon of Infinite Stars", "src": "assets/reward-cards-dragon/reward-dragon-legendary-01.png" }
+]

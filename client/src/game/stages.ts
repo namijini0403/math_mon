@@ -278,13 +278,158 @@ export const STAGES: StageDef[] = [
     reviewSkillIds: [], problemCount: 12,
     boss: { name: '운명의 점술사', emoji: '🔮', hp: 12, image: 'assets/boss/oracle.png', taunt: '네가 이길 가능성은... 0이다!' },
   },
+
+  // ════════ 6학년 1학기 ════════
+  // ── 6-1-1: 분수의 나눗셈 ──
+  { id: 'fd1-1', unitId: 'unitFracDiv1', title: '나눗셈 항구', type: 'lesson', emoji: '⚓', skillIds: ['fdiv1-nat-nat', 'fdiv1-frac-nat'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'fd1-2', unitId: 'unitFracDiv1', title: '분모의 바다', type: 'lesson', emoji: '🌊', skillIds: ['fdiv1-frac-nat2'], reviewSkillIds: ['fdiv1-frac-nat'], problemCount: 8 },
+  { id: 'fd1-3', unitId: 'unitFracDiv1', title: '대분수 등대', type: 'lesson', emoji: '🗼', skillIds: ['fdiv1-mixed-nat', 'fdiv1-word'], reviewSkillIds: ['fdiv1-frac-nat2'], problemCount: 8 },
+  {
+    id: 'fd1-boss', unitId: 'unitFracDiv1', title: '문어 선장', type: 'boss', emoji: '🐙',
+    skillIds: ['fdiv1-nat-nat', 'fdiv1-frac-nat', 'fdiv1-frac-nat2', 'fdiv1-mixed-nat', 'fdiv1-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '문어 선장', emoji: '🐙', hp: 10, image: 'assets/boss/octopus.png', taunt: '내 보물은 똑같이 나눌 수 없다!' },
+  },
+  // ── 6-1-2: 각기둥과 각뿔 ──
+  { id: 'pr-1', unitId: 'unitPrism', title: '수정 기둥 광장', type: 'lesson', emoji: '🔷', skillIds: ['prism-count', 'pyramid-count'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'pr-2', unitId: 'unitPrism', title: '거꾸로 동굴', type: 'lesson', emoji: '🕳️', skillIds: ['prism-inverse', 'pyramid-inverse'], reviewSkillIds: ['prism-count'], problemCount: 8 },
+  { id: 'pr-3', unitId: 'unitPrism', title: '지혜의 전망대', type: 'lesson', emoji: '🔭', skillIds: ['prism-pick', 'prism-word'], reviewSkillIds: ['pyramid-inverse'], problemCount: 8 },
+  {
+    id: 'pr-boss', unitId: 'unitPrism', title: '수정 정령', type: 'boss', emoji: '💎',
+    skillIds: ['prism-count', 'pyramid-count', 'prism-inverse', 'pyramid-inverse', 'prism-pick', 'prism-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '수정 정령', emoji: '💎', hp: 10, image: 'assets/boss/crystal.png', taunt: '내 모서리를 전부 셀 수 있을까?' },
+  },
+  // ── 6-1-3: 소수의 나눗셈 ──
+  { id: 'dd1-1', unitId: 'unitDecDiv1', title: '유랑단 천막', type: 'lesson', emoji: '🎪', skillIds: ['ddiv1-basic', 'ddiv1-natnat'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'dd1-2', unitId: 'unitDecDiv1', title: '곡예의 줄', type: 'lesson', emoji: '🎭', skillIds: ['ddiv1-carry', 'ddiv1-zero'], reviewSkillIds: ['ddiv1-basic'], problemCount: 8 },
+  { id: 'dd1-3', unitId: 'unitDecDiv1', title: '마술 상자', type: 'lesson', emoji: '🎁', skillIds: ['ddiv1-point', 'ddiv1-word'], reviewSkillIds: ['ddiv1-carry'], problemCount: 8 },
+  {
+    id: 'dd1-boss', unitId: 'unitDecDiv1', title: '유랑단장', type: 'boss', emoji: '🎩',
+    skillIds: ['ddiv1-basic', 'ddiv1-carry', 'ddiv1-zero', 'ddiv1-natnat', 'ddiv1-point', 'ddiv1-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '소수점 유랑단장', emoji: '🎩', hp: 10, image: 'assets/boss/ringmaster.png', taunt: '소수점이 어디로 갔는지 맞혀 보시지!' },
+  },
+  // ── 6-1-4: 비와 비율 ──
+  { id: 'rt-1', unitId: 'unitRatio', title: '여우 시장', type: 'lesson', emoji: '🏪', skillIds: ['ratio-express', 'ratio-value'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'rt-2', unitId: 'unitRatio', title: '백분율 골목', type: 'lesson', emoji: '💯', skillIds: ['ratio-percent', 'percent-of', 'percent-apply'], reviewSkillIds: ['ratio-value'], problemCount: 9 },
+  { id: 'rt-3', unitId: 'unitRatio', title: '흥정의 광장', type: 'lesson', emoji: '⚖️', skillIds: ['ratio-compare', 'ratio-word'], reviewSkillIds: ['percent-apply'], problemCount: 8 },
+  {
+    id: 'rt-boss', unitId: 'unitRatio', title: '여우 상인', type: 'boss', emoji: '🦊',
+    skillIds: ['ratio-express', 'ratio-value', 'ratio-percent', 'percent-of', 'percent-apply', 'ratio-compare', 'ratio-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '비율 여우 상인', emoji: '🦊', hp: 10, image: 'assets/boss/foxmerchant.png', taunt: '이 거래, 너에게 유리할 비율은 없어!' },
+  },
+  // ── 6-1-5: 여러 가지 그래프 ──
+  { id: 'gr-1', unitId: 'unitGraph', title: '띠그래프 들판', type: 'lesson', emoji: '📊', skillIds: ['graph-read', 'graph-most'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'gr-2', unitId: 'unitGraph', title: '원그래프 호수', type: 'lesson', emoji: '🥧', skillIds: ['graph-percent', 'graph-missing'], reviewSkillIds: ['graph-read'], problemCount: 8 },
+  { id: 'gr-3', unitId: 'unitGraph', title: '해석의 정원', type: 'lesson', emoji: '🌷', skillIds: ['graph-times', 'graph-word'], reviewSkillIds: ['graph-missing'], problemCount: 8 },
+  {
+    id: 'gr-boss', unitId: 'unitGraph', title: '그래프 카멜레온', type: 'boss', emoji: '🦎',
+    skillIds: ['graph-read', 'graph-most', 'graph-percent', 'graph-missing', 'graph-times', 'graph-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '그래프 카멜레온', emoji: '🦎', hp: 10, image: 'assets/boss/chameleon.png', taunt: '내 색깔 속에 숨은 숫자를 찾아봐!' },
+  },
+  // ── 6-1-6: 직육면체의 부피와 겉넓이 ──
+  { id: 'vl-1', unitId: 'unitVolume', title: '부피의 항만', type: 'lesson', emoji: '📦', skillIds: ['vol-rect', 'vol-cube'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'vl-2', unitId: 'unitVolume', title: '겉넓이 부두', type: 'lesson', emoji: '🚢', skillIds: ['surf-rect', 'surf-cube'], reviewSkillIds: ['vol-rect'], problemCount: 8 },
+  { id: 'vl-3', unitId: 'unitVolume', title: '깊은 바다 창고', type: 'lesson', emoji: '🌊', skillIds: ['vol-missing', 'vol-unit', 'vol-word'], reviewSkillIds: ['surf-rect'], problemCount: 9 },
+  {
+    id: 'vl-boss', unitId: 'unitVolume', title: '부피 고래', type: 'boss', emoji: '🐋',
+    skillIds: ['vol-rect', 'vol-cube', 'vol-missing', 'surf-rect', 'surf-cube', 'vol-unit', 'vol-word'],
+    reviewSkillIds: [], problemCount: 12,
+    boss: { name: '부피 고래', emoji: '🐋', hp: 12, image: 'assets/boss/whale.png', taunt: '내 뱃속의 부피를 잴 수 있겠어?' },
+  },
+
+  // ════════ 6학년 2학기 ════════
+  // ── 6-2-1: 분수의 나눗셈 ──
+  { id: 'fd2-1', unitId: 'unitFracDiv2', title: '역수의 무대', type: 'lesson', emoji: '🎪', skillIds: ['fdiv2-same', 'fdiv2-nat-frac'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'fd2-2', unitId: 'unitFracDiv2', title: '뒤집기 거울방', type: 'lesson', emoji: '🪞', skillIds: ['fdiv2-diff'], reviewSkillIds: ['fdiv2-same'], problemCount: 8 },
+  { id: 'fd2-3', unitId: 'unitFracDiv2', title: '환상의 천장', type: 'lesson', emoji: '🎠', skillIds: ['fdiv2-mixed', 'fdiv2-word'], reviewSkillIds: ['fdiv2-diff'], problemCount: 8 },
+  {
+    id: 'fd2-boss', unitId: 'unitFracDiv2', title: '역수 마술사', type: 'boss', emoji: '🎩',
+    skillIds: ['fdiv2-same', 'fdiv2-nat-frac', 'fdiv2-diff', 'fdiv2-mixed', 'fdiv2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '역수 마술사', emoji: '🎩', hp: 10, image: 'assets/boss/magician.png', taunt: '뒤집어라, 뒤집어! 뭐가 진짜일까?' },
+  },
+  // ── 6-2-2: 소수의 나눗셈 ──
+  { id: 'dd2-1', unitId: 'unitDecDiv2', title: '너구리 가게', type: 'lesson', emoji: '🏮', skillIds: ['ddiv2-same', 'ddiv2-nat'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'dd2-2', unitId: 'unitDecDiv2', title: '저울의 방', type: 'lesson', emoji: '⚖️', skillIds: ['ddiv2-diff', 'ddiv2-round'], reviewSkillIds: ['ddiv2-same'], problemCount: 8 },
+  { id: 'dd2-3', unitId: 'unitDecDiv2', title: '나눔 창고', type: 'lesson', emoji: '🛖', skillIds: ['ddiv2-share', 'ddiv2-word'], reviewSkillIds: ['ddiv2-diff'], problemCount: 8 },
+  {
+    id: 'dd2-boss', unitId: 'unitDecDiv2', title: '소수점 너구리', type: 'boss', emoji: '🦝',
+    skillIds: ['ddiv2-same', 'ddiv2-diff', 'ddiv2-nat', 'ddiv2-round', 'ddiv2-share', 'ddiv2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '소수점 너구리', emoji: '🦝', hp: 10, image: 'assets/boss/raccoon.png', taunt: '소수점을 슬쩍 옮겨놨지롱~!' },
+  },
+  // ── 6-2-3: 공간과 입체 ──
+  { id: 'spc-1', unitId: 'unitSpace', title: '쌓기나무 언덕', type: 'lesson', emoji: '🧱', skillIds: ['space-layers', 'space-cube'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'spc-2', unitId: 'unitSpace', title: '얼음 블록 협곡', type: 'lesson', emoji: '🧊', skillIds: ['space-need', 'space-hidden'], reviewSkillIds: ['space-cube'], problemCount: 8 },
+  { id: 'spc-3', unitId: 'unitSpace', title: '설산의 탑', type: 'lesson', emoji: '🏔️', skillIds: ['space-word'], reviewSkillIds: ['space-need'], problemCount: 8 },
+  {
+    id: 'spc-boss', unitId: 'unitSpace', title: '쌓기나무 예티', type: 'boss', emoji: '☃️',
+    skillIds: ['space-layers', 'space-cube', 'space-need', 'space-hidden', 'space-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '쌓기나무 예티', emoji: '☃️', hp: 10, image: 'assets/boss/yeti.png', taunt: '내가 쌓은 탑, 몇 개인지 알아맞혀 봐!' },
+  },
+  // ── 6-2-4: 비례식과 비례배분 ──
+  { id: 'pp-1', unitId: 'unitProportion', title: '균형의 다리', type: 'lesson', emoji: '🌉', skillIds: ['prop-simplify', 'prop-simplify2'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'pp-2', unitId: 'unitProportion', title: '저울 게의 집', type: 'lesson', emoji: '🦀', skillIds: ['prop-solve', 'prop-property'], reviewSkillIds: ['prop-simplify'], problemCount: 8 },
+  { id: 'pp-3', unitId: 'unitProportion', title: '나눔의 해변', type: 'lesson', emoji: '🏖️', skillIds: ['prop-divide', 'prop-word'], reviewSkillIds: ['prop-solve'], problemCount: 8 },
+  {
+    id: 'pp-boss', unitId: 'unitProportion', title: '비례 게 장군', type: 'boss', emoji: '🦀',
+    skillIds: ['prop-simplify', 'prop-simplify2', 'prop-solve', 'prop-property', 'prop-divide', 'prop-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '비례 게 장군', emoji: '🦀', hp: 10, image: 'assets/boss/crab.png', taunt: '내 집게의 균형을 무너뜨릴 수 있겠나!' },
+  },
+  // ── 6-2-5: 원의 넓이 ──
+  { id: 'cir-1', unitId: 'unitCircle', title: '바퀴의 길', type: 'lesson', emoji: '🛞', skillIds: ['circ-circum', 'circ-circum-inv'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'cir-2', unitId: 'unitCircle', title: '둥근 들판', type: 'lesson', emoji: '⭕', skillIds: ['circ-area', 'circ-point'], reviewSkillIds: ['circ-circum'], problemCount: 8 },
+  { id: 'cir-3', unitId: 'unitCircle', title: '반달 정원', type: 'lesson', emoji: '🌗', skillIds: ['circ-half', 'circ-word'], reviewSkillIds: ['circ-area'], problemCount: 8 },
+  {
+    id: 'cir-boss', unitId: 'unitCircle', title: '바퀴 정령', type: 'boss', emoji: '🛞',
+    skillIds: ['circ-circum', 'circ-circum-inv', 'circ-area', 'circ-half', 'circ-point', 'circ-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '바퀴 정령', emoji: '🛞', hp: 10, image: 'assets/boss/wheel.png', taunt: '빙글빙글~ 내 둘레를 따라잡아 봐!' },
+  },
+  // ── 6-2-6: 원기둥, 원뿔, 구 ──
+  { id: 'r3-1', unitId: 'unitRound3d', title: '회전목마 입구', type: 'lesson', emoji: '🎠', skillIds: ['round3d-parts', 'round3d-rotate'], reviewSkillIds: [], problemCount: 8 },
+  { id: 'r3-2', unitId: 'unitRound3d', title: '둥근 지붕 마을', type: 'lesson', emoji: '🏰', skillIds: ['round3d-pick', 'round3d-size'], reviewSkillIds: ['round3d-parts'], problemCount: 8 },
+  { id: 'r3-3', unitId: 'unitRound3d', title: '별빛 대관람차', type: 'lesson', emoji: '🎡', skillIds: ['round3d-word'], reviewSkillIds: ['round3d-size'], problemCount: 8 },
+  {
+    id: 'r3-boss', unitId: 'unitRound3d', title: '회전목마 왕', type: 'boss', emoji: '🎠',
+    skillIds: ['round3d-parts', 'round3d-pick', 'round3d-rotate', 'round3d-size', 'round3d-word'],
+    reviewSkillIds: [], problemCount: 12,
+    boss: { name: '회전목마 왕', emoji: '🎠', hp: 12, image: 'assets/boss/carousel.png', taunt: '돌고 도는 내 왕국에서 길을 잃어 보렴!' },
+  },
 ];
 
-/** 유닛맵 표시 순서 (교육과정 순서, 1학기 → 2학기) */
-export const UNIT_ORDER = [
-  'unitMix', 'unitDiv', 'unitPattern', 'unit1', 'unit2', 'unitPoly',
-  'unitRange', 'unitFracMul', 'unitSym', 'unitDecMul', 'unitCuboid', 'unitAvg',
-] as const;
+/** 학기별 단원 구성 (2022 개정교육과정) — 유닛맵 탭 */
+export interface SemesterDef {
+  id: string;
+  label: string;
+  emoji: string;
+  units: string[];
+}
+
+export const SEMESTERS: SemesterDef[] = [
+  {
+    id: 'g5s1', label: '5학년 1학기', emoji: '🌱',
+    units: ['unitMix', 'unitDiv', 'unitPattern', 'unit1', 'unit2', 'unitPoly'],
+  },
+  {
+    id: 'g5s2', label: '5학년 2학기', emoji: '🍁',
+    units: ['unitRange', 'unitFracMul', 'unitSym', 'unitDecMul', 'unitCuboid', 'unitAvg'],
+  },
+  {
+    id: 'g6s1', label: '6학년 1학기', emoji: '🌸',
+    units: ['unitFracDiv1', 'unitPrism', 'unitDecDiv1', 'unitRatio', 'unitGraph', 'unitVolume'],
+  },
+  {
+    id: 'g6s2', label: '6학년 2학기', emoji: '❄️',
+    units: ['unitFracDiv2', 'unitDecDiv2', 'unitSpace', 'unitProportion', 'unitCircle', 'unitRound3d'],
+  },
+];
 
 export const UNIT_TITLES: Record<string, string> = {
   unitMix: '1. 자연수의 혼합 계산',
@@ -299,6 +444,18 @@ export const UNIT_TITLES: Record<string, string> = {
   unitDecMul: '4. 소수의 곱셈',
   unitCuboid: '5. 직육면체',
   unitAvg: '6. 평균과 가능성',
+  unitFracDiv1: '1. 분수의 나눗셈',
+  unitPrism: '2. 각기둥과 각뿔',
+  unitDecDiv1: '3. 소수의 나눗셈',
+  unitRatio: '4. 비와 비율',
+  unitGraph: '5. 여러 가지 그래프',
+  unitVolume: '6. 직육면체의 부피와 겉넓이',
+  unitFracDiv2: '1. 분수의 나눗셈',
+  unitDecDiv2: '2. 소수의 나눗셈',
+  unitSpace: '3. 공간과 입체',
+  unitProportion: '4. 비례식과 비례배분',
+  unitCircle: '5. 원의 넓이',
+  unitRound3d: '6. 원기둥, 원뿔, 구',
 };
 
 export function getStage(id: string): StageDef {

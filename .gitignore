@@ -10,3 +10,5 @@ dev-dist/
 .playwright-mcp/
 *.png
 !client/public/**/*.png
+
+.claude/settings.local.json
