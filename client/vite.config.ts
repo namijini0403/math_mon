@@ -4,6 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  // GitHub Pages는 /math_mon/ 하위 경로에서 서빙 (Railway는 루트)
+  base: process.env.GHPAGES ? '/math_mon/' : '/',
   plugins: [
     react(),
     tailwindcss(),

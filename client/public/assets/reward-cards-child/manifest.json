@@ -1,0 +1,12 @@
+[
+  { "id": "reward-child-common-01", "rarity": "common", "title": "Star Lantern Child", "src": "assets/reward-cards-child/reward-child-common-01.png" },
+  { "id": "reward-child-common-02", "rarity": "common", "title": "Moon Garden Apprentice", "src": "assets/reward-cards-child/reward-child-common-02.png" },
+  { "id": "reward-child-common-03", "rarity": "common", "title": "Tiny Astral Cartographer", "src": "assets/reward-cards-child/reward-child-common-03.png" },
+  { "id": "reward-child-common-04", "rarity": "common", "title": "Crystal Key Child", "src": "assets/reward-cards-child/reward-child-common-04.png" },
+  { "id": "reward-child-common-05", "rarity": "common", "title": "Aurora Dreamer", "src": "assets/reward-cards-child/reward-child-common-05.png" },
+  { "id": "reward-child-common-06", "rarity": "common", "title": "Silent Bell Keeper", "src": "assets/reward-cards-child/reward-child-common-06.png" },
+  { "id": "reward-child-common-07", "rarity": "common", "title": "Little Rune Weaver", "src": "assets/reward-cards-child/reward-child-common-07.png" },
+  { "id": "reward-child-rare-01", "rarity": "rare", "title": "Celestial Crown Child", "src": "assets/reward-cards-child/reward-child-rare-01.png" },
+  { "id": "reward-child-rare-02", "rarity": "rare", "title": "Oracle of the Small Moon", "src": "assets/reward-cards-child/reward-child-rare-02.png" },
+  { "id": "reward-child-legendary-01", "rarity": "legendary", "title": "Child of Infinite Stars", "src": "assets/reward-cards-child/reward-child-legendary-01.png" }
+]

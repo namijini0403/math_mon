@@ -7,7 +7,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
-import type { Problem } from '../generator/types';
+import { SEMESTERS } from '../game/stages';
+import type { Problem, SkillDef } from '../generator/types';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { useGame } from '../game/store';
 import { sfx } from '../game/sounds';
@@ -19,18 +20,26 @@ import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
 
+/** 유닛맵에서 선택한 학기까지의 단원만 연습 풀에 포함 (이전 학기는 복습으로 누적) */
+function semesterScopedSkills(): SkillDef[] {
+  const semId = localStorage.getItem('mathmon-semester') ?? 'g5s1';
+  const idx = SEMESTERS.findIndex((s) => s.id === semId);
+  const unitIds = new Set(SEMESTERS.slice(0, (idx < 0 ? 0 : idx) + 1).flatMap((s) => s.units));
+  return SKILLS.filter((s) => unitIds.has(s.unitId));
+}
+
 const MODES = {
   basic: {
     title: '기초 연산 연습',
     emoji: '🏋️',
     desc: '계산 문제만 무한으로!',
-    pool: () => SKILLS.filter((s) => !s.word && s.difficulty <= 2),
+    pool: () => semesterScopedSkills().filter((s) => !s.word && s.difficulty <= 2),
   },
   word: {
     title: '문장제 연습',
     emoji: '📖',
     desc: '줄글 문제만 모아서 연습!',
-    pool: () => SKILLS.filter((s) => s.word === true),
+    pool: () => semesterScopedSkills().filter((s) => s.word === true),
   },
 } as const;
 
