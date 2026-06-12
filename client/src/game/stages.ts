@@ -24,6 +24,285 @@ export interface StageDef {
 }
 
 export const STAGES: StageDef[] = [
+  // ════════ 4학년 1학기 ════════
+  // ── 4-1-1: 큰 수 ──
+  {
+    id: 'bn-1', unitId: 'unitBigNum', title: '만·억·조의 마을', type: 'lesson', emoji: '🏛️',
+    skillIds: ['big-read', 'big-write'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'bn-2', unitId: 'unitBigNum', title: '자릿값 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['big-place', 'big-placevalue'], reviewSkillIds: ['big-read'], problemCount: 8,
+  },
+  {
+    id: 'bn-3', unitId: 'unitBigNum', title: '뛰어 세기 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['big-skip', 'big-compare'], reviewSkillIds: ['big-placevalue'], problemCount: 8,
+  },
+  {
+    id: 'bn-4', unitId: 'unitBigNum', title: '수의 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['big-word'], reviewSkillIds: ['big-skip', 'big-compare'], problemCount: 8,
+  },
+  {
+    id: 'bn-boss', unitId: 'unitBigNum', title: '수의 콜로서스', type: 'boss', emoji: '🏛️',
+    skillIds: ['big-read', 'big-write', 'big-place', 'big-placevalue', 'big-skip', 'big-compare', 'big-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '수의 콜로서스', emoji: '🏛️', hp: 10, image: 'assets/boss/colossus.png', taunt: '억·조 단위를 읽을 수 있겠느냐?' },
+  },
+  // ── 4-1-2: 각도 ──
+  {
+    id: 'ag-1', unitId: 'unitAngle', title: '각도 학교', type: 'lesson', emoji: '📐',
+    skillIds: ['ang-classify', 'ang-add-sub'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'ag-2', unitId: 'unitAngle', title: '직선과 바퀴 광장', type: 'lesson', emoji: '🎡',
+    skillIds: ['ang-line', 'ang-round'], reviewSkillIds: ['ang-classify'], problemCount: 8,
+  },
+  {
+    id: 'ag-3', unitId: 'unitAngle', title: '도형 각도의 숲', type: 'lesson', emoji: '🌲',
+    skillIds: ['ang-triangle', 'ang-quad'], reviewSkillIds: ['ang-line', 'ang-round'], problemCount: 8,
+  },
+  {
+    id: 'ag-4', unitId: 'unitAngle', title: '각도 이야기 정원', type: 'lesson', emoji: '🌷',
+    skillIds: ['ang-word'], reviewSkillIds: ['ang-triangle', 'ang-quad'], problemCount: 8,
+  },
+  {
+    id: 'ag-boss', unitId: 'unitAngle', title: '각도 매', type: 'boss', emoji: '🦅',
+    skillIds: ['ang-classify', 'ang-add-sub', 'ang-line', 'ang-round', 'ang-triangle', 'ang-quad', 'ang-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '각도 매', emoji: '🦅', hp: 10, image: 'assets/boss/hawk.png', taunt: '180°와 360°의 비밀을 풀 수 있겠나?' },
+  },
+  // ── 4-1-3: 곱셈과 나눗셈 ──
+  {
+    id: 'md-1', unitId: 'unitMulDiv', title: '몇십 곱셈 도장', type: 'lesson', emoji: '⚒️',
+    skillIds: ['md4-mul-tens'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'md-2', unitId: 'unitMulDiv', title: '두 자리 곱셈 요새', type: 'lesson', emoji: '🏰',
+    skillIds: ['md4-mul-two'], reviewSkillIds: ['md4-mul-tens'], problemCount: 8,
+  },
+  {
+    id: 'md-3', unitId: 'unitMulDiv', title: '나눗셈 협곡', type: 'lesson', emoji: '🏔️',
+    skillIds: ['md4-div-tens', 'md4-div-two'], reviewSkillIds: ['md4-mul-two'], problemCount: 8,
+  },
+  {
+    id: 'md-4', unitId: 'unitMulDiv', title: '검산과 이야기 시장', type: 'lesson', emoji: '🎪',
+    skillIds: ['md4-verify', 'md4-word'], reviewSkillIds: ['md4-div-two'], problemCount: 8,
+  },
+  {
+    id: 'md-boss', unitId: 'unitMulDiv', title: '계산 황소', type: 'boss', emoji: '🐂',
+    skillIds: ['md4-mul-tens', 'md4-mul-two', 'md4-div-tens', 'md4-div-two', 'md4-verify', 'md4-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '계산 황소', emoji: '🐂', hp: 10, image: 'assets/boss/ox.png', taunt: '나눗셈 검산으로 나를 막아 보렴!' },
+  },
+  // ── 4-1-4: 평면도형의 이동 ──
+  {
+    id: 'mv-1', unitId: 'unitMove', title: '돌리기 연습장', type: 'lesson', emoji: '🌀',
+    skillIds: ['move-rotate-deg', 'move-rotate-back'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'mv-2', unitId: 'unitMove', title: '뒤집기 거울방', type: 'lesson', emoji: '🪞',
+    skillIds: ['move-flip-twice', 'move-method-choice'], reviewSkillIds: ['move-rotate-deg'], problemCount: 8,
+  },
+  {
+    id: 'mv-3', unitId: 'unitMove', title: '디지털 돌리기 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['move-digital-180'], reviewSkillIds: ['move-flip-twice'], problemCount: 8,
+  },
+  {
+    id: 'mv-4', unitId: 'unitMove', title: '이동 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['move-word'], reviewSkillIds: ['move-digital-180', 'move-rotate-back'], problemCount: 8,
+  },
+  {
+    id: 'mv-boss', unitId: 'unitMove', title: '거울 나비', type: 'boss', emoji: '🦋',
+    skillIds: ['move-rotate-deg', 'move-rotate-back', 'move-flip-twice', 'move-digital-180', 'move-method-choice', 'move-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '거울 나비', emoji: '🦋', hp: 10, image: 'assets/boss/butterfly.png', taunt: '날갯짓 한 번에 세상이 뒤집힌다!' },
+  },
+  // ── 4-1-5: 막대그래프 ──
+  {
+    id: 'bg-1', unitId: 'unitBarGraph', title: '자료 읽기 들판', type: 'lesson', emoji: '📊',
+    skillIds: ['bar-most'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'bg-2', unitId: 'unitBarGraph', title: '비교의 다리', type: 'lesson', emoji: '🌉',
+    skillIds: ['bar-diff', 'bar-total'], reviewSkillIds: ['bar-most'], problemCount: 8,
+  },
+  {
+    id: 'bg-3', unitId: 'unitBarGraph', title: '눈금의 정원', type: 'lesson', emoji: '🌷',
+    skillIds: ['bar-scale'], reviewSkillIds: ['bar-diff'], problemCount: 8,
+  },
+  {
+    id: 'bg-4', unitId: 'unitBarGraph', title: '그래프 이야기 마을', type: 'lesson', emoji: '🏘️',
+    skillIds: ['bar-word'], reviewSkillIds: ['bar-total', 'bar-scale'], problemCount: 8,
+  },
+  {
+    id: 'bg-boss', unitId: 'unitBarGraph', title: '그래프 펭귄', type: 'boss', emoji: '🐧',
+    skillIds: ['bar-most', 'bar-diff', 'bar-total', 'bar-scale', 'bar-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '그래프 펭귄', emoji: '🐧', hp: 10, image: 'assets/boss/penguin.png', taunt: '내 자료를 제대로 읽을 수 있겠어?' },
+  },
+  // ── 4-1-6: 규칙 찾기 ──
+  {
+    id: 'fr-1', unitId: 'unitFindRule', title: '수 배열의 오솔길', type: 'lesson', emoji: '🍂',
+    skillIds: ['rule-next-term'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'fr-2', unitId: 'unitFindRule', title: '계산식 패턴 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['rule-formula-nth'], reviewSkillIds: ['rule-next-term'], problemCount: 8,
+  },
+  {
+    id: 'fr-3', unitId: 'unitFindRule', title: '도형 배열 광장', type: 'lesson', emoji: '🔷',
+    skillIds: ['rule-shape-count', 'rule-inverse'], reviewSkillIds: ['rule-formula-nth'], problemCount: 8,
+  },
+  {
+    id: 'fr-4', unitId: 'unitFindRule', title: '규칙 이야기 미궁', type: 'lesson', emoji: '📜',
+    skillIds: ['rule-word'], reviewSkillIds: ['rule-shape-count', 'rule-inverse'], problemCount: 8,
+  },
+  {
+    id: 'fr-boss', unitId: 'unitFindRule', title: '규칙 스핑크스', type: 'boss', emoji: '🐈',
+    skillIds: ['rule-next-term', 'rule-formula-nth', 'rule-shape-count', 'rule-inverse', 'rule-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '규칙 스핑크스', emoji: '🐈', hp: 10, image: 'assets/boss/sphinx.png', taunt: '내 수수께끼 규칙을 풀 수 있겠느냐?' },
+  },
+
+  // ════════ 4학년 2학기 (전반) ════════
+  // ── 4-2-1: 분수의 덧셈과 뺄셈 ──
+  {
+    id: 'f4-1', unitId: 'unitFracAS4', title: '분수 덧셈 광장', type: 'lesson', emoji: '🌼',
+    skillIds: ['f4-add-proper-lt1', 'f4-add-proper-ge1'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'f4-2', unitId: 'unitFracAS4', title: '분수 뺄셈 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['f4-sub-proper', 'f4-nat-sub-frac'], reviewSkillIds: ['f4-add-proper-lt1'], problemCount: 8,
+  },
+  {
+    id: 'f4-3', unitId: 'unitFracAS4', title: '대분수 화산', type: 'lesson', emoji: '🌋',
+    skillIds: ['f4-add-mixed', 'f4-sub-mixed'], reviewSkillIds: ['f4-sub-proper'], problemCount: 8,
+  },
+  {
+    id: 'f4-4', unitId: 'unitFracAS4', title: '분수 이야기 마을', type: 'lesson', emoji: '🏘️',
+    skillIds: ['f4-word'], reviewSkillIds: ['f4-add-mixed', 'f4-sub-mixed'], problemCount: 8,
+  },
+  {
+    id: 'f4-boss', unitId: 'unitFracAS4', title: '분수 토끼', type: 'boss', emoji: '🐰',
+    skillIds: ['f4-add-proper-lt1', 'f4-add-proper-ge1', 'f4-sub-proper', 'f4-add-mixed', 'f4-sub-mixed', 'f4-nat-sub-frac', 'f4-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '분수 토끼', emoji: '🐰', hp: 10, image: 'assets/boss/rabbit.png', taunt: '동분모 분수는 껌이지! 받아내림이 두렵지 않으니?' },
+  },
+  // ── 4-2-2: 삼각형 ──
+  {
+    id: 'tr-1', unitId: 'unitTriangle', title: '이등변삼각형 언덕', type: 'lesson', emoji: '🔺',
+    skillIds: ['tri-isosceles-apex', 'tri-isosceles-base'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'tr-2', unitId: 'unitTriangle', title: '정삼각형 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['tri-equilateral', 'tri-perimeter-inv'], reviewSkillIds: ['tri-isosceles-apex'], problemCount: 8,
+  },
+  {
+    id: 'tr-3', unitId: 'unitTriangle', title: '삼각형 분류 광장', type: 'lesson', emoji: '📐',
+    skillIds: ['tri-classify'], reviewSkillIds: ['tri-equilateral'], problemCount: 8,
+  },
+  {
+    id: 'tr-4', unitId: 'unitTriangle', title: '삼각형 이야기 숲', type: 'lesson', emoji: '🌲',
+    skillIds: ['tri-word'], reviewSkillIds: ['tri-classify', 'tri-perimeter-inv'], problemCount: 8,
+  },
+  {
+    id: 'tr-boss', unitId: 'unitTriangle', title: '삼각 공작', type: 'boss', emoji: '🦚',
+    skillIds: ['tri-isosceles-apex', 'tri-isosceles-base', 'tri-equilateral', 'tri-classify', 'tri-perimeter-inv', 'tri-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '삼각 공작', emoji: '🦚', hp: 10, image: 'assets/boss/peacock-tri.png', taunt: '내 꼬리 깃털은 완벽한 이등변삼각형! 각도를 맞춰 봐!' },
+  },
+  // ── 4-2-3: 소수의 덧셈과 뺄셈 ──
+  {
+    id: 'da-1', unitId: 'unitDecAS', title: '소수 자릿값 광장', type: 'lesson', emoji: '🔢',
+    skillIds: ['dec4-placevalue', 'dec4-compare'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'da-2', unitId: 'unitDecAS', title: '소수 덧셈 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['dec4-add'], reviewSkillIds: ['dec4-placevalue'], problemCount: 8,
+  },
+  {
+    id: 'da-3', unitId: 'unitDecAS', title: '소수 뺄셈 협곡', type: 'lesson', emoji: '🏔️',
+    skillIds: ['dec4-sub', 'dec4-scale'], reviewSkillIds: ['dec4-add'], problemCount: 8,
+  },
+  {
+    id: 'da-4', unitId: 'unitDecAS', title: '소수 이야기 시장', type: 'lesson', emoji: '🎪',
+    skillIds: ['dec4-word'], reviewSkillIds: ['dec4-sub', 'dec4-scale'], problemCount: 8,
+  },
+  {
+    id: 'da-boss', unitId: 'unitDecAS', title: '소수점 수달', type: 'boss', emoji: '🦦',
+    skillIds: ['dec4-placevalue', 'dec4-compare', 'dec4-add', 'dec4-sub', 'dec4-scale', 'dec4-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '소수점 수달', emoji: '🦦', hp: 10, image: 'assets/boss/otter.png', taunt: '소수점을 슬쩍 옮기면 아무도 모르겠지?' },
+  },
+
+  // ── 4-2-4: 사각형 ──
+  {
+    id: 'qd-1', unitId: 'unitQuad', title: '평행사변형 각도 요새', type: 'lesson', emoji: '📐',
+    skillIds: ['quad-para-angle'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'qd-2', unitId: 'unitQuad', title: '변의 길이 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['quad-para-side', 'quad-rhombus'], reviewSkillIds: ['quad-para-angle'], problemCount: 8,
+  },
+  {
+    id: 'qd-3', unitId: 'unitQuad', title: '사각형 분류 광장', type: 'lesson', emoji: '🔷',
+    skillIds: ['quad-classify'], reviewSkillIds: ['quad-rhombus'], problemCount: 8,
+  },
+  {
+    id: 'qd-4', unitId: 'unitQuad', title: '사각형 이야기 마을', type: 'lesson', emoji: '🏘️',
+    skillIds: ['quad-word'], reviewSkillIds: ['quad-para-side', 'quad-classify'], problemCount: 8,
+  },
+  {
+    id: 'qd-boss', unitId: 'unitQuad', title: '사각 두더지', type: 'boss', emoji: '🦔',
+    skillIds: ['quad-para-angle', 'quad-para-side', 'quad-rhombus', 'quad-classify', 'quad-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '사각 두더지', emoji: '🦔', hp: 10, image: 'assets/boss/mole.png', taunt: '내 굴은 완벽한 평행사변형이야! 각도를 맞혀 봐!' },
+  },
+
+  // ── 4-2-5: 꺾은선그래프 ──
+  {
+    id: 'lg-1', unitId: 'unitLineGraph', title: '변화 구간 탐색', type: 'lesson', emoji: '📈',
+    skillIds: ['line-max-change'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'lg-2', unitId: 'unitLineGraph', title: '두 시점 비교의 다리', type: 'lesson', emoji: '🌉',
+    skillIds: ['line-two-diff', 'line-total'], reviewSkillIds: ['line-max-change'], problemCount: 8,
+  },
+  {
+    id: 'lg-3', unitId: 'unitLineGraph', title: '눈금 비밀 정원', type: 'lesson', emoji: '🌷',
+    skillIds: ['line-scale'], reviewSkillIds: ['line-two-diff'], problemCount: 8,
+  },
+  {
+    id: 'lg-4', unitId: 'unitLineGraph', title: '꺾은선 이야기 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['line-word'], reviewSkillIds: ['line-total', 'line-scale'], problemCount: 8,
+  },
+  {
+    id: 'lg-boss', unitId: 'unitLineGraph', title: '꺾은선 학', type: 'boss', emoji: '🦢',
+    skillIds: ['line-max-change', 'line-two-diff', 'line-total', 'line-scale', 'line-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '꺾은선 학', emoji: '🦢', hp: 10, image: 'assets/boss/crane.png', taunt: '내 날갯짓의 변화량을 읽을 수 있겠어?' },
+  },
+
+  // ── 4-2-6: 다각형 ──
+  {
+    id: 'pg-1', unitId: 'unitPolygon', title: '정다각형 둘레 광장', type: 'lesson', emoji: '🔶',
+    skillIds: ['pgon-perimeter', 'pgon-side-inv'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'pg-2', unitId: 'unitPolygon', title: '대각선의 숲', type: 'lesson', emoji: '🌲',
+    skillIds: ['pgon-diagonal', 'pgon-name'], reviewSkillIds: ['pgon-perimeter'], problemCount: 8,
+  },
+  {
+    id: 'pg-3', unitId: 'unitPolygon', title: '다각형 이야기 미궁', type: 'lesson', emoji: '📜',
+    skillIds: ['pgon-word'], reviewSkillIds: ['pgon-diagonal', 'pgon-side-inv'], problemCount: 8,
+  },
+  {
+    id: 'pg-boss', unitId: 'unitPolygon', title: '다각형 공작', type: 'boss', emoji: '🦚',
+    skillIds: ['pgon-perimeter', 'pgon-side-inv', 'pgon-diagonal', 'pgon-name', 'pgon-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '다각형 공작', emoji: '🦚', hp: 10, image: 'assets/boss/peacock.png', taunt: '내 꼬리 깃털의 다각형 개수를 맞혀 봐!' },
+  },
+
   // ── 1단원: 자연수의 혼합 계산 ──
   {
     id: 'sm-1', unitId: 'unitMix', title: '계산 골짜기', type: 'lesson', emoji: '🏞️',
@@ -432,6 +711,14 @@ export interface SemesterDef {
 
 export const SEMESTERS: SemesterDef[] = [
   {
+    id: 'g4s1', label: '4학년 1학기', emoji: '🌼',
+    units: ['unitBigNum', 'unitAngle', 'unitMulDiv', 'unitMove', 'unitBarGraph', 'unitFindRule'],
+  },
+  {
+    id: 'g4s2', label: '4학년 2학기', emoji: '🍂',
+    units: ['unitFracAS4', 'unitTriangle', 'unitDecAS', 'unitQuad', 'unitLineGraph', 'unitPolygon'],
+  },
+  {
     id: 'g5s1', label: '5학년 1학기', emoji: '🌱',
     units: ['unitMix', 'unitDiv', 'unitPattern', 'unit1', 'unit2', 'unitPoly'],
   },
@@ -450,6 +737,18 @@ export const SEMESTERS: SemesterDef[] = [
 ];
 
 export const UNIT_TITLES: Record<string, string> = {
+  unitBigNum: '1. 큰 수',
+  unitAngle: '2. 각도',
+  unitFracAS4: '1. 분수의 덧셈과 뺄셈',
+  unitTriangle: '2. 삼각형',
+  unitDecAS: '3. 소수의 덧셈과 뺄셈',
+  unitQuad: '4. 사각형',
+  unitLineGraph: '5. 꺾은선그래프',
+  unitPolygon: '6. 다각형',
+  unitMulDiv: '3. 곱셈과 나눗셈',
+  unitMove: '4. 평면도형의 이동',
+  unitBarGraph: '5. 막대그래프',
+  unitFindRule: '6. 규칙 찾기',
   unitMix: '1. 자연수의 혼합 계산',
   unitDiv: '2. 약수와 배수',
   unitPattern: '3. 규칙과 대응',

@@ -1,5 +1,17 @@
 /** 생성기 공개 API — 스킬 레지스트리와 문제 생성 진입점 */
 
+import { unitBigNumSkills } from './units/g4BigNum';
+import { unitAngleSkills } from './units/g4Angle';
+import { unitMulDivSkills } from './units/g4MulDiv';
+import { unitMoveSkills } from './units/g4Move';
+import { unitBarGraphSkills } from './units/g4BarGraph';
+import { unitFindRuleSkills } from './units/g4FindRule';
+import { unitFracAS4Skills } from './units/g4FracAS';
+import { unitTriangleSkills } from './units/g4Triangle';
+import { unitDecASSkills } from './units/g4DecAS';
+import { unitQuadSkills } from './units/g4Quad';
+import { unitLineGraphSkills } from './units/g4LineGraph';
+import { unitPolygonSkills } from './units/g4Polygon';
 import { unit1Skills } from './units/unit1';
 import { unit2Skills } from './units/unit2';
 import { unitMixSkills } from './units/unitMix';
@@ -31,8 +43,24 @@ import { challengeG6S2Skills } from './units/challengeG6S2';
 import type { Problem, SkillDef, UnitDef } from './types';
 import { randomSeed } from './rng';
 
-/** 2022 개정교육과정 단원 순서 (5-1 → 5-2 → 6-1 → 6-2) */
+/** 2022 개정교육과정 단원 순서 (4-1 → 4-2 → 5-1 → 5-2 → 6-1 → 6-2) */
 export const SKILLS: SkillDef[] = [
+  // ── 4-1 ──
+  ...unitBigNumSkills,
+  ...unitAngleSkills,
+  ...unitMulDivSkills,
+  ...unitMoveSkills,
+  ...unitBarGraphSkills,
+  ...unitFindRuleSkills,
+  // ── 4-2 (전반) ──
+  ...unitFracAS4Skills,
+  ...unitTriangleSkills,
+  ...unitDecASSkills,
+  // ── 4-2 (후반) ──
+  ...unitQuadSkills,
+  ...unitLineGraphSkills,
+  ...unitPolygonSkills,
+  // ── 5-1 ──
   ...unitMixSkills,
   ...unitDivSkills,
   ...unitPatternSkills,
@@ -67,6 +95,18 @@ export const SKILLS: SkillDef[] = [
 const skillMap = new Map(SKILLS.map((s) => [s.id, s]));
 
 export const UNITS: UnitDef[] = [
+  { id: 'unitBigNum', title: '4-1 큰 수', skillIds: unitBigNumSkills.map((s) => s.id) },
+  { id: 'unitAngle', title: '4-1 각도', skillIds: unitAngleSkills.map((s) => s.id) },
+  { id: 'unitMulDiv', title: '4-1 곱셈과 나눗셈', skillIds: unitMulDivSkills.map((s) => s.id) },
+  { id: 'unitMove', title: '4-1 평면도형의 이동', skillIds: unitMoveSkills.map((s) => s.id) },
+  { id: 'unitBarGraph', title: '4-1 막대그래프', skillIds: unitBarGraphSkills.map((s) => s.id) },
+  { id: 'unitFindRule', title: '4-1 규칙 찾기', skillIds: unitFindRuleSkills.map((s) => s.id) },
+  { id: 'unitFracAS4', title: '4-2 분수의 덧셈과 뺄셈', skillIds: unitFracAS4Skills.map((s) => s.id) },
+  { id: 'unitTriangle', title: '4-2 삼각형', skillIds: unitTriangleSkills.map((s) => s.id) },
+  { id: 'unitDecAS', title: '4-2 소수의 덧셈과 뺄셈', skillIds: unitDecASSkills.map((s) => s.id) },
+  { id: 'unitQuad', title: '4-2 사각형', skillIds: unitQuadSkills.map((s) => s.id) },
+  { id: 'unitLineGraph', title: '4-2 꺾은선그래프', skillIds: unitLineGraphSkills.map((s) => s.id) },
+  { id: 'unitPolygon', title: '4-2 다각형', skillIds: unitPolygonSkills.map((s) => s.id) },
   { id: 'unitMix', title: '5-1 자연수의 혼합 계산', skillIds: unitMixSkills.map((s) => s.id) },
   { id: 'unitDiv', title: '5-1 약수와 배수', skillIds: unitDivSkills.map((s) => s.id) },
   { id: 'unitPattern', title: '5-1 규칙과 대응', skillIds: unitPatternSkills.map((s) => s.id) },

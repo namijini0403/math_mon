@@ -62,6 +62,22 @@ export interface BossCardDef {
 }
 
 export const BOSS_CARDS: Record<string, BossCardDef> = {
+  // ── 4-1 보스 ──
+  'bn-boss': { name: '콜로서스 격파자', subtitle: 'COLOSSUS BREAKER', colors: ['#1c1917', '#a16207'], accent: '#fef9c3', emoji: '🏛️' },
+  // ── 4-2 보스 (전반) ──
+  'f4-boss': { name: '토끼 정복자', subtitle: 'RABBIT CONQUEROR', colors: ['#4a1942', '#db2777'], accent: '#fce7f3', emoji: '🐰' },
+  'tr-boss': { name: '공작의 눈', subtitle: 'PEACOCK EYE', colors: ['#14532d', '#16a34a'], accent: '#dcfce7', emoji: '🦚' },
+  'da-boss': { name: '수달의 친구', subtitle: 'OTTER FRIEND', colors: ['#0c4a6e', '#0ea5e9'], accent: '#e0f2fe', emoji: '🦦' },
+  // ── 4-2 보스 (후반) ──
+  'qd-boss': { name: '두더지 정복자', subtitle: 'MOLE CONQUEROR', colors: ['#292524', '#a16207'], accent: '#fef9c3', emoji: '🦔' },
+  'lg-boss': { name: '학의 친구', subtitle: 'CRANE FRIEND', colors: ['#0f4c81', '#38bdf8'], accent: '#e0f2fe', emoji: '🦢' },
+  'pg-boss': { name: '공작의 날개', subtitle: 'PEACOCK WING', colors: ['#14532d', '#84cc16'], accent: '#ecfccb', emoji: '🦚' },
+  'ag-boss': { name: '매의 눈', subtitle: 'HAWK EYE', colors: ['#0c4a6e', '#0369a1'], accent: '#bae6fd', emoji: '🦅' },
+  'md-boss': { name: '황소 정복자', subtitle: 'OX CONQUEROR', colors: ['#14532d', '#15803d'], accent: '#d9f99d', emoji: '🐂' },
+  'mv-boss': { name: '나비의 날개', subtitle: 'BUTTERFLY WING', colors: ['#4a044e', '#c026d3'], accent: '#f5d0fe', emoji: '🦋' },
+  'bg-boss': { name: '펭귄 분석가', subtitle: 'PENGUIN ANALYST', colors: ['#0f172a', '#0ea5e9'], accent: '#bae6fd', emoji: '🐧' },
+  'fr-boss': { name: '스핑크스의 친구', subtitle: 'SPHINX FRIEND', colors: ['#422006', '#d97706'], accent: '#fde68a', emoji: '🐈' },
+  // ── 5-1 보스 ──
   's1-boss': { name: '드래곤 슬레이어', subtitle: 'DRAGON SLAYER', colors: ['#450a0a', '#ea580c'], accent: '#fed7aa', emoji: '🐲' },
   's2-boss': { name: '마왕 정복자', subtitle: 'DEMON CONQUEROR', colors: ['#2e1065', '#dc2626'], accent: '#fecaca', emoji: '👹' },
   'sm-boss': { name: '계산의 거인 사냥꾼', subtitle: 'GIANT HUNTER', colors: ['#1c1917', '#65a30d'], accent: '#d9f99d', emoji: '🗿' },
