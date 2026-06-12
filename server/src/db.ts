@@ -35,5 +35,7 @@ export async function bootstrap() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
   `);
+  // 구버전 테이블에 세이브 컬럼 추가 (전체 게임 상태 — 기기 변경 시 복원용)
+  await pool.query(`ALTER TABLE progress ADD COLUMN IF NOT EXISTS save JSONB`);
   console.log('DB 스키마 준비 완료');
 }

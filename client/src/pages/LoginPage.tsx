@@ -28,6 +28,10 @@ export default function LoginPage() {
       }
       const res = await join(classCode.trim().toUpperCase(), name, pin);
       if (res) {
+        // 서버에 세이브가 있으면 복원 (기기를 바꿔 로그인한 경우)
+        if (res.save && typeof res.save === 'object') {
+          useGame.setState(res.save as unknown as Parameters<typeof useGame.setState>[0]);
+        }
         setProfile({ nickname: res.nickname, classCode: res.classCode, studentId: res.studentId });
         navigate('/');
         return;
@@ -41,7 +45,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6 max-w-md mx-auto">
+    <div
+      className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6"
+      style={{
+        backgroundImage:
+          'linear-gradient(to bottom, rgba(15,13,41,0.55), rgba(15,13,41,0.92)), url(assets/bg/title.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="w-full max-w-md flex flex-col items-center gap-6">
       <motion.div
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -94,8 +107,9 @@ export default function LoginPage() {
         disabled={busy || nickname.trim().length === 0}
         className="btn-3d w-full rounded-2xl py-4 text-xl bg-glow border-glow border-b-lime-600 text-night-950 disabled:opacity-30"
       >
-        {busy ? '접속 중...' : '모험 시작! ⚔️'}
+        {busy ? '접속 중...' : '모험 시작! 🐲'}
       </button>
+      </div>
     </div>
   );
 }

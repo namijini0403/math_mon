@@ -68,6 +68,7 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
   const [solved, setSolved] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [setToast, setSetToast] = useState(false);
   const answeredRef = useRef(0);
 
   // 나갈 때 동기화
@@ -90,6 +91,14 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
     } else {
       setStreak(0);
       sfx.wrong();
+    }
+    // 드래곤 성장: 연습 10문제 = 1세트
+    const game = useGame.getState();
+    const completedSet = game.addPracticeAnswer(mode);
+    setSetToast(completedSet !== null);
+    if (completedSet) {
+      game.evaluateDragonItems();
+      sfx.fanfare();
     }
     answeredRef.current += 1;
     if (answeredRef.current % 10 === 0) syncNow();
@@ -181,6 +190,11 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
                 <div className={`text-2xl mb-1 ${lastCorrect ? 'text-glow' : 'text-hurt'}`}>
                   {lastCorrect ? '정답! +1 XP ✨' : '아쉬워요! 😢'}
                 </div>
+                {setToast && (
+                  <div className="text-sm text-coin mb-1">
+                    🐲 연습 1세트 완성! 드래곤이 쑥쑥 자라요 (+15 성장)
+                  </div>
+                )}
                 {!lastCorrect && (
                   <div className="text-sm leading-relaxed opacity-90 mb-1">
                     <MathView expr={problem.explanation} size="md" className="justify-start" />

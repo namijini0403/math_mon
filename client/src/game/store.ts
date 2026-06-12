@@ -6,6 +6,21 @@ import { levelFromXp, tierForLevel, XP_MISSION_REWARD } from './xp';
 import { emptyDaily, todayStr, type DailyCounters } from './missions';
 import { dailyRewardXp, newlyEarned, type BadgeDef, type BadgeStats } from './badges';
 import { drawRewardCard, DUPLICATE_XP, type RewardCardDef } from './rewardCards';
+import {
+  AFFINITY_SOURCES,
+  DRAGON_ITEMS,
+  decideAdultForm,
+  emptyDragon,
+  FRUITS,
+  getFruit,
+  GP_REWARDS,
+  currentFullness,
+  stageForGp,
+  topAffinity,
+  type Affinity,
+  type DragonItemDef,
+  type DragonState,
+} from './dragon';
 import { pushProgress } from '../api';
 
 export interface EarnedCard {
@@ -43,6 +58,10 @@ interface GameState {
   rewardCards: string[];
   /** 통산 기록 (배지 조건용) */
   records: { bestCombo: number; perfectLessons: number; lessonsCompleted: number };
+  /** 드래곤 육성 상태 */
+  dragon: DragonState;
+  /** 연습 모드 누적 (10문제 = 1세트) */
+  practice: { basicAnswered: number; wordAnswered: number; basicSets: number; wordSets: number };
 
   setProfile: (p: { nickname: string; classCode?: string; studentId?: string }) => void;
   recordAnswer: (skillId: string, correct: boolean) => void;
@@ -63,6 +82,20 @@ interface GameState {
   } | null;
   /** 배지 조건 재평가 — 새로 얻은 배지 반환 */
   evaluateBadges: () => BadgeDef[];
+  /** 드래곤 성장 포인트·속성·과일 지급 (내부 공용) */
+  dragonGain: (gain: {
+    gp?: number;
+    affinity?: Partial<Record<Affinity, number>>;
+    fruits?: number;
+  }) => void;
+  /** 먹이 주기. 성공 시 true (과일이 없으면 false) */
+  feedDragon: (fruitId: string) => boolean;
+  /** 연습 1문제 기록 — 10문제마다 세트 완성 (세트 완성 시 'basic'|'word' 반환) */
+  addPracticeAnswer: (mode: 'basic' | 'word') => 'basic' | 'word' | null;
+  /** 드래곤 아이템 조건 재평가 — 새로 얻은 아이템 반환 (아이템당 +20 GP) */
+  evaluateDragonItems: () => DragonItemDef[];
+  /** 보물 카드 1장 뽑기 (보스 격파 보상용). 중복이면 +10 XP */
+  drawTreasureCard: () => { drawn: RewardCardDef; duplicate: boolean };
   claimMission: (missionId: number) => EarnedCard[];
   /** 연습 모드 등에서 수동 서버 동기화 */
   syncNow: () => void;
@@ -102,6 +135,8 @@ export const useGame = create<GameState>()(
       badges: [],
       rewardCards: [],
       records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0 },
+      dragon: emptyDragon(),
+      practice: { basicAnswered: 0, wordAnswered: 0, basicSets: 0, wordSets: 0 },
 
       setProfile: ({ nickname, classCode, studentId }) =>
         set({ nickname, classCode: classCode ?? null, studentId: studentId ?? null }),
@@ -173,6 +208,17 @@ export const useGame = create<GameState>()(
             },
           };
         });
+        // 드래곤 성장: 보스는 크게, 레슨은 보통 + 과일 보상
+        const isBoss = stageId.endsWith('-boss');
+        get().dragonGain({
+          gp: isBoss ? GP_REWARDS.boss : GP_REWARDS.lesson,
+          fruits: isBoss ? 2 : 1,
+          affinity: {
+            ...(isBoss ? AFFINITY_SOURCES.boss : {}),
+            ...(perfect ? AFFINITY_SOURCES.perfectLesson : {}),
+          },
+        });
+        get().evaluateDragonItems();
         // 서버 동기화 (실패해도 게임 진행에 영향 없음)
         const s = get();
         void pushProgress(s);
@@ -203,7 +249,119 @@ export const useGame = create<GameState>()(
         });
         const xp = dailyRewardXp(streak.count) + (duplicate ? DUPLICATE_XP : 0);
         const cards = get().addXp(xp);
+        get().dragonGain({ gp: GP_REWARDS.attendance, affinity: AFFINITY_SOURCES.attendance });
+        get().evaluateDragonItems();
         return { xp, day: streak.count, cards, drawn, duplicate };
+      },
+
+      drawTreasureCard: () => {
+        const s = get();
+        const drawn = drawRewardCard(s.streak.count);
+        const duplicate = s.rewardCards.includes(drawn.id);
+        if (duplicate) {
+          get().addXp(DUPLICATE_XP);
+        } else {
+          set({ rewardCards: [...s.rewardCards, drawn.id] });
+        }
+        return { drawn, duplicate };
+      },
+
+      dragonGain: ({ gp = 0, affinity = {}, fruits = 0 }) => {
+        set((s) => {
+          const d = s.dragon;
+          const affinities = { ...d.affinities };
+          for (const [k, v] of Object.entries(affinity)) {
+            affinities[k as Affinity] += v ?? 0;
+          }
+          const newFruits = { ...d.fruits };
+          for (let i = 0; i < fruits; i++) {
+            const f = FRUITS[Math.floor(Math.random() * FRUITS.length)];
+            newFruits[f.id] = (newFruits[f.id] ?? 0) + 1;
+          }
+          const gpTotal = d.gp + gp;
+          let adult = d.adult;
+          // 성체 도달 순간 속성·형태 확정 (1회)
+          if (!adult && stageForGp(gpTotal) >= 4) {
+            adult = {
+              affinity: topAffinity(affinities),
+              form: decideAdultForm(s.rewardCards.length),
+            };
+          }
+          return { dragon: { ...d, gp: gpTotal, affinities, fruits: newFruits, adult } };
+        });
+      },
+
+      feedDragon: (fruitId) => {
+        const s = get();
+        const fruit = getFruit(fruitId);
+        const have = s.dragon.fruits[fruitId] ?? 0;
+        if (!fruit || have <= 0) return false;
+        const today = todayStr();
+        const now = currentFullness(s.dragon, today);
+        set({
+          dragon: {
+            ...s.dragon,
+            fruits: { ...s.dragon.fruits, [fruitId]: have - 1 },
+            lastFed: today,
+            fullnessAtFed: Math.min(100, now + fruit.fill),
+            feedCount: s.dragon.feedCount + 1,
+          },
+        });
+        get().dragonGain({
+          gp: GP_REWARDS.feed,
+          affinity: { ...AFFINITY_SOURCES.feed, [fruit.affinity]: 1 },
+        });
+        return true;
+      },
+
+      addPracticeAnswer: (mode) => {
+        const s = get();
+        const p = { ...s.practice };
+        let completed: 'basic' | 'word' | null = null;
+        if (mode === 'basic') {
+          p.basicAnswered += 1;
+          if (p.basicAnswered % 10 === 0) {
+            p.basicSets += 1;
+            completed = 'basic';
+          }
+        } else {
+          p.wordAnswered += 1;
+          if (p.wordAnswered % 10 === 0) {
+            p.wordSets += 1;
+            completed = 'word';
+          }
+        }
+        set({ practice: p });
+        if (completed) {
+          get().dragonGain({
+            gp: GP_REWARDS.practiceSet,
+            affinity: completed === 'basic' ? AFFINITY_SOURCES.basicSet : AFFINITY_SOURCES.wordSet,
+          });
+        }
+        return completed;
+      },
+
+      evaluateDragonItems: () => {
+        const s = get();
+        const stats = {
+          lessonsCompleted: s.records.lessonsCompleted,
+          bossesCleared: Object.keys(s.stages).filter(
+            (id) => id.endsWith('-boss') && (s.stages[id]?.stars ?? 0) > 0,
+          ).length,
+          basicSets: s.practice.basicSets,
+          wordSets: s.practice.wordSets,
+          attendanceDays: s.attendance.totalDays,
+          feedCount: s.dragon.feedCount,
+          rewardCardCount: s.rewardCards.length,
+        };
+        const earned = DRAGON_ITEMS.filter((it) => !s.dragon.items.includes(it.id) && it.earned(stats));
+        if (earned.length > 0) {
+          set({
+            dragon: { ...get().dragon, items: [...get().dragon.items, ...earned.map((i) => i.id)] },
+          });
+          get().dragonGain({ gp: GP_REWARDS.item * earned.length });
+        }
+        return earned;
       },
 
       evaluateBadges: () => {
@@ -237,6 +395,7 @@ export const useGame = create<GameState>()(
         const daily = freshDaily(s.daily);
         if (daily.claimed.includes(missionId)) return [];
         set({ daily: { ...daily, claimed: [...daily.claimed, missionId] } });
+        get().dragonGain({ gp: GP_REWARDS.mission, fruits: 1 });
         return get().addXp(XP_MISSION_REWARD);
       },
 
@@ -256,6 +415,8 @@ export const useGame = create<GameState>()(
           badges: [],
           rewardCards: [],
           records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0 },
+          dragon: emptyDragon(),
+          practice: { basicAnswered: 0, wordAnswered: 0, basicSets: 0, wordSets: 0 },
         }),
     }),
     { name: 'math-mon-save' },

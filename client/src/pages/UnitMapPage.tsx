@@ -3,6 +3,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DailyRewardModal from '../components/DailyRewardModal';
+import DragonWidget from '../components/DragonWidget';
 import { STAGES, UNIT_ORDER, UNIT_TITLES, type StageDef } from '../game/stages';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
@@ -143,6 +144,10 @@ export default function UnitMapPage() {
 
       <div className="mt-3">
         <MissionPanel />
+      </div>
+
+      <div className="mt-3">
+        <DragonWidget />
       </div>
 
       {/* ── 연습 모드 ── */}

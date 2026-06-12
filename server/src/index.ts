@@ -37,13 +37,22 @@ app.post('/api/auth/join', async (c) => {
   );
   if (existing.rowCount && existing.rowCount > 0) {
     if (existing.rows[0].pin_hash !== hash) return c.json({ error: 'wrong pin' }, 403);
-    return c.json({ studentId: existing.rows[0].id, nickname, classCode });
+    // 저장된 세이브 반환 → 기기를 바꿔도 진도·드래곤이 복원됨
+    const saved = await pool.query('SELECT save FROM progress WHERE student_id = $1', [
+      existing.rows[0].id,
+    ]);
+    return c.json({
+      studentId: existing.rows[0].id,
+      nickname,
+      classCode,
+      save: saved.rows[0]?.save ?? null,
+    });
   }
   const inserted = await pool.query(
     'INSERT INTO students (class_code, nickname, pin_hash) VALUES ($1, $2, $3) RETURNING id',
     [classCode, nickname, hash],
   );
-  return c.json({ studentId: inserted.rows[0].id, nickname, classCode });
+  return c.json({ studentId: inserted.rows[0].id, nickname, classCode, save: null });
 });
 
 /** 진도 스냅샷 업서트 */
@@ -56,14 +65,16 @@ app.post('/api/progress', async (c) => {
     skillStats?: unknown;
     cardCount?: number;
     streak?: number;
+    save?: unknown;
   }>();
   if (!body.studentId) return c.json({ error: 'bad request' }, 400);
   await pool.query(
-    `INSERT INTO progress (student_id, xp, stages, skill_stats, card_count, streak, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, now())
+    `INSERT INTO progress (student_id, xp, stages, skill_stats, card_count, streak, save, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, now())
      ON CONFLICT (student_id) DO UPDATE SET
        xp = EXCLUDED.xp, stages = EXCLUDED.stages, skill_stats = EXCLUDED.skill_stats,
-       card_count = EXCLUDED.card_count, streak = EXCLUDED.streak, updated_at = now()`,
+       card_count = EXCLUDED.card_count, streak = EXCLUDED.streak, save = EXCLUDED.save,
+       updated_at = now()`,
     [
       body.studentId,
       body.xp ?? 0,
@@ -71,6 +82,7 @@ app.post('/api/progress', async (c) => {
       JSON.stringify(body.skillStats ?? {}),
       body.cardCount ?? 0,
       body.streak ?? 0,
+      JSON.stringify(body.save ?? null),
     ],
   );
   return c.json({ ok: true });

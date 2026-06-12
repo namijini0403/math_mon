@@ -15,6 +15,7 @@ import { useGame, type EarnedCard } from '../game/store';
 import { sfx } from '../game/sounds';
 import { XP_BOSS_CLEAR, XP_LESSON_CLEAR, XP_PERFECT_BONUS, XP_PER_CORRECT } from '../game/xp';
 import { COMBO_BONUS, type BadgeDef } from '../game/badges';
+import { RARITY_COLOR, RARITY_LABEL, type RewardCardDef } from '../game/rewardCards';
 import { MathView } from '../components/MathView';
 import { CardView } from '../components/CardView';
 import { ChoiceView } from '../components/problem/ChoiceView';
@@ -62,6 +63,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     xp: number;
     cards: EarnedCard[];
     badges: BadgeDef[];
+    treasure: { drawn: RewardCardDef; duplicate: boolean } | null;
   } | null>(null);
   const maxComboRef = useRef(0);
 
@@ -155,14 +157,18 @@ function LessonRunner({ stageId }: { stageId: string }) {
       (perfect ? XP_PERFECT_BONUS : 0) +
       comboBonus;
     const cards = [...addXp(xp)];
-    if (isBoss) cards.push(addBossCard(stage.id));
+    let treasure: { drawn: RewardCardDef; duplicate: boolean } | null = null;
+    if (isBoss) {
+      cards.push(addBossCard(stage.id));
+      treasure = useGame.getState().drawTreasureCard();
+    }
     const game = useGame.getState();
     game.reportCombo(maxComboRef.current);
     completeStage(stage.id, stars, perfect);
     const badges = useGame.getState().evaluateBadges();
     sfx.fanfare();
     if (cards.length > 0 || badges.length > 0) setTimeout(() => sfx.levelUp(), 600);
-    setResult({ stars, xp, cards, badges });
+    setResult({ stars, xp, cards, badges, treasure });
     setPhase('result');
   };
 
@@ -211,6 +217,31 @@ function LessonRunner({ stageId }: { stageId: string }) {
           <span className="text-coin">+{result.xp} XP</span>
           {comboBonus > 0 && <span className="text-sm opacity-70 ml-2">(콤보 보너스 +{comboBonus} 포함)</span>}
         </motion.div>
+
+        {result.treasure && (
+          <motion.div
+            initial={{ rotateY: 180, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            transition={{ delay: 1.3, duration: 0.7 }}
+            className="flex flex-col items-center gap-1.5"
+          >
+            <div className="text-sm opacity-80">🎴 보물 카드 획득!</div>
+            <img
+              src={result.treasure.drawn.src}
+              alt={result.treasure.drawn.name}
+              className="w-32 rounded-2xl border-4"
+              style={{
+                borderColor: RARITY_COLOR[result.treasure.drawn.rarity],
+                boxShadow: `0 0 20px 3px ${RARITY_COLOR[result.treasure.drawn.rarity]}66`,
+              }}
+            />
+            <div className="text-sm font-bold">{result.treasure.drawn.name}</div>
+            <div className="text-xs" style={{ color: RARITY_COLOR[result.treasure.drawn.rarity] }}>
+              {RARITY_LABEL[result.treasure.drawn.rarity]}
+              {result.treasure.duplicate && ' · 중복이라 +10 XP!'}
+            </div>
+          </motion.div>
+        )}
 
         {result.badges.length > 0 && (
           <motion.div
@@ -284,7 +315,19 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const timeRatio = served.timeLimit && timeLeft !== null ? Math.max(0, timeLeft / served.timeLimit) : 1;
 
   return (
-    <div className="min-h-dvh flex flex-col max-w-xl mx-auto">
+    <div
+      className="min-h-dvh flex flex-col max-w-xl mx-auto"
+      style={
+        isBoss
+          ? {
+              backgroundImage:
+                'linear-gradient(to bottom, rgba(15,13,41,0.85), rgba(15,13,41,0.95)), url(assets/bg/boss.png)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }
+          : undefined
+      }
+    >
       {/* ── 상단 바 ── */}
       <div className="flex items-center gap-3 p-4">
         <Link to="/" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">
