@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+﻿import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -14,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: '매스몬 - 수학 몬스터 모험',
         short_name: '매스몬',
-        description: '문제를 풀고 몬스터를 물리치는 수학 모험!',
+        description: '석암초등학교 수학 모험 학습앱 — 문제를 풀어 드래곤을 키우세요!',
         lang: 'ko',
         display: 'standalone',
         orientation: 'portrait',

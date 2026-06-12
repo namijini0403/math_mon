@@ -39,9 +39,35 @@ async function post<T>(path: string, body: unknown): Promise<T | null> {
   }
 }
 
-/** 반 코드 + 닉네임 + PIN으로 가입/로그인 (서버가 같은 닉네임이면 PIN 검증) */
-export function join(classCode: string, nickname: string, pin: string) {
-  return post<JoinResult>('/api/auth/join', { classCode, nickname, pin });
+export type JoinOutcome =
+  | { kind: 'ok'; data: JoinResult }
+  | { kind: 'wrong-pin' }
+  | { kind: 'no-class' }
+  | { kind: 'no-server' };
+
+/** 반 코드 + 닉네임 + PIN으로 가입/로그인 — 실패 원인을 구분해 반환 */
+export async function join(classCode: string, nickname: string, pin: string): Promise<JoinOutcome> {
+  try {
+    const res = await fetch('/api/auth/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ classCode, nickname, pin }),
+    });
+    if (res.ok) {
+      const ct = res.headers.get('content-type') ?? '';
+      if (!ct.includes('json')) return { kind: 'no-server' };
+      return { kind: 'ok', data: (await res.json()) as JoinResult };
+    }
+    if (res.status === 403) return { kind: 'wrong-pin' };
+    if (res.status === 404) {
+      // 서버의 "반 없음" 응답(JSON)과 정적 호스팅의 404 페이지(HTML)를 구분
+      const ct = res.headers.get('content-type') ?? '';
+      return ct.includes('json') ? { kind: 'no-class' } : { kind: 'no-server' };
+    }
+    return { kind: 'no-server' };
+  } catch {
+    return { kind: 'no-server' };
+  }
 }
 
 /** 진도 스냅샷 + 전체 세이브 업로드 */

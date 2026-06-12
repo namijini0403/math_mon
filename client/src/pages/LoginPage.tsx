@@ -27,17 +27,32 @@ export default function LoginPage() {
         return;
       }
       const res = await join(classCode.trim().toUpperCase(), name, pin);
-      if (res) {
+      if (res.kind === 'ok') {
         // 서버에 세이브가 있으면 복원 (기기를 바꿔 로그인한 경우)
-        if (res.save && typeof res.save === 'object') {
-          useGame.setState(res.save as unknown as Parameters<typeof useGame.setState>[0]);
+        if (res.data.save && typeof res.data.save === 'object') {
+          useGame.setState(res.data.save as unknown as Parameters<typeof useGame.setState>[0]);
         }
-        setProfile({ nickname: res.nickname, classCode: res.classCode, studentId: res.studentId });
+        setProfile({
+          nickname: res.data.nickname,
+          classCode: res.data.classCode,
+          studentId: res.data.studentId,
+        });
         navigate('/');
         return;
       }
-      setError('접속에 실패했어요. 반 코드와 PIN을 확인하거나, 비워두고 혼자 모험을 시작할 수도 있어요.');
-      setBusy(false);
+      if (res.kind === 'wrong-pin') {
+        setError('비밀번호(PIN)가 달라요. 처음 정했던 숫자 4개를 다시 확인해 주세요.');
+        setBusy(false);
+        return;
+      }
+      if (res.kind === 'no-class') {
+        setError('그 반 코드를 찾을 수 없어요. 선생님께 다시 확인해 주세요.');
+        setBusy(false);
+        return;
+      }
+      // 서버 없음(미리보기 배포 등) → 혼자 모험 모드로 자동 시작
+      setProfile({ nickname: name });
+      navigate('/');
       return;
     }
     setProfile({ nickname: name });
@@ -60,9 +75,24 @@ export default function LoginPage() {
         animate={{ y: 0, opacity: 1 }}
         className="text-center"
       >
-        <div className="text-7xl mb-3">🦊</div>
+        {/* 드래곤의 알 — 고급 일러스트 도착 전엔 빛나는 알 연출 */}
+        <motion.div
+          animate={{ y: [0, -6, 0], filter: ['drop-shadow(0 0 18px rgba(251,191,36,0.45))', 'drop-shadow(0 0 34px rgba(251,191,36,0.8))', 'drop-shadow(0 0 18px rgba(251,191,36,0.45))'] }}
+          transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+          className="mb-3 flex justify-center"
+        >
+          <img
+            src="assets/dragon/mini/stage0.png"
+            alt="드래곤의 알"
+            className="w-28 h-28 object-contain"
+            onError={(e) => {
+              e.currentTarget.outerHTML = '<span class="text-7xl">🥚</span>';
+            }}
+          />
+        </motion.div>
         <h1 className="text-4xl text-glow">매스몬</h1>
-        <p className="opacity-70 mt-2">분수 몬스터를 물리치는 수학 모험!</p>
+        <p className="opacity-70 mt-2">석암초등학교 수학 모험 학습앱</p>
+        <p className="opacity-50 mt-1 text-sm">문제를 풀어 드래곤의 알을 깨우세요 🐉</p>
       </motion.div>
 
       <div className="w-full flex flex-col gap-3">
@@ -71,7 +101,7 @@ export default function LoginPage() {
           <input
             value={nickname}
             onChange={(e) => setNickname(e.target.value.slice(0, 10))}
-            placeholder="예: 번개여우"
+            placeholder="예: 별빛드래곤"
             autoFocus
             className="rounded-2xl border-2 border-night-700 bg-night-800 px-4 py-3.5 text-lg focus:border-mana focus:outline-none"
           />

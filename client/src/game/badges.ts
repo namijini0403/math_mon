@@ -1,4 +1,4 @@
-/** 배지(업적) 시스템 — 조건은 순수 함수, 획득 목록은 store에 저장 */
+﻿/** 배지(업적) 시스템 — 조건은 순수 함수, 획득 목록은 store에 저장 */
 
 export interface BadgeStats {
   totalCorrect: number;
@@ -40,7 +40,7 @@ export const BADGES: BadgeDef[] = [
   { id: 'boss-12', name: '전설의 사냥꾼', desc: '모든 보스 격파', emoji: '👑', rarity: 3, earned: (s) => s.bossesCleared >= 12 },
   { id: 'perfect-5', name: '완벽주의자', desc: '하트 무손실 클리어 5회', emoji: '💎', rarity: 2, earned: (s) => s.perfectLessons >= 5 },
   { id: 'card-10', name: '카드 수집가', desc: '인증카드 10장 모으기', emoji: '🃏', rarity: 2, earned: (s) => s.cardCount >= 10 },
-  { id: 'level-10', name: '베테랑 모험가', desc: '레벨 10 달성', emoji: '🦊', rarity: 2, earned: (s) => s.level >= 10 },
+  { id: 'level-10', name: '베테랑 모험가', desc: '레벨 10 달성', emoji: '🐲', rarity: 2, earned: (s) => s.level >= 10 },
 ];
 
 export function getBadge(id: string): BadgeDef | undefined {

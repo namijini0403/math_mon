@@ -197,3 +197,9 @@ export function adultTitle(adult: { affinity: Affinity; form: 'human' | 'dragon'
 
 /** 레어 엔딩 조건: 성체 + 보물 카드 30장 이상 */
 export const RARE_ENDING_CARDS = 30;
+
+/** 현재 드래곤 모습 이모지 — 홈/프로필 아바타용 (알 → 성체로 아바타도 자란다) */
+export function dragonEmoji(d: DragonState): string {
+  if (d.adult) return d.adult.form === 'dragon' ? '🐉' : '🧙';
+  return DRAGON_STAGES[stageForGp(d.gp)].emoji;
+}

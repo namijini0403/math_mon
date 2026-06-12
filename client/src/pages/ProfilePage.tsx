@@ -8,6 +8,7 @@ import { levelFromXp } from '../game/xp';
 import { CardView } from '../components/CardView';
 import { downloadCardPng } from '../card/renderCardPng';
 import { BADGES, type BadgeDef } from '../game/badges';
+import { dragonEmoji } from '../game/dragon';
 import { RARITY_COLOR, REWARD_CARDS } from '../game/rewardCards';
 
 /** 희귀도별 테두리 + glow 스타일 */
@@ -18,7 +19,7 @@ function rarityStyle(rarity: 1 | 2 | 3): string {
 }
 
 export default function ProfilePage() {
-  const { nickname, xp, cards, streak, skillStats, badges, rewardCards, resetAll } = useGame();
+  const { nickname, xp, cards, streak, skillStats, badges, rewardCards, dragon, resetAll } = useGame();
   const { level } = levelFromXp(xp);
   const [selected, setSelected] = useState<EarnedCard | null>(null);
   const [saving, setSaving] = useState(false);
@@ -37,7 +38,7 @@ export default function ProfilePage() {
 
       <div className="rounded-3xl bg-night-900 border border-night-700 p-5 flex items-center gap-4">
         <div className="w-16 h-16 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 flex items-center justify-center text-3xl">
-          🦊
+          {dragonEmoji(dragon)}
         </div>
         <div className="flex-1">
           <div className="text-xl">{nickname}</div>
