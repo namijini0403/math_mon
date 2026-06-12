@@ -90,9 +90,9 @@ export default function LoginPage() {
             }}
           />
         </motion.div>
-        <h1 className="text-4xl text-glow">매스몬</h1>
-        <p className="opacity-70 mt-2">석암초등학교 수학 모험 학습앱</p>
-        <p className="opacity-50 mt-1 text-sm">문제를 풀어 드래곤의 알을 깨우세요 🐉</p>
+        <h1 className="text-4xl text-glow tracking-widest">DRACONIS</h1>
+        <p className="opacity-70 mt-2">오늘을 쌓아, 드래곤을 깨워라</p>
+        <p className="opacity-50 mt-1 text-sm">매일 미션을 완료하며 나만의 드래곤을 키워 보세요 🐉</p>
       </motion.div>
 
       <div className="w-full flex flex-col gap-3">

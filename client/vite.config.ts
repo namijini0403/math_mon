@@ -12,9 +12,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: '매스몬 - 수학 몬스터 모험',
-        short_name: '매스몬',
-        description: '석암초등학교 수학 모험 학습앱 — 문제를 풀어 드래곤을 키우세요!',
+        name: 'DRACONIS - 드래곤을 깨우는 수학 모험',
+        short_name: 'DRACONIS',
+        description: '오늘을 쌓아, 드래곤을 깨워라 — 매일 미션을 완료하며 나만의 드래곤을 키워 보세요!',
         lang: 'ko',
         display: 'standalone',
         orientation: 'portrait',
