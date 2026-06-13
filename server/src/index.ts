@@ -34,6 +34,47 @@ function extractBearer(authHeader: string | undefined): string | null {
   return m ? m[1] : null;
 }
 
+// ── PIN 무차별 대입 방어 (인메모리, fail-open) — SECURITY-PLAN H1 ───────────────
+// 정상 사용자엔 관대(15분 내 10회 실패 시 15분 잠금). 내부 오류는 무조건 통과(로그인 우선).
+const PIN_MAX_FAILS = 10;
+const PIN_WINDOW_MS = 15 * 60_000;
+const PIN_LOCK_MS = 15 * 60_000;
+const pinAttempts = new Map<string, { fails: number; first: number; lockUntil: number }>();
+
+/** 잠겨 있으면 남은 초, 아니면 0. 오류 시 0(통과). */
+function pinLockRemaining(key: string): number {
+  try {
+    const e = pinAttempts.get(key);
+    if (!e) return 0;
+    const now = Date.now();
+    if (e.lockUntil > now) return Math.ceil((e.lockUntil - now) / 1000);
+    // 창이 지났으면 리셋
+    if (now - e.first > PIN_WINDOW_MS) pinAttempts.delete(key);
+    return 0;
+  } catch {
+    return 0;
+  }
+}
+
+function pinRecordFail(key: string): void {
+  try {
+    const now = Date.now();
+    const e = pinAttempts.get(key);
+    if (!e || now - e.first > PIN_WINDOW_MS) {
+      pinAttempts.set(key, { fails: 1, first: now, lockUntil: 0 });
+      return;
+    }
+    e.fails += 1;
+    if (e.fails >= PIN_MAX_FAILS) e.lockUntil = now + PIN_LOCK_MS;
+  } catch {
+    /* fail-open */
+  }
+}
+
+function pinClear(key: string): void {
+  try { pinAttempts.delete(key); } catch { /* noop */ }
+}
+
 // ── 허용 event_type 목록 ──────────────────────────────────────────────────────
 const ALLOWED_EVENT_TYPES = new Set([
   'session.start', 'session.end', 'auth.login',
@@ -126,6 +167,13 @@ app.post('/api/auth/join', async (c) => {
       pseudonym_id: string;
     };
 
+    // PIN 무차별 대입 방어 — 잠겨 있으면 잠시 차단 (정상 사용자엔 영향 없음)
+    const limitKey = `${classCode}:${nickname}`;
+    const lockSec = pinLockRemaining(limitKey);
+    if (lockSec > 0) {
+      return c.json({ error: 'too many attempts', retryAfter: lockSec }, 429);
+    }
+
     // PIN 검증: scrypt 우선 → 없으면 sha256 폴백
     let pinOk = false;
     if (row.pin_scrypt) {
@@ -138,7 +186,11 @@ app.post('/api/auth/join', async (c) => {
         await pool.query('UPDATE students SET pin_scrypt = $1 WHERE id = $2', [newScrypt, row.id]);
       }
     }
-    if (!pinOk) return c.json({ error: 'wrong pin' }, 403);
+    if (!pinOk) {
+      pinRecordFail(limitKey);
+      return c.json({ error: 'wrong pin' }, 403);
+    }
+    pinClear(limitKey);
 
     // 저장된 세이브 반환
     const saved = await pool.query('SELECT save FROM progress WHERE student_id = $1', [row.id]);
@@ -306,15 +358,13 @@ app.post('/api/progress', async (c) => {
   }>();
   if (!body.studentId) return c.json({ error: 'bad request' }, 400);
 
-  // TODO(2단계): Bearer 토큰을 필수로 강제 전환 예정.
-  // 현재는 토큰이 있으면 검증 + studentId 일치 확인, 없으면 기존 동작(하위호환) 유지.
-  const authHeader = c.req.header('Authorization');
-  const bearerToken = extractBearer(authHeader);
-  if (bearerToken) {
-    const payload = verifyToken(bearerToken);
-    if (!payload) return c.json({ error: 'invalid token' }, 401);
-    if (payload.sid !== body.studentId) return c.json({ error: 'forbidden' }, 403);
-  }
+  // Bearer 토큰 필수 — 토큰의 studentId와 일치할 때만 진도 저장 (SECURITY-PLAN M1).
+  // 클라는 항상 토큰을 보내며(api.ts), 없으면 로컬 저장으로 graceful 폴백.
+  const bearerToken = extractBearer(c.req.header('Authorization'));
+  if (!bearerToken) return c.json({ error: 'unauthorized' }, 401);
+  const payload = verifyToken(bearerToken);
+  if (!payload || payload.typ === 'refresh') return c.json({ error: 'invalid token' }, 401);
+  if (payload.sid !== body.studentId) return c.json({ error: 'forbidden' }, 403);
 
   await pool.query(
     `INSERT INTO progress (student_id, xp, stages, skill_stats, card_count, streak, save, updated_at)
@@ -350,10 +400,10 @@ app.post('/api/teacher/class', async (c) => {
   return c.json({ ok: true, code });
 });
 
-/** 교사용 — 반 현황 */
+/** 교사용 — 반 현황 (키는 헤더로 — URL 쿼리 로그 노출 방지, SECURITY-PLAN M2) */
 app.get('/api/teacher/:classCode', async (c) => {
   if (!pool) return c.json({ error: 'db unavailable' }, 503);
-  const key = c.req.query('key');
+  const key = c.req.header('X-Teacher-Key');
   if (!process.env.TEACHER_KEY || key !== process.env.TEACHER_KEY)
     return c.json({ error: 'forbidden' }, 403);
   const rows = await pool.query(

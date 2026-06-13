@@ -23,9 +23,9 @@
 
 ### 🔴 HIGH
 
-**H1. PIN 무차별 대입(brute-force) 방어 없음**
-- 4자리 PIN(1만 가지) + `/api/auth/join`에 시도 제한·계정 잠금 없음 → 같은 반 친구 계정 탈취 가능.
-- 보완: (classCode, nickname)별 실패 횟수 카운터 + 지연/잠금(예: 5회 실패 시 5분), IP 단위 rate limit.
+**H1. PIN 무차별 대입(brute-force) 방어 없음** — ✅ **보완 완료(2026-06-13)**
+- 4자리 PIN(1만 가지) + `/api/auth/join`에 시도 제한 없어 같은 반 친구 계정 탈취 가능했음.
+- 적용: (classCode, nickname)별 **인메모리 카운터 — 15분 내 10회 실패 시 15분 잠금**(429). 정상 사용자엔 영향 없을 만큼 관대하고, **내부 오류 시 fail-open(로그인 우선)**. 성공 시 카운터 초기화. (분산/영속 rate-limit은 추후 — 단일 인스턴스 가정.)
 
 **H2. 공유 기기 localStorage 잔존 (학교 태블릿 시나리오)** — ✅ **보완 완료(2026-06-13)**
 - 학생 A가 로그아웃 없이 자리를 뜨면 `localStorage['math-mon-save']`(닉네임·반코드·studentId)와 refresh 토큰(`draconis-refresh`)이 남아 다음 학생 B가 A의 계정·기록에 접근하는 위험.
@@ -33,13 +33,13 @@
 
 ### 🟠 MEDIUM
 
-**M1. `/api/progress` 비인증 경로(하위호환)**
-- Bearer 토큰 없으면 `studentId`만으로 진도 덮어쓰기 허용(코드에 TODO로 명시됨). studentId(UUID) 유출 시 타인 진도 변조 가능.
-- 보완: Bearer 토큰 필수화(이미 예정된 TODO 실행).
+**M1. `/api/progress` 비인증 경로(하위호환)** — ✅ **보완 완료(2026-06-13)**
+- Bearer 토큰 없으면 `studentId`만으로 진도 덮어쓰기 허용했음.
+- 적용: **Bearer 토큰 필수화** + 토큰 `sid`와 `studentId` 일치 검증. 토큰 없으면 401(클라는 로컬 저장으로 graceful 폴백, 로그인 무관).
 
-**M2. 교사 API 키가 URL 쿼리 + 단일 공유키**
-- `GET /api/teacher/:code?key=...` → 키가 서버/프록시 접근 로그에 남음. 또 모든 교사가 같은 `TEACHER_KEY` → 한 명 유출 시 전체 반 데이터(닉네임·진도) 노출.
-- 보완: 키를 `Authorization` 헤더로 이동, 교사별 키 발급, 주기적 회전.
+**M2. 교사 API 키가 URL 쿼리 + 단일 공유키** — 🟡 **부분 보완(2026-06-13)**
+- `GET /api/teacher/:code?key=...` → 키가 접근 로그에 남던 문제.
+- 적용: 키를 **`X-Teacher-Key` 헤더로 이동**(쿼리 로그 노출 제거, TeacherPage도 갱신). **잔여**: 교사별 키 발급·회전(여전히 단일 공유키).
 
 **M3. refresh 토큰 localStorage 저장 (XSS 노출면)**
 - XSS 취약점 발생 시 refresh 토큰(90일) 탈취 → 장기 세션 가로채기.

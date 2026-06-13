@@ -26,7 +26,9 @@ export default function TeacherPage() {
     setBusy(true);
     setError('');
     try {
-      const res = await fetch(`/api/teacher/${classCode.trim().toUpperCase()}?key=${encodeURIComponent(key)}`);
+      const res = await fetch(`/api/teacher/${classCode.trim().toUpperCase()}`, {
+        headers: { 'X-Teacher-Key': key },
+      });
       if (!res.ok) throw new Error(res.status === 403 ? '교사 키가 틀렸습니다.' : '조회 실패');
       const data = (await res.json()) as { students: StudentRow[] };
       setStudents(data.students);
