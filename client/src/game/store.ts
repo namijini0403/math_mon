@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { levelFromXp, tierForLevel, XP_MISSION_REWARD } from './xp';
 import { emptyDaily, todayStr, type DailyCounters } from './missions';
+import { addSteps, emptySteps, type StepState } from './steps';
 import { dailyRewardXp, newlyEarned, type BadgeDef, type BadgeStats } from './badges';
 import { drawRewardCard, DUPLICATE_XP, type RewardCardDef } from './rewardCards';
 import { newlyCompletedHidden, type HiddenMissionDef } from './hiddenMissions';
@@ -91,6 +92,8 @@ interface GameState {
     challengeAnswered: number;
     challengeSets: number;
   };
+  /** 만보기 — 오늘 걸음·2000보 달성 누적일 */
+  steps: StepState;
 
   setProfile: (p: { nickname: string; classCode?: string; studentId?: string }) => void;
   recordAnswer: (skillId: string, correct: boolean) => void;
@@ -126,6 +129,8 @@ interface GameState {
   /** 심화 스테이지 클리어 기록 */
   recordChallengeClear: () => void;
   recordReviewClear: () => void;
+  /** 측정된 걸음 추가 — 2000보 첫 달성 시 과일+배지 보상 */
+  ingestSteps: (count: number) => void;
   /** 명예의 시험 응시 기록 */
   recordExam: () => void;
   /** 총괄평가 결과 기록. passed(90%↑)이고 그 학기 첫 통과면 grantCard=true (카드 1회) */
@@ -191,6 +196,7 @@ export const useGame = create<GameState>()(
         challengeAnswered: 0,
         challengeSets: 0,
       },
+      steps: emptySteps(),
 
       setProfile: ({ nickname, classCode, studentId }) =>
         set({ nickname, classCode: classCode ?? null, studentId: studentId ?? null }),
@@ -330,6 +336,17 @@ export const useGame = create<GameState>()(
         set((s) => ({
           records: { ...s.records, reviewCleared: s.records.reviewCleared + 1 },
         })),
+
+      ingestSteps: (count) => {
+        const s = get();
+        const { state, goalReached } = addSteps(s.steps, count, todayStr());
+        set({ steps: state });
+        if (goalReached) {
+          // 2000보 첫 달성 보상: 드래곤 과일 1개 + 걸음 배지 평가
+          get().dragonGain({ fruits: 1 });
+          get().evaluateBadges();
+        }
+      },
 
       recordExam: () => set((s) => ({ examCount: s.examCount + 1 })),
 
@@ -527,6 +544,7 @@ export const useGame = create<GameState>()(
           feedCount: s.dragon.feedCount,
           dragonAdult: !!s.dragon.adult,
           reviewCleared: s.records.reviewCleared,
+          stepGoalDays: s.steps.goalDays,
         };
         const earned = newlyEarned(stats, s.badges);
         if (earned.length > 0) {
@@ -591,6 +609,7 @@ export const useGame = create<GameState>()(
             challengeAnswered: 0,
             challengeSets: 0,
           },
+          steps: emptySteps(),
         }),
     }),
     { name: 'math-mon-save' },

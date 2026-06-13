@@ -26,6 +26,7 @@ import {
 } from '../game/dragon';
 import { dragonArt } from '../game/dragonArt';
 import { DragonRoom } from '../components/DragonRoom';
+import { StepsCard } from '../components/StepsCard';
 import { todayStr } from '../game/missions';
 import { sfx } from '../game/sounds';
 
@@ -580,6 +581,9 @@ export default function DragonPage() {
           </div>
         </div>
       </div>
+
+      {/* ── 만보기 ── */}
+      <StepsCard />
 
       {/* ── 방 꾸미기 ── */}
       <div className="mt-4 rounded-3xl bg-night-900 border border-night-700 p-4">

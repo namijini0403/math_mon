@@ -25,6 +25,8 @@ export interface BadgeStats {
   dragonAdult: boolean;
   /** 복습(이전 학기) 스테이지 클리어 누적 */
   reviewCleared: number;
+  /** 만보기 2000보 달성 누적일 */
+  stepGoalDays: number;
 }
 
 export interface BadgeDef {
@@ -133,6 +135,14 @@ export const BADGES: BadgeDef[] = [
     visual: { shape: 'banner', palette: 'gold', glyph: 'castle' }, earned: (s) => s.finalExamsPassed >= 1 },
   { id: 'final-5', name: '학기의 정복자', desc: '총괄평가 던전 5회 통과', emoji: '👑', rarity: 3,
     visual: { shape: 'banner', palette: 'indigo', glyph: 'castle', ring: true }, earned: (s) => s.finalExamsPassed >= 5 },
+
+  // ── 만보기(운동) ──
+  { id: 'steps-first', name: '첫 만보 모험', desc: '하루 2000보를 걸었어요', emoji: '👟', rarity: 1,
+    visual: { shape: 'roundel', palette: 'emerald', glyph: 'sprout' }, earned: (s) => s.stepGoalDays >= 1 },
+  { id: 'steps-7', name: '아침 산책가', desc: '2000보 7일 달성', emoji: '🏃', rarity: 2,
+    visual: { shape: 'roundel', palette: 'sky', glyph: 'sun' }, earned: (s) => s.stepGoalDays >= 7 },
+  { id: 'steps-30', name: '운동장의 바람', desc: '2000보 30일 달성', emoji: '🌬️', rarity: 3,
+    visual: { shape: 'roundel', palette: 'gold', glyph: 'sun', ring: true }, earned: (s) => s.stepGoalDays >= 30 },
 
   // ── 복습(시간여행) ──
   { id: 'time-traveler', name: '시간여행자', desc: '복습으로 이전 학기를 탐험했어요', emoji: '⏳', rarity: 1,
