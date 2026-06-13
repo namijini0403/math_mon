@@ -7,6 +7,7 @@ import DailyRewardModal from '../components/DailyRewardModal';
 import DragonWidget from '../components/DragonWidget';
 import { DragonAvatar } from '../components/DragonAvatar';
 import { SEMESTERS, STAGES, UNIT_TITLES, type StageDef } from '../game/stages';
+import { parseGradeSemester, semesterIndex, type AccessZone } from '../game/gradeAccess';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
 import { DAILY_MISSIONS, todayStr } from '../game/missions';
@@ -110,14 +111,24 @@ function MissionPanel() {
 }
 
 export default function UnitMapPage() {
-  const { nickname, xp, stages, streak } = useGame();
+  const { nickname, xp, stages, streak, classCode } = useGame();
   const { level, into, need } = levelFromXp(xp);
   const streakActive = streak.last === todayStr();
-  // 학기 탭 (마지막 선택 기억)
+  // 학생 현재 학기(반코드 파생) — 기본 선택·영역 라벨에 사용
+  const studentSem = parseGradeSemester(classCode);
+  // 학기 탭 (마지막 선택 기억, 없으면 학생 현재 학기, 그것도 없으면 5-1)
   const [semesterId, setSemesterId] = useState(
-    () => localStorage.getItem('mathmon-semester') ?? 'g5s1',
+    () => localStorage.getItem('mathmon-semester') ?? studentSem ?? 'g5s1',
   );
   const semester = SEMESTERS.find((s) => s.id === semesterId) ?? SEMESTERS[0];
+  // 선택한 학기가 학생 현재 학기 대비 어느 영역인지 (배너·라벨용)
+  const viewZone: AccessZone = !studentSem
+    ? 'current'
+    : semester.id === studentSem
+      ? 'current'
+      : semesterIndex(semester.id) < semesterIndex(studentSem)
+        ? 'review'
+        : 'ahead';
   const selectSemester = (id: string) => {
     setSemesterId(id);
     localStorage.setItem('mathmon-semester', id);
@@ -207,17 +218,37 @@ export default function UnitMapPage() {
           <button
             key={s.id}
             onClick={() => selectSemester(s.id)}
-            className={`rounded-2xl py-2.5 text-xs leading-tight border-2 transition-colors ${
+            className={`relative rounded-2xl py-2.5 text-xs leading-tight border-2 transition-colors ${
               s.id === semesterId
                 ? 'bg-coin/20 border-coin text-coin'
                 : 'bg-night-900 border-night-700 opacity-60 hover:opacity-100'
             }`}
           >
+            {studentSem === s.id && (
+              <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 text-[9px] bg-glow text-night-950 font-bold rounded-full px-1.5 leading-tight">
+                현재
+              </span>
+            )}
             <div className="text-lg">{s.emoji}</div>
             {s.label}
           </button>
         ))}
       </div>
+
+      {/* ── 영역 안내 배너 (복습/선행 학기 선택 시) ── */}
+      {viewZone !== 'current' && (
+        <div
+          className={`mt-2 rounded-2xl px-4 py-2.5 text-xs leading-snug border ${
+            viewZone === 'review'
+              ? 'bg-mana/10 border-mana/40 text-mana'
+              : 'bg-night-800 border-night-700 opacity-80'
+          }`}
+        >
+          {viewZone === 'review'
+            ? '⏳ 복습 학기예요 — 클리어해도 경험치·메달은 없지만 시간여행 배지를 받아요. 기초 다지기 좋아요!'
+            : '🚀 아직 학교에서 안 배운 선행 학기예요 — 구경·도전은 자유지만 경험치·보상은 오르지 않아요.'}
+        </div>
+      )}
 
       {/* ── 유닛맵: 단원을 탭하면 그 단원의 스테이지만 펼쳐진다 ── */}
       {semester.units.map((unitId) => {

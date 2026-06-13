@@ -77,6 +77,8 @@ interface GameState {
     challengeCleared: number;
     /** 총괄평가 90%↑ 통과 누적 횟수 */
     finalExamsPassed: number;
+    /** 복습(이전 학기) 스테이지 클리어 누적 — 시간여행 배지용 */
+    reviewCleared: number;
   };
   /** 드래곤 육성 상태 */
   dragon: DragonState;
@@ -123,6 +125,7 @@ interface GameState {
   drawTreasureCard: () => { drawn: RewardCardDef; duplicate: boolean };
   /** 심화 스테이지 클리어 기록 */
   recordChallengeClear: () => void;
+  recordReviewClear: () => void;
   /** 명예의 시험 응시 기록 */
   recordExam: () => void;
   /** 총괄평가 결과 기록. passed(90%↑)이고 그 학기 첫 통과면 grantCard=true (카드 1회) */
@@ -178,7 +181,7 @@ export const useGame = create<GameState>()(
       hiddenDone: [],
       examCount: 0,
       finalExamCleared: [],
-      records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0, finalExamsPassed: 0 },
+      records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0, finalExamsPassed: 0, reviewCleared: 0 },
       dragon: emptyDragon(),
       practice: {
         basicAnswered: 0,
@@ -321,6 +324,11 @@ export const useGame = create<GameState>()(
       recordChallengeClear: () =>
         set((s) => ({
           records: { ...s.records, challengeCleared: s.records.challengeCleared + 1 },
+        })),
+
+      recordReviewClear: () =>
+        set((s) => ({
+          records: { ...s.records, reviewCleared: s.records.reviewCleared + 1 },
         })),
 
       recordExam: () => set((s) => ({ examCount: s.examCount + 1 })),
@@ -518,6 +526,7 @@ export const useGame = create<GameState>()(
           examCount: s.examCount,
           feedCount: s.dragon.feedCount,
           dragonAdult: !!s.dragon.adult,
+          reviewCleared: s.records.reviewCleared,
         };
         const earned = newlyEarned(stats, s.badges);
         if (earned.length > 0) {
@@ -572,7 +581,7 @@ export const useGame = create<GameState>()(
           hiddenDone: [],
           examCount: 0,
           finalExamCleared: [],
-          records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0, finalExamsPassed: 0 },
+          records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0, finalExamsPassed: 0, reviewCleared: 0 },
           dragon: emptyDragon(),
           practice: {
             basicAnswered: 0,

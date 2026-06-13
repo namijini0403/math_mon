@@ -36,5 +36,13 @@
 5. **시간여행 배지** 추가 (badges.ts BADGES + BadgeStats에 reviewCleared 등).
 6. **UI**: 홈 학기 탭에서 현재 학기를 디폴트·강조, 이전=「복습」, 미래=「선행 도전」 라벨.
 
-## 미결정 (착수 전 확인 필요)
+## 구현 상태 (2026-06-13)
+- ✅ 반코드 파싱(gradeAccess.ts) · 영역 판정(current/review/ahead) · 진입 모달 · 보상 게이팅(LessonPage) · 시간여행 배지(time-traveler, time-traveler-20) · 홈 학기탭 기본=학생 학기·"현재" 마커·복습/선행 배너(UnitMapPage).
+- 복습/선행은 XP·별·카드·격파메달·콤보배지 전부 미지급. 복습만 recordReviewClear→시간여행 배지.
+- 학생 학기는 classCode에서 파생(별도 persist 필드 없음). 미설정 시 전체 'current' 폴백.
+
+## 후속 적용 대상 (이번 범위 밖 — 같은 정책 확장 필요)
+- **연습 모드(PracticePage)·단원평가(ExamPage)·총괄평가(FinalExamPage)**: 현재 메인 레슨/보스 경로만 게이팅. 이 모드들도 XP/별을 줄 수 있으므로, 동일 영역 판정으로 보상 게이팅 추가 필요(복습 학기 연습으로 XP 파밍 방지).
+
+## 미결정
 - 별(최고기록) 표시 정책: 복습/선행은 미기록이 기본(파밍 방지 일관성) — 진행감과 trade-off, 조정 가능.

@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CHALLENGE_PASS, getStage } from '../game/stages';
+import { accessZone, parseGradeSemester, type AccessZone } from '../game/gradeAccess';
 import { nextProblem, type Served } from '../game/lesson';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { useGame, type EarnedCard } from '../game/store';
@@ -40,7 +41,15 @@ export default function LessonPage() {
 function LessonRunner({ stageId }: { stageId: string }) {
   const stage = useMemo(() => getStage(stageId), [stageId]);
   const navigate = useNavigate();
-  const { skillStats, showAnswers, recordAnswer, addXp, addBossCard, completeStage } = useGame();
+  const { skillStats, showAnswers, recordAnswer, addXp, addBossCard, completeStage, classCode } = useGame();
+
+  // 학년 접근 영역 — 학생 현재 학기(반코드 파생) 대비 이 스테이지의 위치
+  const zone: AccessZone = useMemo(
+    () => accessZone(parseGradeSemester(classCode), stage.unitId),
+    [classCode, stage.unitId],
+  );
+  // 복습/선행이면 진입 전 안내 모달을 한 번 띄운다
+  const [zoneAck, setZoneAck] = useState(zone === 'current');
 
   const total = stage.problemCount;
   const isBoss = stage.type === 'boss';
@@ -73,6 +82,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     cards: EarnedCard[];
     badges: BadgeDef[];
     treasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[];
+    zone: AccessZone;
   } | null>(null);
   const maxComboRef = useRef(0);
   const servedAtRef = useRef<number>(Date.now());
@@ -207,6 +217,22 @@ function LessonRunner({ stageId }: { stageId: string }) {
       return;
     }
 
+    // 학년 접근 정책: 복습(이전 학기)=시간여행 배지만, 선행(다음 학기)=보상 전무.
+    // XP·별·카드·격파메달·콤보배지 전부 미지급(어뷰징·선행조장 방지).
+    if (zone !== 'current') {
+      let badges: BadgeDef[] = [];
+      if (zone === 'review') {
+        game.recordReviewClear();
+        badges = useGame.getState().evaluateBadges();
+      }
+      sfx.fanfare();
+      if (badges.length > 0) setTimeout(() => sfx.levelUp(), 600);
+      void track(isBoss ? 'boss.defeat' : 'lesson.complete', { stage_id: stage.id, stars: 0, score: 0 });
+      setResult({ stars: 0, xp: 0, cards: [], badges, treasures: [], zone });
+      setPhase('result');
+      return;
+    }
+
     const perfect = isChallenge ? correctCount === total : wrongCount === 0;
     const stars = isChallenge
       ? Math.min(3, correctCount - CHALLENGE_PASS + 1) // 8→1, 9→2, 10→3
@@ -253,7 +279,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
       stars,
       score: xp,
     });
-    setResult({ stars, xp, cards, badges, treasures });
+    setResult({ stars, xp, cards, badges, treasures, zone: 'current' });
     setPhase('result');
   };
 
@@ -283,37 +309,53 @@ function LessonRunner({ stageId }: { stageId: string }) {
     return (
       <div className="min-h-dvh flex flex-col items-center gap-6 p-6 pt-16 pb-12 text-center">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
-          <div className="text-7xl mb-2">{isBoss ? '🏆' : isChallenge ? '🌌' : '🎉'}</div>
+          <div className="text-7xl mb-2">
+            {result.zone === 'review' ? '⏳' : result.zone === 'ahead' ? '🚀' : isBoss ? '🏆' : isChallenge ? '🌌' : '🎉'}
+          </div>
           <h1 className="text-3xl text-glow">
-            {isBoss
-              ? `${stage.boss?.name} 격파!`
-              : isChallenge
-                ? `심화 탐험 정복! (${correctCount}/${total})`
-                : '레슨 완료!'}
+            {result.zone === 'review'
+              ? '복습 완료!'
+              : result.zone === 'ahead'
+                ? '선행 도전 완료!'
+                : isBoss
+                  ? `${stage.boss?.name} 격파!`
+                  : isChallenge
+                    ? `심화 탐험 정복! (${correctCount}/${total})`
+                    : '레슨 완료!'}
           </h1>
         </motion.div>
-        <div className="flex gap-2 text-5xl">
-          {[1, 2, 3].map((i) => (
-            <motion.span
-              key={i}
-              initial={{ scale: 0, rotate: -30 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.3 + i * 0.25, type: 'spring' }}
-              className={i <= result.stars ? '' : 'opacity-20 grayscale'}
-            >
-              ⭐
-            </motion.span>
-          ))}
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
-          className="rounded-2xl bg-night-800 px-8 py-4 text-xl"
-        >
-          <span className="text-coin">+{result.xp} XP</span>
-          {comboBonus > 0 && <span className="text-sm opacity-70 ml-2">(콤보 보너스 +{comboBonus} 포함)</span>}
-        </motion.div>
+        {result.zone === 'current' && (
+          <div className="flex gap-2 text-5xl">
+            {[1, 2, 3].map((i) => (
+              <motion.span
+                key={i}
+                initial={{ scale: 0, rotate: -30 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.3 + i * 0.25, type: 'spring' }}
+                className={i <= result.stars ? '' : 'opacity-20 grayscale'}
+              >
+                ⭐
+              </motion.span>
+            ))}
+          </div>
+        )}
+        {result.zone === 'current' ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            className="rounded-2xl bg-night-800 px-8 py-4 text-xl"
+          >
+            <span className="text-coin">+{result.xp} XP</span>
+            {comboBonus > 0 && <span className="text-sm opacity-70 ml-2">(콤보 보너스 +{comboBonus} 포함)</span>}
+          </motion.div>
+        ) : (
+          <div className="rounded-2xl bg-night-800 px-6 py-4 text-base max-w-xs opacity-90">
+            {result.zone === 'review'
+              ? '복습은 경험치가 오르지 않지만 기초가 단단해졌어요! 💪'
+              : '선행 도전은 보상이 없지만 도전 정신이 멋져요! 🌟'}
+          </div>
+        )}
 
         {result.treasures.map((t, i) => (
           <TreasureReveal key={i} drawn={t.drawn} duplicate={t.duplicate} label={t.label} delay={1.3 + i * 0.5} />
@@ -409,6 +451,32 @@ function LessonRunner({ stageId }: { stageId: string }) {
           <Link to="/" className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-8 py-3 text-lg">
             지도로
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // ── 학년 접근 안내 모달 (복습/선행 진입 시 1회) ──
+  if (!zoneAck && zone !== 'current') {
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-8 text-center">
+        <div className="text-6xl">{zone === 'review' ? '⏳' : '🚀'}</div>
+        <h1 className="text-2xl font-bold">{zone === 'review' ? '복습하려고요?' : '선행에 도전!'}</h1>
+        <p className="opacity-80 max-w-xs leading-relaxed">
+          {zone === 'review'
+            ? '복습 중요하죠!! 이전 학기 내용이라 경험치·메달은 오르지 않지만, 클리어하면 시간여행 배지를 받아요. 기초를 단단히 다져봐요!'
+            : '아직 학교에서 배우지 않은 내용이에요. 도전해 볼 수는 있지만 경험치나 보상은 오르지 않아요. 그래도 궁금하면 구경해봐요!'}
+        </p>
+        <div className="flex gap-3">
+          <Link to="/" className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-7 py-3 text-lg">
+            돌아가기
+          </Link>
+          <button
+            onClick={() => setZoneAck(true)}
+            className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-8 py-3 text-lg text-night-950"
+          >
+            {zone === 'review' ? '복습 시작' : '도전하기'}
+          </button>
         </div>
       </div>
     );

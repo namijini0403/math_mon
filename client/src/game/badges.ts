@@ -23,6 +23,8 @@ export interface BadgeStats {
   feedCount: number;
   /** 드래곤이 완전한 성체에 도달했는가 */
   dragonAdult: boolean;
+  /** 복습(이전 학기) 스테이지 클리어 누적 */
+  reviewCleared: number;
 }
 
 export interface BadgeDef {
@@ -131,6 +133,12 @@ export const BADGES: BadgeDef[] = [
     visual: { shape: 'banner', palette: 'gold', glyph: 'castle' }, earned: (s) => s.finalExamsPassed >= 1 },
   { id: 'final-5', name: '학기의 정복자', desc: '총괄평가 던전 5회 통과', emoji: '👑', rarity: 3,
     visual: { shape: 'banner', palette: 'indigo', glyph: 'castle', ring: true }, earned: (s) => s.finalExamsPassed >= 5 },
+
+  // ── 복습(시간여행) ──
+  { id: 'time-traveler', name: '시간여행자', desc: '복습으로 이전 학기를 탐험했어요', emoji: '⏳', rarity: 1,
+    visual: { shape: 'hexagon', palette: 'violet', glyph: 'compass' }, earned: (s) => s.reviewCleared >= 1 },
+  { id: 'time-traveler-20', name: '시간의 수호자', desc: '복습 20회 — 기초를 단단히', emoji: '⌛', rarity: 3,
+    visual: { shape: 'hexagon', palette: 'indigo', glyph: 'compass', ring: true }, earned: (s) => s.reviewCleared >= 20 },
 
   // ── 드래곤 ──
   { id: 'feed-50', name: '다정한 조련사', desc: '드래곤에게 먹이 50번 주기', emoji: '🍎', rarity: 2,
