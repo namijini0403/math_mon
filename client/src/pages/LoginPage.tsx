@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useGame } from '../game/store';
 import { join } from '../api';
+import { track } from '../analytics';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,6 +15,19 @@ export default function LoginPage() {
   const [pin, setPin] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [device, setDevice] = useState<'laptop' | 'phone' | ''>(() => {
+    try {
+      const v = localStorage.getItem('draconis-device');
+      return v === 'laptop' || v === 'phone' ? v : '';
+    } catch {
+      return '';
+    }
+  });
+
+  const selectDevice = (d: 'laptop' | 'phone') => {
+    setDevice(d);
+    try { localStorage.setItem('draconis-device', d); } catch { /* ignore */ }
+  };
 
   const start = async () => {
     const name = nickname.trim();
@@ -37,6 +51,7 @@ export default function LoginPage() {
           classCode: res.data.classCode,
           studentId: res.data.studentId,
         });
+        void track('auth.login');
         navigate('/');
         return;
       }
@@ -52,10 +67,12 @@ export default function LoginPage() {
       }
       // 서버 없음(미리보기 배포 등) → 혼자 모험 모드로 자동 시작
       setProfile({ nickname: name });
+      void track('auth.login');
       navigate('/');
       return;
     }
     setProfile({ nickname: name });
+    void track('auth.login');
     navigate('/');
   };
 
@@ -130,6 +147,26 @@ export default function LoginPage() {
         </div>
         <p className="text-xs opacity-50">반 코드 없이도 시작할 수 있어요. 나중에 다시 입력하면 돼요.</p>
         {error && <p className="text-sm text-hurt">{error}</p>}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <span className="text-sm opacity-80">내 기기 종류 (선택)</span>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => selectDevice('laptop')}
+            className={`btn-3d flex-1 rounded-2xl py-2.5 text-base border-2 ${device === 'laptop' ? 'bg-mana/30 border-mana text-white' : 'bg-night-800 border-night-700 opacity-70'}`}
+          >
+            💻 노트북
+          </button>
+          <button
+            type="button"
+            onClick={() => selectDevice('phone')}
+            className={`btn-3d flex-1 rounded-2xl py-2.5 text-base border-2 ${device === 'phone' ? 'bg-mana/30 border-mana text-white' : 'bg-night-800 border-night-700 opacity-70'}`}
+          >
+            📱 휴대폰
+          </button>
+        </div>
       </div>
 
       <button

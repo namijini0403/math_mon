@@ -1,11 +1,20 @@
 /** 서버 API 클라이언트 — 오프라인/서버 없음 환경에서도 앱이 동작하도록 베스트에포트 */
 
+import { setAnalyticsAdapter } from './analytics';
+import { createServerAdapter } from './analytics/adapters/server';
+
 export interface JoinResult {
   studentId: string;
   nickname: string;
   classCode: string;
   /** 서버에 저장된 전체 게임 상태 (기존 학생 재로그인 시 복원용) */
   save?: Record<string, unknown> | null;
+  /** 분석용 가명 식별자 */
+  pseudonymId?: string;
+  /** access 토큰 (1시간) */
+  accessToken?: string;
+  /** refresh 토큰 (90일) */
+  refreshToken?: string;
 }
 
 /** 서버에 통째로 저장하는 게임 상태 필드 (프로필 식별자는 제외) */
@@ -28,11 +37,153 @@ export const SAVE_KEYS = [
   'practice',
 ] as const;
 
-async function post<T>(path: string, body: unknown): Promise<T | null> {
+// ── 토큰 저장소 ──────────────────────────────────────────────────────────────
+const LS_REFRESH_KEY = 'draconis-refresh';
+const IDB_DB_NAME = 'draconis-auth';
+const IDB_STORE = 'tokens';
+const IDB_REFRESH_KEY = 'refresh';
+
+/** 모듈 메모리에 보관하는 access 토큰 */
+let _accessToken: string | null = null;
+
+/** 다른 모듈(analytics ServerAdapter 등)이 사용하는 계약 */
+export function getAccessToken(): string | null {
+  return _accessToken;
+}
+
+/** access 토큰 JWT payload의 exp(epoch seconds) 반환. 파싱 실패 시 0 */
+function getTokenExp(token: string): number {
   try {
-    const res = await fetch(path, {
+    const parts = token.split('.');
+    if (parts.length !== 3) return 0;
+    const padded = parts[1] + '==='.slice((parts[1].length + 3) % 4);
+    const json = atob(padded.replace(/-/g, '+').replace(/_/g, '/'));
+    const payload = JSON.parse(json) as { exp?: number };
+    return payload.exp ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** access 토큰이 유효하고 만료까지 5분 이상 남아있으면 true */
+function isTokenFresh(token: string | null): boolean {
+  if (!token) return false;
+  const exp = getTokenExp(token);
+  const nowSec = Math.floor(Date.now() / 1000);
+  return exp - nowSec > 5 * 60; // 5분 여유
+}
+
+// ── IndexedDB 헬퍼 (iOS Safari 7일 만료 대응 이중 저장) ────────────────────
+function openIdb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(IDB_STORE);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function idbSet(key: string, value: string): Promise<void> {
+  try {
+    const db = await openIdb();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch {
+    // IndexedDB 실패는 무시 (localStorage 폴백으로 충분)
+  }
+}
+
+async function idbGet(key: string): Promise<string | null> {
+  try {
+    const db = await openIdb();
+    return await new Promise<string | null>((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(key);
+      req.onsuccess = () => resolve((req.result as string | undefined) ?? null);
+      req.onerror = () => reject(req.error);
+    });
+  } catch {
+    return null;
+  }
+}
+
+/** refresh 토큰을 localStorage + IndexedDB(이중)에 저장 */
+async function storeRefreshToken(token: string): Promise<void> {
+  try { localStorage.setItem(LS_REFRESH_KEY, token); } catch { /* noop */ }
+  await idbSet(IDB_REFRESH_KEY, token);
+}
+
+/** refresh 토큰을 읽기 (localStorage 우선, 없으면 IndexedDB) */
+async function loadRefreshToken(): Promise<string | null> {
+  try {
+    const ls = localStorage.getItem(LS_REFRESH_KEY);
+    if (ls) return ls;
+  } catch { /* noop */ }
+  return idbGet(IDB_REFRESH_KEY);
+}
+
+/** join 응답에서 토큰들을 메모리/영구 저장소에 저장 */
+async function storeTokens(data: JoinResult): Promise<void> {
+  if (data.accessToken) _accessToken = data.accessToken;
+  if (data.refreshToken) await storeRefreshToken(data.refreshToken);
+}
+
+// ── analytics 어댑터 전환 ────────────────────────────────────────────────────
+// 서버 모드가 확인되는 순간(로그인·토큰 갱신 성공) no-op → 서버 전송으로 전환.
+// GitHub Pages 등 서버 없는 배포에서는 호출되지 않아 no-op 유지.
+let _serverAnalyticsOn = false;
+function enableServerAnalytics(): void {
+  if (_serverAnalyticsOn || !_accessToken) return;
+  _serverAnalyticsOn = true;
+  setAnalyticsAdapter(createServerAdapter({ baseUrl: '', getToken: getAccessToken }));
+}
+
+/**
+ * access 토큰이 없거나 만료 임박 시 refresh 엔드포인트로 갱신.
+ * 실패해도 기존 동작에 영향 없음 (오프라인·로컬 모드 무영향).
+ */
+export async function ensureFreshToken(): Promise<void> {
+  if (isTokenFresh(_accessToken)) return;
+
+  const refreshToken = await loadRefreshToken();
+  if (!refreshToken) return;
+
+  try {
+    const res = await fetch('/api/auth/refresh', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!res.ok) return;
+    const data = (await res.json()) as { accessToken?: string; refreshToken?: string };
+    if (data.accessToken) _accessToken = data.accessToken;
+    if (data.refreshToken) await storeRefreshToken(data.refreshToken);
+    enableServerAnalytics();
+  } catch {
+    // 오프라인이거나 서버 없음 — 무시
+  }
+}
+
+// ── 기본 POST 헬퍼 ────────────────────────────────────────────────────────────
+async function post<T>(
+  path: string,
+  body: unknown,
+  options?: { bearerToken?: string },
+): Promise<T | null> {
+  try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (options?.bearerToken) {
+      headers['Authorization'] = `Bearer ${options.bearerToken}`;
+    }
+    const res = await fetch(path, {
+      method: 'POST',
+      headers,
       body: JSON.stringify(body),
     });
     if (!res.ok) return null;
@@ -59,7 +210,11 @@ export async function join(classCode: string, nickname: string, pin: string): Pr
     if (res.ok) {
       const ct = res.headers.get('content-type') ?? '';
       if (!ct.includes('json')) return { kind: 'no-server' };
-      return { kind: 'ok', data: (await res.json()) as JoinResult };
+      const data = (await res.json()) as JoinResult;
+      // 토큰 저장 (실패해도 무시)
+      await storeTokens(data).catch(() => undefined);
+      enableServerAnalytics();
+      return { kind: 'ok', data };
     }
     if (res.status === 403) return { kind: 'wrong-pin' };
     if (res.status === 404) {
@@ -74,7 +229,7 @@ export async function join(classCode: string, nickname: string, pin: string): Pr
 }
 
 /** 진도 스냅샷 + 전체 세이브 업로드 */
-export function pushProgress(s: {
+export async function pushProgress(s: {
   studentId: string | null;
   xp: number;
   stages: Record<string, { stars: number }>;
@@ -83,16 +238,25 @@ export function pushProgress(s: {
   streak: { last: string; count: number };
 }) {
   if (!s.studentId) return Promise.resolve(null);
+
+  // access 토큰 갱신 시도 (실패해도 계속)
+  await ensureFreshToken().catch(() => undefined);
+
   const save: Record<string, unknown> = {};
   const anyState = s as unknown as Record<string, unknown>;
   for (const k of SAVE_KEYS) save[k] = anyState[k];
-  return post('/api/progress', {
-    studentId: s.studentId,
-    xp: s.xp,
-    stages: s.stages,
-    skillStats: s.skillStats,
-    cardCount: s.cards.length,
-    streak: s.streak.count,
-    save,
-  });
+
+  return post(
+    '/api/progress',
+    {
+      studentId: s.studentId,
+      xp: s.xp,
+      stages: s.stages,
+      skillStats: s.skillStats,
+      cardCount: s.cards.length,
+      streak: s.streak.count,
+      save,
+    },
+    _accessToken ? { bearerToken: _accessToken } : undefined,
+  );
 }

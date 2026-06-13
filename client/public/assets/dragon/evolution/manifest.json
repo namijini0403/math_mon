@@ -1,0 +1,22 @@
+{
+  "full": [
+    { "id": "egg-default", "stage": "egg", "label": "신비한 알", "src": "assets/dragon/evolution/full/egg-default.png" },
+    { "id": "egg-light-default", "stage": "egg", "label": "신비한 알 밝은 버전", "src": "assets/dragon/evolution/full/egg-light-default.png" },
+    { "id": "cracked-default", "stage": "cracked", "label": "금이 간 알", "src": "assets/dragon/evolution/full/cracked-default.png" },
+    { "id": "toddler-default", "stage": "toddler", "label": "2-3살", "src": "assets/dragon/evolution/full/toddler-default.png" },
+    { "id": "child-04-05-default", "stage": "child-04-05", "label": "4-5살", "src": "assets/dragon/evolution/full/child-04-05-default.png" },
+    { "id": "child-07-10-default", "stage": "child-07-10", "label": "7-10살", "src": "assets/dragon/evolution/full/child-07-10-default.png" },
+    { "id": "preteen-11-14-default", "stage": "preteen-11-14", "label": "11-14살", "src": "assets/dragon/evolution/full/preteen-11-14-default.png" },
+    { "id": "teen-default", "stage": "teen", "label": "청소년기", "src": "assets/dragon/evolution/full/teen-default.png" },
+    { "id": "teen-female-default", "stage": "teen-female", "label": "청소년기 여성 분기", "src": "assets/dragon/evolution/full/teen-female-default.png" }
+  ],
+  "moods": [
+    { "id": "toddler-hungry", "stage": "toddler", "mood": "hungry", "src": "assets/dragon/evolution/moods/toddler/toddler-hungry.png" },
+    { "id": "toddler-welcome", "stage": "toddler", "mood": "welcome", "src": "assets/dragon/evolution/moods/toddler/toddler-welcome.png" },
+    { "id": "toddler-happy", "stage": "toddler", "mood": "happy", "src": "assets/dragon/evolution/moods/toddler/toddler-happy.png" },
+    { "id": "toddler-best", "stage": "toddler", "mood": "best", "src": "assets/dragon/evolution/moods/toddler/toddler-best.png" },
+    { "id": "child-04-05-hungry", "stage": "child-04-05", "mood": "hungry", "src": "assets/dragon/evolution/moods/child-04-05/child-04-05-hungry.png" },
+    { "id": "child-04-05-welcome", "stage": "child-04-05", "mood": "welcome", "src": "assets/dragon/evolution/moods/child-04-05/child-04-05-welcome.png" },
+    { "id": "child-04-05-happy", "stage": "child-04-05", "mood": "happy", "src": "assets/dragon/evolution/moods/child-04-05/child-04-05-happy.png" }
+  ]
+}

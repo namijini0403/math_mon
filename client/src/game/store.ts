@@ -23,6 +23,7 @@ import {
   type DragonState,
 } from './dragon';
 import { pushProgress } from '../api';
+import { track } from '../analytics';
 
 export interface EarnedCard {
   /** 'level' = 레벨업 카드, 'boss' = 보스 격파 카드 (구버전 저장은 undefined → level) */
@@ -282,6 +283,7 @@ export const useGame = create<GameState>()(
         const cards = get().addXp(xp);
         get().dragonGain({ gp: GP_REWARDS.attendance, fruits: 1, affinity: AFFINITY_SOURCES.attendance });
         get().evaluateDragonItems();
+        void track('daily_reward.claim', { score: xp });
         return { xp, day: streak.count, cards };
       },
 
@@ -371,6 +373,7 @@ export const useGame = create<GameState>()(
           gp: GP_REWARDS.feed,
           affinity: { ...AFFINITY_SOURCES.feed, [fruit.affinity]: 1 },
         });
+        void track('dragon.feed', { policy_tag: fruitId });
         return true;
       },
 
@@ -481,6 +484,7 @@ export const useGame = create<GameState>()(
         if (daily.claimed.includes(missionId)) return [];
         set({ daily: { ...daily, claimed: [...daily.claimed, missionId] } });
         get().dragonGain({ gp: GP_REWARDS.mission, fruits: 1 });
+        void track('mission.claim', { policy_tag: String(missionId) });
         return get().addXp(XP_MISSION_REWARD);
       },
 

@@ -4,7 +4,7 @@
  * 하트 없음, 보스전과 비슷한 난이도. 교사는 단원평가 대비용으로 활용.
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
@@ -23,6 +23,7 @@ import { FractionInputView } from '../components/problem/FractionInputView';
 import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
+import { track } from '../analytics';
 
 const TOTAL = 10;
 
@@ -61,6 +62,8 @@ export default function ExamPage() {
   const [score, setScore] = useState(0);
   const [treasures, setTreasures] = useState<{ drawn: RewardCardDef; duplicate: boolean; label: string }[]>([]);
 
+  const servedAtRef = useRef<number>(Date.now());
+
   const semId = localStorage.getItem('mathmon-semester') ?? 'g5s1';
   const semester = SEMESTERS.find((s) => s.id === semId) ?? SEMESTERS[0];
 
@@ -69,15 +72,25 @@ export default function ExamPage() {
     setIndex(0);
     setScore(0);
     setProblem(pickExamProblem(uid, 0));
+    servedAtRef.current = Date.now();
     setAnswer(null);
+    void track('exam.start', { unit_id: uid });
     setPhase('answering');
   };
 
   const confirm = (forced?: UserAnswer) => {
     const a = forced ?? answer;
     if (!a || !problem) return;
+    const elapsed_ms = Date.now() - servedAtRef.current;
     const ok = checkAnswer(problem, a);
     recordAnswer(problem.skillId, ok);
+    void track('exam.answer', {
+      unit_id: unitId ?? undefined,
+      skill_id: problem.skillId,
+      problem_id: problem.id,
+      correct: ok,
+      elapsed_ms,
+    });
     setLastCorrect(ok);
     if (ok) {
       setScore((s) => s + 1);
@@ -102,6 +115,7 @@ export default function ExamPage() {
         label: `히든 미션: ${h.mission.name}`,
       }));
       setTreasures(hidden);
+      void track('exam.complete', { unit_id: unitId, score: score * 10 });
       syncNow();
       sfx.fanfare();
       setPhase('result');
@@ -109,6 +123,7 @@ export default function ExamPage() {
     }
     setIndex((i) => i + 1);
     setProblem(pickExamProblem(unitId, index + 1));
+    servedAtRef.current = Date.now();
     setAnswer(null);
     setPhase('answering');
   };

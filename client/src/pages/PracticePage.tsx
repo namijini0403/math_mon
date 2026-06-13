@@ -20,6 +20,7 @@ import { FractionInputView } from '../components/problem/FractionInputView';
 import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
+import { track } from '../analytics';
 
 /** 유닛맵에서 선택한 학기까지의 단원만 연습 풀에 포함 (이전 학기는 복습으로 누적) */
 function semesterScopedSkills(): SkillDef[] {
@@ -91,6 +92,7 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
   const [streak, setStreak] = useState(0);
   const [setToast, setSetToast] = useState(false);
   const answeredRef = useRef(0);
+  const servedAtRef = useRef<number>(Date.now());
 
   // 나갈 때 동기화
   useEffect(() => () => syncNow(), [syncNow]);
@@ -100,8 +102,16 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
   const confirm = (forced?: UserAnswer) => {
     const a = forced ?? answer;
     if (!a) return;
+    const elapsed_ms = Date.now() - servedAtRef.current;
     const ok = checkAnswer(problem, a);
     recordAnswer(problem.skillId, ok);
+    void track('practice.answer', {
+      skill_id: problem.skillId,
+      problem_id: problem.id,
+      correct: ok,
+      elapsed_ms,
+      policy_tag: mode,
+    });
     setLastCorrect(ok);
     setSolved((s) => s + 1);
     if (ok) {
@@ -119,6 +129,7 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
     setSetToast(completedSet !== null);
     if (completedSet) {
       game.evaluateDragonItems();
+      void track('practice.set_complete', { policy_tag: mode });
       sfx.fanfare();
     }
     answeredRef.current += 1;
@@ -128,6 +139,7 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
 
   const next = () => {
     setProblem(pickProblem(mode, useGame.getState().skillStats));
+    servedAtRef.current = Date.now();
     setAnswer(null);
     setPhase('answering');
   };

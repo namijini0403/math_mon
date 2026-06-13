@@ -26,6 +26,7 @@ import { FractionInputView } from '../components/problem/FractionInputView';
 import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
+import { track } from '../analytics';
 
 type Phase = 'answering' | 'feedback' | 'result' | 'failed';
 const MAX_MISSES = 3;
@@ -71,10 +72,20 @@ function LessonRunner({ stageId }: { stageId: string }) {
     treasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[];
   } | null>(null);
   const maxComboRef = useRef(0);
+  const servedAtRef = useRef<number>(Date.now());
 
   const problem = served.problem;
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
+
+  // ── analytics: 마운트 시 시작 이벤트 ──
+  useEffect(() => {
+    void track(isBoss ? 'boss.start' : 'lesson.start', {
+      stage_id: stage.id,
+      unit_id: stage.unitId,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── 보스전 타이머: 0이 되면 시간 초과 처리 ──
   useEffect(() => {
@@ -112,11 +123,28 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const confirm = (forced?: UserAnswer) => {
     const a = forced ?? answer;
     if (!a) return;
+    const elapsed_ms = Date.now() - servedAtRef.current;
     const correct = checkAnswer(problem, a);
     if (!correct) {
+      void track(isBoss ? 'boss.answer' : 'lesson.answer', {
+        stage_id: stage.id,
+        unit_id: stage.unitId,
+        skill_id: problem.skillId,
+        problem_id: problem.id,
+        correct: false,
+        elapsed_ms,
+      });
       miss(false);
       return;
     }
+    void track(isBoss ? 'boss.answer' : 'lesson.answer', {
+      stage_id: stage.id,
+      unit_id: stage.unitId,
+      skill_id: problem.skillId,
+      problem_id: problem.id,
+      correct: true,
+      elapsed_ms,
+    });
     recordAnswer(problem.skillId, true);
     setLastCorrect(true);
     setTimedOut(false);
@@ -144,6 +172,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
 
   const next = () => {
     if (!isChallenge && !lastCorrect && misses >= MAX_MISSES) {
+      void track(isBoss ? 'boss.fail' : 'lesson.fail', { stage_id: stage.id });
       setPhase('failed');
       return;
     }
@@ -154,6 +183,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     const s = useGame.getState();
     const nextServed = nextProblem(stage, s.skillStats, done, s.recentWrong);
     setServed(nextServed);
+    servedAtRef.current = Date.now();
     setTimeLeft(nextServed.timeLimit);
     setAnswer(null);
     setPhase('answering');
@@ -165,6 +195,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
 
     // 심화 탐험: 10문제 중 8개 이상이어야 클리어
     if (isChallenge && correctCount < CHALLENGE_PASS) {
+      void track('lesson.fail', { stage_id: stage.id });
       setPhase('failed');
       return;
     }
@@ -210,6 +241,11 @@ function LessonRunner({ stageId }: { stageId: string }) {
     sfx.fanfare();
     if (cards.length > 0 || badges.length > 0 || treasures.length > 0)
       setTimeout(() => sfx.levelUp(), 600);
+    void track(isBoss ? 'boss.defeat' : 'lesson.complete', {
+      stage_id: stage.id,
+      stars,
+      score: xp,
+    });
     setResult({ stars, xp, cards, badges, treasures });
     setPhase('result');
   };
@@ -225,6 +261,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     const s = useGame.getState();
     const nextServed = nextProblem(stage, s.skillStats, 0, s.recentWrong);
     setServed(nextServed);
+    servedAtRef.current = Date.now();
     setTimeLeft(nextServed.timeLimit);
     setAnswer(null);
     setPhase('answering');
@@ -384,7 +421,12 @@ function LessonRunner({ stageId }: { stageId: string }) {
     >
       {/* ── 상단 바 ── */}
       <div className="flex items-center gap-3 p-4">
-        <Link to="/" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">
+        <Link
+          to="/"
+          className="text-2xl opacity-60 hover:opacity-100"
+          aria-label="나가기"
+          onClick={() => void track('lesson.abandon', { stage_id: stage.id, score: done })}
+        >
           ✕
         </Link>
         {isBoss && stage.boss ? (
