@@ -99,6 +99,9 @@ export interface DragonItemDef {
   /** 획득 조건 설명 (UI 표시용) */
   hint: string;
   earned: (s: DragonItemStats) => boolean;
+  /** true면 성장 서사상 그 시기에 꼭 필요 → 조건 충족 시 그대로 지급(고정).
+   *  false/없음이면 '언제 나와도 되는' 수집형 → 랜덤 뽑기 풀에 들어감. */
+  fixed?: boolean;
 }
 
 export interface DragonItemStats {
@@ -115,20 +118,49 @@ export interface DragonItemStats {
 }
 
 export const DRAGON_ITEMS: DragonItemDef[] = [
-  { id: 'incubator', name: '드래곤 부화기', emoji: '🪺', desc: '알을 따뜻하게 품어 주는 마법 둥지', hint: '첫 레슨을 완료하면', earned: (s) => s.lessonsCompleted >= 1 },
-  { id: 'warm-lamp', name: '온기의 랜턴', emoji: '🏮', desc: '알에서 콩콩 소리가 들리기 시작해요', hint: '레슨 5개를 완료하면', earned: (s) => s.lessonsCompleted >= 5 },
-  { id: 'first-meal', name: '아기 수저', emoji: '🥄', desc: '아기 드래곤의 첫 식사 도구', hint: '먹이를 3번 주면', earned: (s) => s.feedCount >= 3 },
+  { id: 'incubator', name: '드래곤 부화기', emoji: '🪺', desc: '알을 따뜻하게 품어 주는 마법 둥지', hint: '첫 레슨을 완료하면', earned: (s) => s.lessonsCompleted >= 1 , fixed: true },
+  { id: 'warm-lamp', name: '온기의 랜턴', emoji: '🏮', desc: '알에서 콩콩 소리가 들리기 시작해요', hint: '레슨 5개를 완료하면', earned: (s) => s.lessonsCompleted >= 5 , fixed: true },
+  { id: 'first-meal', name: '아기 수저', emoji: '🥄', desc: '아기 드래곤의 첫 식사 도구', hint: '먹이를 3번 주면', earned: (s) => s.feedCount >= 3 , fixed: true },
   { id: 'star-mobile', name: '별빛 모빌', emoji: '🌠', desc: '연산의 별이 빙글빙글 도는 모빌', hint: '기초 연산 연습 3세트를 마치면', earned: (s) => s.basicSets >= 3 },
   { id: 'story-book', name: '이야기 그림책', emoji: '📖', desc: '드래곤이 가장 좋아하는 잠자리 동화', hint: '문장제 연습 3세트를 마치면', earned: (s) => s.wordSets >= 3 },
   { id: 'brave-scale', name: '용기의 비늘', emoji: '🛡️', desc: '첫 보스를 봉인한 기념 비늘', hint: '보스를 1마리 봉인하면', earned: (s) => s.bossesCleared >= 1 },
   { id: 'cloud-saddle', name: '구름 안장', emoji: '☁️', desc: '언젠가 함께 하늘을 날 준비', hint: '보스를 3마리 봉인하면', earned: (s) => s.bossesCleared >= 3 },
-  { id: 'crown-seed', name: '왕관 새싹', emoji: '🌱', desc: '성체가 되면 피어날 왕관의 씨앗', hint: '10일 출석하면', earned: (s) => s.attendanceDays >= 10 },
+  { id: 'crown-seed', name: '왕관 새싹', emoji: '🌱', desc: '성체가 되면 피어날 왕관의 씨앗', hint: '10일 출석하면', earned: (s) => s.attendanceDays >= 10 , fixed: true },
   { id: 'treasure-pouch', name: '보물 주머니', emoji: '👝', desc: '보물 카드를 소중히 담는 주머니', hint: '보물 카드를 10장 모으면', earned: (s) => s.rewardCardCount >= 10 },
-  { id: 'rainbow-ribbon', name: '무지개 리본', emoji: '🎀', desc: '완전한 성체를 축하하는 리본', hint: '보스를 6마리 봉인하면', earned: (s) => s.bossesCleared >= 6 },
+  { id: 'rainbow-ribbon', name: '무지개 리본', emoji: '🎀', desc: '완전한 성체를 축하하는 리본', hint: '보스를 6마리 봉인하면', earned: (s) => s.bossesCleared >= 6 , fixed: true },
   { id: 'challenge-gem', name: '심연의 보석', emoji: '💠', desc: '심화 탐험을 정복한 자의 증표', hint: '심화 탐험을 1번 클리어하면', earned: (s) => s.challengeCleared >= 1 },
   { id: 'scholar-quill', name: '현자의 깃펜', emoji: '🪶', desc: '어려운 문제를 사랑하는 마음', hint: '심화 연습 3세트를 마치면', earned: (s) => s.challengeSets >= 3 },
   { id: 'exam-medal', name: '명예의 메달', emoji: '🎖️', desc: '시험장을 누빈 용사의 메달', hint: '명예의 시험에 3번 도전하면', earned: (s) => s.examCount >= 3 },
 ];
+
+/** 고정(성장 서사) 아이템 — 조건 충족 시 그대로 지급 */
+export const FIXED_ITEMS = DRAGON_ITEMS.filter((i) => i.fixed);
+/** 가챠(수집형) 아이템 — 랜덤 뽑기 풀 */
+export const GACHA_ITEMS = DRAGON_ITEMS.filter((i) => !i.fixed);
+
+/**
+ * 가챠 아이템 추첨 (순수). 지금까지 얻은 '뽑기 티켓 수'(=조건 충족한 가챠 아이템 수)에서
+ * 이미 보유한 가챠 수를 뺀 만큼, 미보유 가챠 풀에서 랜덤으로 뽑아 지급 id 목록을 반환.
+ * @param ticketsMet 조건 충족한 가챠 아이템 수
+ * @param ownedGachaIds 이미 보유한 가챠 아이템 id
+ * @param rand 0~1 난수 함수 (테스트 시 주입)
+ */
+export function rollGachaItems(
+  ticketsMet: number,
+  ownedGachaIds: string[],
+  rand: () => number = Math.random,
+): string[] {
+  const owned = new Set(ownedGachaIds);
+  const pool = GACHA_ITEMS.map((i) => i.id).filter((id) => !owned.has(id));
+  const pulls = Math.max(0, Math.min(ticketsMet - owned.size, pool.length));
+  const picked: string[] = [];
+  for (let i = 0; i < pulls; i++) {
+    const idx = Math.floor(rand() * pool.length) % pool.length;
+    picked.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+  return picked;
+}
 
 /** 드래곤 저장 상태 */
 export interface DragonState {

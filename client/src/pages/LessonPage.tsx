@@ -18,6 +18,8 @@ import { XP_BOSS_CLEAR, XP_LESSON_CLEAR, XP_PERFECT_BONUS, XP_PER_CORRECT } from
 import { COMBO_BONUS, type BadgeDef } from '../game/badges';
 import { type RewardCardDef } from '../game/rewardCards';
 import { TreasureReveal } from '../components/TreasureReveal';
+import { ItemGachaReveal } from '../components/ItemGachaReveal';
+import type { DragonItemDef } from '../game/dragon';
 import { MedalView } from '../components/MedalView';
 import { answerToText } from '../generator/render-text';
 import { MathView } from '../components/MathView';
@@ -82,6 +84,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     cards: EarnedCard[];
     badges: BadgeDef[];
     treasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[];
+    items: DragonItemDef[];
     zone: AccessZone;
   } | null>(null);
   const maxComboRef = useRef(0);
@@ -228,7 +231,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
       sfx.fanfare();
       if (badges.length > 0) setTimeout(() => sfx.levelUp(), 600);
       void track(isBoss ? 'boss.defeat' : 'lesson.complete', { stage_id: stage.id, stars: 0, score: 0 });
-      setResult({ stars: 0, xp: 0, cards: [], badges, treasures: [], zone });
+      setResult({ stars: 0, xp: 0, cards: [], badges, treasures: [], items: [], zone });
       setPhase('result');
       return;
     }
@@ -269,17 +272,17 @@ function LessonRunner({ stageId }: { stageId: string }) {
     for (const h of useGame.getState().checkHiddenMissions()) {
       treasures.push({ drawn: h.drawn, duplicate: h.duplicate, label: `히든 미션: ${h.mission.name}` });
     }
-    useGame.getState().evaluateDragonItems();
+    const items = useGame.getState().evaluateDragonItems(); // 새 아이템(고정+가챠) — 뽑기 연출용
     const badges = useGame.getState().evaluateBadges();
     sfx.fanfare();
-    if (cards.length > 0 || badges.length > 0 || treasures.length > 0)
+    if (cards.length > 0 || badges.length > 0 || treasures.length > 0 || items.length > 0)
       setTimeout(() => sfx.levelUp(), 600);
     void track(isBoss ? 'boss.defeat' : 'lesson.complete', {
       stage_id: stage.id,
       stars,
       score: xp,
     });
-    setResult({ stars, xp, cards, badges, treasures, zone: 'current' });
+    setResult({ stars, xp, cards, badges, treasures, items, zone: 'current' });
     setPhase('result');
   };
 
@@ -360,6 +363,14 @@ function LessonRunner({ stageId }: { stageId: string }) {
         {result.treasures.map((t, i) => (
           <TreasureReveal key={i} drawn={t.drawn} duplicate={t.duplicate} label={t.label} delay={1.3 + i * 0.5} />
         ))}
+
+        {result.items.length > 0 && (
+          <div className="flex flex-wrap gap-4 justify-center">
+            {result.items.map((it, i) => (
+              <ItemGachaReveal key={it.id} item={it} delay={1.4 + i * 0.4} />
+            ))}
+          </div>
+        )}
 
         {result.badges.length > 0 && (
           <motion.div

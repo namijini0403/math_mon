@@ -81,16 +81,16 @@ id 규칙: `rare-{속성}-{form}`, `super-{rainbow|obsidian}-{form}`  (form = dr
 **레어(각성) — 속성 4 × 형태 2 = 8** (한 학기 ~6보스 봉인 + 뚜렷한 으뜸 속성)
 | id (dragon / human) | 이름 (드래곤형 / 인간형) | 컨셉 |
 |---|---|---|
-| `rare-sun-dragon` / `rare-sun-human` | 작열하는 태양 패왕룡 / 불꽃의 태양 성기사 | 황금 불꽃 갈기·태양 문장의 웅장한 각성형 / 불꽃 갑옷의 성기사(무기 강조 X) |
-| `rare-moon-dragon` / `rare-moon-human` | 몽환의 월령 마도룡 / 심연을 보는 월광 현자 | 보랏빛 오로라 날개·초승달 룬 / 달빛 로브의 현자 |
-| `rare-star-dragon` / `rare-star-human` | 천공의 성좌룡 / 운명을 읽는 별 점성왕 | 별자리가 흐르는 우주룡 / 성좌 망토의 점성왕 |
-| `rare-forest-dragon` / `rare-forest-human` | 세계수의 정령룡 / 생명의 숲 정령왕 | 꽃·잎 만개한 비취룡 / 잎사귀 왕관의 정령왕 |
+| `rare-sun-dragon` / `rare-sun-human` | 작열하는 태양 패왕룡 / 여명을 여는 태양 성기사단장 | 황금 불꽃 갈기·태양 문장의 웅장한 각성형 / 불꽃 갑옷의 성기사(무기 강조 X) |
+| `rare-moon-dragon` / `rare-moon-human` | 몽환의 월령 마도룡 / 달빛 신탁의 대현자 | 보랏빛 오로라 날개·초승달 룬 / 달빛 로브의 현자 |
+| `rare-star-dragon` / `rare-star-human` | 천공의 성좌룡 / 천공을 읽는 대점성왕 | 별자리가 흐르는 우주룡 / 성좌 망토의 점성왕 |
+| `rare-forest-dragon` / `rare-forest-human` | 세계수의 정령룡 / 생명을 틔우는 숲의 대정령왕 | 꽃·잎 만개한 비취룡 / 잎사귀 왕관의 정령왕 |
 
 **슈퍼레어(전설) — 2종 × 형태 2 = 4** (두 학기 ~12보스 봉인)
 | id (dragon / human) | 이름 | 도달 조건 | 컨셉 |
 |---|---|---|---|
-| `super-rainbow-dragon` / `super-rainbow-human` | 무지개 창세룡 / 세계를 잇는 무지개 현왕 | 네 속성 고루 높음(균형) | 무지개 오로라를 두른 창세의 존재, 사방에 빛 |
-| `super-obsidian-dragon` / `super-obsidian-human` | 흑요석 폭풍룡 / 폭풍을 다스리는 흑요석 군주 | 한 속성 극단 편향 | 흑요석 비늘·폭풍 번개의 장엄함(무섭지 않게, 멋짐 강조) |
+| `super-rainbow-dragon` / `super-rainbow-human` | 무지개 창세룡 / 만물을 잇는 무지개 창세 신관 | 네 속성 고루 높음(균형) | 무지개 오로라를 두른 창세의 존재, 사방에 빛 |
+| `super-obsidian-dragon` / `super-obsidian-human` | 흑요석 폭풍룡 / 뇌광을 거느린 흑요석 대군주 | 한 속성 극단 편향 | 흑요석 비늘·폭풍 번개의 장엄함(무섭지 않게, 멋짐 강조) |
 
 ---
 

@@ -1,16 +1,31 @@
 /**
- * 보물 카드 획득 연출 — 비밀상자가 흔들리다 빛과 함께 터지고,
- * 카드가 클로즈업됐다가 작아지며 보관함에 저장되는 시퀀스.
+ * 보물 카드 뽑기 연출 — 뒤집힌 카드 3장 중 하나를 직접 골라 뒤집어 보는 가챠식 연출.
+ * (보상은 이미 정해져 있고, 어떤 카드를 고르든 그 보상이 나온다 — 고르는 재미용 연출)
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { RARITY_COLOR, RARITY_LABEL, type RewardCardDef } from '../game/rewardCards';
 import { sfx } from '../game/sounds';
 
-type Stage = 'box' | 'burst' | 'closeup' | 'stored';
+type Stage = 'pick' | 'reveal' | 'stored';
+const SLOTS = [-1, 0, 1];
 
-const RAYS = Array.from({ length: 10 }, (_, i) => i * 36);
+function CardBack({ color, faded }: { color: string; faded?: boolean }) {
+  return (
+    <div
+      className="w-full h-full rounded-xl border-2 flex items-center justify-center"
+      style={{
+        borderColor: `${color}99`,
+        background: 'linear-gradient(150deg, #241f57 0%, #0f0d29 100%)',
+        boxShadow: faded ? undefined : `0 0 12px ${color}55`,
+        opacity: faded ? 0.35 : 1,
+      }}
+    >
+      <span className="text-2xl" style={{ color }}>✦</span>
+    </div>
+  );
+}
 
 export function TreasureReveal({
   drawn,
@@ -23,102 +38,66 @@ export function TreasureReveal({
   label: string;
   delay?: number;
 }) {
-  const [stage, setStage] = useState<Stage>('box');
+  const [stage, setStage] = useState<Stage>('pick');
   const color = RARITY_COLOR[drawn.rarity];
 
-  // 자동 진행: 상자(흔들) → 폭발 → 클로즈업 → 보관
-  useEffect(() => {
-    const t1 = setTimeout(() => {
-      setStage('burst');
-      sfx.bossHit();
-    }, (delay + 1.2) * 1000);
-    const t2 = setTimeout(() => {
-      setStage('closeup');
-      sfx.levelUp();
-    }, (delay + 1.7) * 1000);
-    const t3 = setTimeout(() => setStage('stored'), (delay + 3.6) * 1000);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [delay]);
+  const choose = () => {
+    if (stage !== 'pick') return;
+    setStage('reveal');
+    sfx.levelUp();
+    setTimeout(() => setStage('stored'), 1800);
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="flex flex-col items-center gap-1.5 relative"
+      className="flex flex-col items-center gap-2 relative"
     >
       <div className="text-sm opacity-80">🗝️ {label}</div>
 
-      <div className="relative flex items-center justify-center min-h-24">
-        <AnimatePresence mode="wait">
-          {stage === 'box' && (
-            <motion.div
-              key="box"
-              animate={{ rotate: [-6, 6, -6, 6, 0], scale: [1, 1.06, 1, 1.08, 1] }}
-              transition={{ duration: 1.1, repeat: Infinity }}
-              exit={{ scale: 1.4, opacity: 0 }}
-              className="text-6xl drop-shadow-lg"
-            >
-              🎁
-            </motion.div>
-          )}
-
-          {stage === 'burst' && (
-            <motion.div key="burst" className="relative w-24 h-24" exit={{ opacity: 0 }}>
-              {/* 빛줄기 방사 */}
-              {RAYS.map((deg) => (
-                <motion.div
-                  key={deg}
-                  className="absolute left-1/2 top-1/2 w-1 rounded-full origin-bottom"
-                  style={{ background: color, rotate: `${deg}deg` }}
-                  initial={{ height: 0, opacity: 1 }}
-                  animate={{ height: 56, opacity: 0 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
-                />
-              ))}
-              <motion.div
-                className="absolute inset-0 rounded-full"
-                style={{ background: `radial-gradient(circle, ${color}cc, transparent 70%)` }}
-                initial={{ scale: 0.2, opacity: 1 }}
-                animate={{ scale: 2.4, opacity: 0 }}
-                transition={{ duration: 0.5 }}
-              />
-            </motion.div>
-          )}
-
-          {(stage === 'closeup' || stage === 'stored') && (
-            <motion.div
-              key="card"
-              initial={{ scale: 0.2, rotateY: 540, opacity: 0 }}
-              animate={
-                stage === 'closeup'
-                  ? { scale: 1.15, rotateY: 0, opacity: 1 }
-                  : { scale: 0.62, rotateY: 0, opacity: 1 }
-              }
-              transition={
-                stage === 'closeup'
-                  ? { type: 'spring', stiffness: 160, damping: 16 }
-                  : { duration: 0.45, ease: 'easeInOut' }
-              }
-              className="flex flex-col items-center gap-1"
-            >
-              <img
-                src={drawn.src}
-                alt={drawn.name}
-                className="w-36 rounded-2xl border-4"
-                style={{ borderColor: color, boxShadow: `0 0 24px 5px ${color}77` }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {stage === 'pick' ? (
+        <>
+          <div className="text-xs text-coin">카드 한 장을 골라봐! ✨</div>
+          <div className="flex gap-3 justify-center min-h-28">
+            {SLOTS.map((p, i) => (
+              <motion.button
+                key={i}
+                onClick={choose}
+                aria-label="뒤집힌 카드 고르기"
+                className="w-20 h-28"
+                initial={{ rotate: p * 4 }}
+                animate={{ y: [0, -6, 0] }}
+                transition={{ repeat: Infinity, duration: 1.6, delay: i * 0.22 }}
+                whileHover={{ scale: 1.07, y: -8 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <CardBack color={color} />
+              </motion.button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div className="flex items-center justify-center min-h-28">
+          <motion.div
+            initial={{ rotateY: 180, scale: 0.7, opacity: 0 }}
+            animate={{ rotateY: 0, scale: stage === 'stored' ? 0.82 : 1.12, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+            className="flex flex-col items-center"
+          >
+            <img
+              src={drawn.src}
+              alt={drawn.name}
+              className="w-28 rounded-2xl border-4"
+              style={{ borderColor: color, boxShadow: `0 0 24px 5px ${color}77` }}
+            />
+          </motion.div>
+        </div>
+      )}
 
       <AnimatePresence>
-        {(stage === 'closeup' || stage === 'stored') && (
+        {(stage === 'reveal' || stage === 'stored') && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
             <div className="text-sm font-bold">{drawn.name}</div>
             <div className="text-xs font-bold" style={{ color }}>

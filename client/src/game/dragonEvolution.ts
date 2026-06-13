@@ -65,16 +65,16 @@ export function tierRank(t: EvolutionTier): number {
 
 // ── 레어(각성) 로스터 — 속성별 드래곤형·인간형 한 세트 ───────────────────────
 const RARE_NAMES: Record<Affinity, { dragon: string; human: string; emoji: string }> = {
-  sun: { dragon: '작열하는 태양 패왕룡', human: '불꽃의 태양 성기사', emoji: '☀️' },
-  moon: { dragon: '몽환의 월령 마도룡', human: '심연을 보는 월광 현자', emoji: '🌙' },
-  star: { dragon: '천공의 성좌룡', human: '운명을 읽는 별 점성왕', emoji: '⭐' },
-  forest: { dragon: '세계수의 정령룡', human: '생명의 숲 정령왕', emoji: '🌿' },
+  sun: { dragon: '작열하는 태양 패왕룡', human: '여명을 여는 태양 성기사단장', emoji: '☀️' },
+  moon: { dragon: '몽환의 월령 마도룡', human: '달빛 신탁의 대현자', emoji: '🌙' },
+  star: { dragon: '천공의 성좌룡', human: '천공을 읽는 대점성왕', emoji: '⭐' },
+  forest: { dragon: '세계수의 정령룡', human: '생명을 틔우는 숲의 대정령왕', emoji: '🌿' },
 };
 
 // ── 슈퍼레어 로스터 — 2종(균형형/편향형) × 드래곤·인간 ───────────────────────
 const SUPER_NAMES = {
-  rainbow: { dragon: '무지개 창세룡', human: '세계를 잇는 무지개 현왕', emoji: '🌈' },
-  obsidian: { dragon: '흑요석 폭풍룡', human: '폭풍을 다스리는 흑요석 군주', emoji: '🌑' },
+  rainbow: { dragon: '무지개 창세룡', human: '만물을 잇는 무지개 창세 신관', emoji: '🌈' },
+  obsidian: { dragon: '흑요석 폭풍룡', human: '뇌광을 거느린 흑요석 대군주', emoji: '🌑' },
 } as const;
 
 const formEmoji = (form: AdultForm) => (form === 'human' ? '🧙' : '🐉');

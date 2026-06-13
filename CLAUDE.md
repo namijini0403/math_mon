@@ -79,7 +79,7 @@ npm run build -w client               # PWA 빌드
 
 ## 8. 자주 쓰는 사실
 
-- 테스트 수 기준선: 1456개(2026-06-13: 1430 + steps 8 + gradeAccess 7 + dragonEvolution 11). 줄어들면 뭔가 깨진 것.
+- 테스트 수 기준선: 1462개(2026-06-13: 1430 + steps 8 + gradeAccess 7 + dragonEvolution 11 + dragonItems 6). 줄어들면 뭔가 깨진 것.
 - 학기: g1s1~g6s2 전 12학기 완성(스테이지 312개·보스 71종). 1·2학년 청사진 docs/g1g2-design.md, 보스 명세 ASSET_SPEC_G12.md. 스테이지 접두사 전체 목록은 stages.ts grep이 정답.
 - 1·2학년 특이: 이모지를 시각 자료로 사용(세기·모양·반복 패턴), fill-blanks 답 0 금지(0의 곱/합은 choice·식 빈칸), 복수 빈칸 blankAnswers 배열([시,분]·[m,cm]).
 - 문제 형식: choice / fraction-input / decimal-input / comparison / fill-blanks / matching.

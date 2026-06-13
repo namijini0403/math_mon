@@ -12,6 +12,9 @@ import { newlyCompletedHidden, type HiddenMissionDef } from './hiddenMissions';
 import {
   AFFINITY_SOURCES,
   DRAGON_ITEMS,
+  FIXED_ITEMS,
+  GACHA_ITEMS,
+  rollGachaItems,
   emptyDragon,
   FRUITS,
   getFruit,
@@ -281,7 +284,7 @@ export const useGame = create<GameState>()(
             ...(perfect ? AFFINITY_SOURCES.perfectLesson : {}),
           },
         });
-        get().evaluateDragonItems();
+        // 아이템 평가는 호출측(LessonPage)에서 — 새로 얻은 아이템을 뽑기 연출로 보여주려고.
         // 서버 동기화 (실패해도 게임 진행에 영향 없음)
         const s = get();
         void pushProgress(s);
@@ -501,14 +504,24 @@ export const useGame = create<GameState>()(
           feedCount: s.dragon.feedCount,
           rewardCardCount: s.rewardCards.length,
         };
-        const earned = DRAGON_ITEMS.filter((it) => !s.dragon.items.includes(it.id) && it.earned(stats));
-        if (earned.length > 0) {
+        const owned = s.dragon.items;
+        // 고정(성장 서사) 아이템: 조건 충족 시 그대로 지급
+        const fixedEarnedIds = FIXED_ITEMS.filter(
+          (it) => !owned.includes(it.id) && it.earned(stats),
+        ).map((i) => i.id);
+        // 가챠(수집형) 아이템: 조건 충족 수(티켓)만큼 미보유 풀에서 랜덤 지급
+        const ticketsMet = GACHA_ITEMS.filter((it) => it.earned(stats)).length;
+        const ownedGacha = GACHA_ITEMS.filter((it) => owned.includes(it.id)).map((it) => it.id);
+        const gachaEarnedIds = rollGachaItems(ticketsMet, ownedGacha);
+
+        const earnedIds = [...fixedEarnedIds, ...gachaEarnedIds];
+        if (earnedIds.length > 0) {
           set({
-            dragon: { ...get().dragon, items: [...get().dragon.items, ...earned.map((i) => i.id)] },
+            dragon: { ...get().dragon, items: [...get().dragon.items, ...earnedIds] },
           });
-          get().dragonGain({ gp: GP_REWARDS.item * earned.length });
+          get().dragonGain({ gp: GP_REWARDS.item * earnedIds.length });
         }
-        return earned;
+        return DRAGON_ITEMS.filter((it) => earnedIds.includes(it.id));
       },
 
       togglePlacedDecor: (decorId) =>
