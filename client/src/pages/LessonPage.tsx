@@ -252,7 +252,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     const cards = [...addXp(xp)];
     if (isBoss && isFirstClear) {
       cards.push(addBossCard(stage.id));
-      treasures.push({ ...game.drawTreasureCard(), label: '보스 격파 보상' });
+      treasures.push({ ...game.drawTreasureCard(), label: '보스 봉인 보상' });
     }
     if (isChallenge) {
       game.recordChallengeClear();
@@ -318,7 +318,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
               : result.zone === 'ahead'
                 ? '선행 도전 완료!'
                 : isBoss
-                  ? `${stage.boss?.name} 격파!`
+                  ? `${stage.boss?.name} 봉인 성공!`
                   : isChallenge
                     ? `심화 탐험 정복! (${correctCount}/${total})`
                     : '레슨 완료!'}
@@ -388,7 +388,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
             className="flex flex-col items-center gap-2"
           >
             <div className="text-coin text-lg">
-              {isBoss ? '🎖️ 격파 메달 획득!' : '✨ 레벨업! 인증 메달 획득 ✨'}
+              {isBoss ? '🎖️ 봉인의 증표 획득!' : '✨ 레벨업! 인증 메달 획득 ✨'}
             </div>
             <div className="flex gap-4">
               {result.cards.slice(-2).map((c, i) => (
@@ -436,7 +436,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
         </h1>
         <p className="opacity-70">
           {isBoss
-            ? `${stage.boss?.name}이(가) 아직 버티고 있어요. 다시 도전!`
+            ? `${stage.boss?.name}이(가) 아직 봉인되지 않았어요. 다시 도전!`
             : isChallenge
               ? `심화 탐험은 10문제 중 ${CHALLENGE_PASS}개 이상 맞혀야 해요. 다시 도전!`
               : '괜찮아요, 다시 해 봐요!'}

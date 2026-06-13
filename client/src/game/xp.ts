@@ -104,7 +104,7 @@ export const BOSS_CARDS: Record<string, BossCardDef> = {
   'ms3-boss': { name: '저울 곰의 친구', subtitle: 'BEAR BALANCE FRIEND', colors: ['#1c1917', '#78716c'], accent: '#e7e5e4', emoji: '🐻' },
   'dt3-boss': { name: '그래프 앵무의 동반자', subtitle: 'PARROT GRAPH COMPANION', colors: ['#14532d', '#16a34a'], accent: '#d1fae5', emoji: '🦜' },
   // ── 4-1 보스 ──
-  'bn-boss': { name: '콜로서스 격파자', subtitle: 'COLOSSUS BREAKER', colors: ['#1c1917', '#a16207'], accent: '#fef9c3', emoji: '🏛️' },
+  'bn-boss': { name: '콜로서스 봉인자', subtitle: 'COLOSSUS SEALER', colors: ['#1c1917', '#a16207'], accent: '#fef9c3', emoji: '🏛️' },
   // ── 4-2 보스 (전반) ──
   'f4-boss': { name: '토끼 정복자', subtitle: 'RABBIT CONQUEROR', colors: ['#4a1942', '#db2777'], accent: '#fce7f3', emoji: '🐰' },
   'tr-boss': { name: '공작의 눈', subtitle: 'PEACOCK EYE', colors: ['#14532d', '#16a34a'], accent: '#dcfce7', emoji: '🦚' },

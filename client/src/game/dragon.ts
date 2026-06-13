@@ -15,7 +15,7 @@ export const AFFINITY_INFO: Record<
   sun: {
     name: '태양', emoji: '☀️', color: '#f59e0b',
     adultHuman: '태양의 기사단장', adultDragon: '황금 태양룡',
-    desc: '보스를 많이 물리친 용감한 모험가의 길',
+    desc: '보스를 많이 봉인한 용감한 모험가의 길',
   },
   moon: {
     name: '달', emoji: '🌙', color: '#a78bfa',
@@ -120,11 +120,11 @@ export const DRAGON_ITEMS: DragonItemDef[] = [
   { id: 'first-meal', name: '아기 수저', emoji: '🥄', desc: '아기 드래곤의 첫 식사 도구', hint: '먹이를 3번 주면', earned: (s) => s.feedCount >= 3 },
   { id: 'star-mobile', name: '별빛 모빌', emoji: '🌠', desc: '연산의 별이 빙글빙글 도는 모빌', hint: '기초 연산 연습 3세트를 마치면', earned: (s) => s.basicSets >= 3 },
   { id: 'story-book', name: '이야기 그림책', emoji: '📖', desc: '드래곤이 가장 좋아하는 잠자리 동화', hint: '문장제 연습 3세트를 마치면', earned: (s) => s.wordSets >= 3 },
-  { id: 'brave-scale', name: '용기의 비늘', emoji: '🛡️', desc: '첫 보스를 이긴 기념 비늘', hint: '보스를 1마리 물리치면', earned: (s) => s.bossesCleared >= 1 },
-  { id: 'cloud-saddle', name: '구름 안장', emoji: '☁️', desc: '언젠가 함께 하늘을 날 준비', hint: '보스를 3마리 물리치면', earned: (s) => s.bossesCleared >= 3 },
+  { id: 'brave-scale', name: '용기의 비늘', emoji: '🛡️', desc: '첫 보스를 봉인한 기념 비늘', hint: '보스를 1마리 봉인하면', earned: (s) => s.bossesCleared >= 1 },
+  { id: 'cloud-saddle', name: '구름 안장', emoji: '☁️', desc: '언젠가 함께 하늘을 날 준비', hint: '보스를 3마리 봉인하면', earned: (s) => s.bossesCleared >= 3 },
   { id: 'crown-seed', name: '왕관 새싹', emoji: '🌱', desc: '성체가 되면 피어날 왕관의 씨앗', hint: '10일 출석하면', earned: (s) => s.attendanceDays >= 10 },
   { id: 'treasure-pouch', name: '보물 주머니', emoji: '👝', desc: '보물 카드를 소중히 담는 주머니', hint: '보물 카드를 10장 모으면', earned: (s) => s.rewardCardCount >= 10 },
-  { id: 'rainbow-ribbon', name: '무지개 리본', emoji: '🎀', desc: '완전한 성체를 축하하는 리본', hint: '보스를 6마리 물리치면', earned: (s) => s.bossesCleared >= 6 },
+  { id: 'rainbow-ribbon', name: '무지개 리본', emoji: '🎀', desc: '완전한 성체를 축하하는 리본', hint: '보스를 6마리 봉인하면', earned: (s) => s.bossesCleared >= 6 },
   { id: 'challenge-gem', name: '심연의 보석', emoji: '💠', desc: '심화 탐험을 정복한 자의 증표', hint: '심화 탐험을 1번 클리어하면', earned: (s) => s.challengeCleared >= 1 },
   { id: 'scholar-quill', name: '현자의 깃펜', emoji: '🪶', desc: '어려운 문제를 사랑하는 마음', hint: '심화 연습 3세트를 마치면', earned: (s) => s.challengeSets >= 3 },
   { id: 'exam-medal', name: '명예의 메달', emoji: '🎖️', desc: '시험장을 누빈 용사의 메달', hint: '명예의 시험에 3번 도전하면', earned: (s) => s.examCount >= 3 },
@@ -142,8 +142,15 @@ export interface DragonState {
   lastFed: string;
   fullnessAtFed: number;
   feedCount: number;
-  /** 성체 확정 정보 (성체 도달 시 1회 결정) */
-  adult?: { affinity: Affinity; form: 'human' | 'dragon' };
+  /**
+   * 성체 정보. affinity/form은 하위호환 유지. evolution은 보스 봉인 점수로 결정된
+   * 최종 캐릭터(common→rare→superrare)로, 더 높은 티어 도달 시 갱신된다.
+   */
+  adult?: {
+    affinity: Affinity;
+    form: 'human' | 'dragon';
+    evolution?: { id: string; name: string; tier: 'common' | 'rare' | 'superrare'; emoji: string };
+  };
   /** 방에 배치한 장식 id 목록 */
   placedDecor?: string[];
 }
@@ -189,11 +196,11 @@ export interface RoomDecorDef {
 }
 
 export const ROOM_DECOR: RoomDecorDef[] = [
-  { id: 'rug', name: '별무늬 양탄자', emoji: '🟣', slot: 'floorCenter', hint: '첫 보스를 물리치면', earned: (s) => s.bossesCleared >= 1 },
+  { id: 'rug', name: '별무늬 양탄자', emoji: '🟣', slot: 'floorCenter', hint: '첫 보스를 봉인하면', earned: (s) => s.bossesCleared >= 1 },
   { id: 'torch', name: '벽 횃불', emoji: '🔥', slot: 'wallLeft', hint: '레슨 10개를 완료하면', earned: (s) => s.lessonsCompleted >= 10 },
   { id: 'chest', name: '보물 상자', emoji: '🧰', slot: 'floorLeft', hint: '보물 카드 3장을 모으면', earned: (s) => s.rewardCardCount >= 3 },
   { id: 'plant', name: '빛나는 화분', emoji: '🪴', slot: 'floorRight', hint: '10일 출석하면', earned: (s) => s.attendanceDays >= 10 },
-  { id: 'banner', name: '드래곤 깃발', emoji: '🚩', slot: 'wallRight', hint: '보스 6마리를 물리치면', earned: (s) => s.bossesCleared >= 6 },
+  { id: 'banner', name: '드래곤 깃발', emoji: '🚩', slot: 'wallRight', hint: '보스 6마리를 봉인하면', earned: (s) => s.bossesCleared >= 6 },
   { id: 'lantern', name: '별빛 등불', emoji: '🏮', slot: 'wallRight', hint: '7일 연속 접속하면', earned: (s) => s.attendanceDays >= 7 },
   { id: 'bookshelf', name: '마법 책장', emoji: '📚', slot: 'floorLeft', hint: '문장제 연습 3세트를 마치면', earned: (s) => s.wordSets >= 3 },
   { id: 'cushion', name: '포근한 방석', emoji: '🛋️', slot: 'floorCenter', hint: '먹이를 10번 주면', earned: (s) => s.feedCount >= 10 },
@@ -247,10 +254,23 @@ export function decideAdultForm(rewardCardCount: number): 'human' | 'dragon' {
   return rewardCardCount >= 10 ? 'human' : 'dragon';
 }
 
-/** 성체 이름 */
-export function adultTitle(adult: { affinity: Affinity; form: 'human' | 'dragon' }): string {
+/** 성체 이름 — 진화 캐릭터가 있으면 그 이름, 없으면 속성×형태 기본 이름 */
+export function adultTitle(adult: {
+  affinity: Affinity;
+  form: 'human' | 'dragon';
+  evolution?: { name: string };
+}): string {
+  if (adult.evolution?.name) return adult.evolution.name;
   const info = AFFINITY_INFO[adult.affinity];
   return adult.form === 'human' ? info.adultHuman : info.adultDragon;
+}
+
+/** 성체 티어 라벨 (레어/슈퍼레어만 표시) */
+export function adultTierLabel(adult?: {
+  evolution?: { tier: 'common' | 'rare' | 'superrare' };
+}): string | null {
+  const t = adult?.evolution?.tier;
+  return t === 'superrare' ? '슈퍼레어 ✦✦✦' : t === 'rare' ? '레어 ✦' : null;
 }
 
 /** 레어 엔딩 조건: 성체 + 보물 카드 15종 이상 (카드는 희귀 이벤트에서만 나옴) */

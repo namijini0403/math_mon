@@ -182,7 +182,7 @@ export default function CardGalleryPage() {
       </h2>
       {cards.length === 0 ? (
         <div className="rounded-3xl bg-night-900 border border-dashed border-night-700 p-8 text-center opacity-60 text-sm">
-          레벨 2가 되거나 보스를 물리치면 메달을 받아요!
+          레벨 2가 되거나 보스를 봉인하면 메달을 받아요!
         </div>
       ) : (
         <div className="rounded-3xl bg-night-900 border border-night-700 p-4 grid grid-cols-4 gap-4">

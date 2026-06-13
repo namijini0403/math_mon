@@ -17,6 +17,7 @@ import {
   roomTier,
   getDecor,
   adultTitle,
+  adultTierLabel,
   currentFullness,
   dragonMood,
   stageForGp,
@@ -556,20 +557,33 @@ export default function DragonPage() {
           );
         })}
 
-        {/* 성체 칭호 */}
+        {/* 성체 칭호 + 진화 티어 */}
         {dragon.adult && (
-          <motion.div
-            className="relative z-10 text-sm font-bold px-4 py-1 rounded-full"
-            animate={{ opacity: [0.8, 1, 0.8] }}
-            transition={{ repeat: Infinity, duration: 2.4 }}
-            style={{
-              color: AFFINITY_INFO[dragon.adult.affinity].color,
-              boxShadow: `0 0 12px 2px ${AFFINITY_INFO[dragon.adult.affinity].color}55`,
-              border: `1px solid ${AFFINITY_INFO[dragon.adult.affinity].color}66`,
-            }}
-          >
-            {endingTitle}
-          </motion.div>
+          <div className="relative z-10 flex flex-col items-center gap-1">
+            <motion.div
+              className="text-sm font-bold px-4 py-1 rounded-full"
+              animate={{ opacity: [0.8, 1, 0.8] }}
+              transition={{ repeat: Infinity, duration: 2.4 }}
+              style={{
+                color: AFFINITY_INFO[dragon.adult.affinity].color,
+                boxShadow: `0 0 12px 2px ${AFFINITY_INFO[dragon.adult.affinity].color}55`,
+                border: `1px solid ${AFFINITY_INFO[dragon.adult.affinity].color}66`,
+              }}
+            >
+              {endingTitle}
+            </motion.div>
+            {adultTierLabel(dragon.adult) && (
+              <span
+                className={`text-[0.6rem] font-bold px-2 py-0.5 rounded-full ${
+                  dragon.adult.evolution?.tier === 'superrare'
+                    ? 'bg-gradient-to-r from-fuchsia-500 to-amber-400 text-night-950'
+                    : 'bg-coin/20 text-coin border border-coin/40'
+                }`}
+              >
+                {adultTierLabel(dragon.adult)}
+              </span>
+            )}
+          </div>
         )}
 
         {/* 드래곤 (방 위에) */}

@@ -5,20 +5,19 @@ import { persist } from 'zustand/middleware';
 import { levelFromXp, tierForLevel, XP_MISSION_REWARD } from './xp';
 import { emptyDaily, todayStr, type DailyCounters } from './missions';
 import { addSteps, emptySteps, type StepState } from './steps';
+import { bossSeal, decideEvolution, tierRank } from './dragonEvolution';
 import { dailyRewardXp, newlyEarned, type BadgeDef, type BadgeStats } from './badges';
 import { drawRewardCard, DUPLICATE_XP, type RewardCardDef } from './rewardCards';
 import { newlyCompletedHidden, type HiddenMissionDef } from './hiddenMissions';
 import {
   AFFINITY_SOURCES,
   DRAGON_ITEMS,
-  decideAdultForm,
   emptyDragon,
   FRUITS,
   getFruit,
   GP_REWARDS,
   currentFullness,
   stageForGp,
-  topAffinity,
   earnedDecor,
   type Affinity,
   type DragonItemDef,
@@ -244,6 +243,8 @@ export const useGame = create<GameState>()(
       },
 
       completeStage: (stageId, stars, perfect) => {
+        // 보스는 '처음 봉인'할 때만 고유 봉인 점수가 귀속된다 (재도전은 점수 없음)
+        const wasFirstCapture = (get().stages[stageId]?.stars ?? 0) === 0;
         set((s) => {
           const today = todayStr();
           const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('sv');
@@ -269,12 +270,14 @@ export const useGame = create<GameState>()(
           };
         });
         // 드래곤 성장: 보스는 크게, 레슨은 보통 + 과일 보상
+        // 보스 첫 봉인 → 그 보스 고유 속성·세기가 드래곤에 귀속(캐릭터 결정에 반영)
         const isBoss = stageId.endsWith('-boss');
+        const seal = isBoss && wasFirstCapture ? bossSeal(stageId) : null;
         get().dragonGain({
           gp: isBoss ? GP_REWARDS.boss : GP_REWARDS.lesson,
           fruits: isBoss ? 2 : 1,
           affinity: {
-            ...(isBoss ? AFFINITY_SOURCES.boss : {}),
+            ...(seal ? { [seal.affinity]: seal.power } : {}),
             ...(perfect ? AFFINITY_SOURCES.perfectLesson : {}),
           },
         });
@@ -397,12 +400,24 @@ export const useGame = create<GameState>()(
           }
           const gpTotal = d.gp + gp;
           let adult = d.adult;
-          // 성체 도달 순간 속성·형태 확정 (1회)
-          if (!adult && stageForGp(gpTotal) >= 4) {
-            adult = {
-              affinity: topAffinity(affinities),
-              form: decideAdultForm(s.rewardCards.length),
-            };
+          // 성체 도달 후, 봉인 점수로 캐릭터 결정. 더 높은 티어에 도달하면 '성장'(갱신).
+          if (stageForGp(gpTotal) >= 4) {
+            const sealedCount = Object.keys(s.stages).filter(
+              (id) => id.endsWith('-boss') && (s.stages[id]?.stars ?? 0) > 0,
+            ).length;
+            const ev = decideEvolution({
+              affinities,
+              sealedCount,
+              rewardCardCount: s.rewardCards.length,
+            });
+            const currentRank = adult ? tierRank(adult.evolution?.tier ?? 'common') : -1;
+            if (tierRank(ev.tier) > currentRank) {
+              adult = {
+                affinity: ev.affinity,
+                form: ev.form ?? adult?.form ?? 'dragon',
+                evolution: { id: ev.id, name: ev.name, tier: ev.tier, emoji: ev.emoji },
+              };
+            }
           }
           return { dragon: { ...d, gp: gpTotal, affinities, fruits: newFruits, adult } };
         });

@@ -53,14 +53,19 @@ export function dragonArt(dragon: DragonState, fullness: number): DragonArtResul
     minGp: number;
   }[];
 
-  // 성체 확정 → 기존 에셋(adult-*.png)이나 이모지에 위임
+  // 성체 → 진화 티어별 에셋. rare/super는 전용 폴더, common은 기존 mini/adult-*.png.
   if (dragon.adult) {
-    const affinityEmoji = AFFINITY_INFO[dragon.adult.affinity].emoji;
-    const formEmoji = dragon.adult.form === 'human' ? '🧑' : '🐉';
-    return {
-      src: `assets/dragon/mini/adult-${dragon.adult.affinity}-${dragon.adult.form}.png`,
-      fallbackEmoji: affinityEmoji + formEmoji,
-    };
+    const ad = dragon.adult;
+    const ev = ad.evolution;
+    const affinityEmoji = AFFINITY_INFO[ad.affinity].emoji;
+    const formEmoji = ad.form === 'human' ? '🧑' : '🐉';
+    const src =
+      ev?.tier === 'rare'
+        ? `assets/dragon/rare/${ev.id}.png`
+        : ev?.tier === 'superrare'
+          ? `assets/dragon/super/${ev.id}.png`
+          : `assets/dragon/mini/adult-${ad.affinity}-${ad.form}.png`;
+    return { src, fallbackEmoji: ev?.emoji || affinityEmoji + formEmoji };
   }
 
   const stage = stageForGp(dragon.gp);

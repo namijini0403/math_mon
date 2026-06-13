@@ -86,16 +86,16 @@ export const BADGES: BadgeDef[] = [
   { id: 'attend-100', name: '백일의 수호자', desc: '총 100일 출석', emoji: '🎖️', rarity: 3,
     visual: { shape: 'roundel', palette: 'violet', glyph: 'medal', ring: true }, earned: (s) => s.attendanceDays >= 100 },
 
-  // ── 보스 ──
-  { id: 'boss-1', name: '첫 사냥', desc: '보스 1마리 격파', emoji: '🏹', rarity: 1,
+  // ── 보스 봉인 ──
+  { id: 'boss-1', name: '첫 봉인', desc: '보스 1마리 봉인', emoji: '🔮', rarity: 1,
     visual: { shape: 'shield', palette: 'bronze', glyph: 'sword' }, earned: (s) => s.bossesCleared >= 1 },
-  { id: 'boss-6', name: '보스 헌터', desc: '보스 6마리 격파', emoji: '🛡️', rarity: 2,
+  { id: 'boss-6', name: '봉인술사', desc: '보스 6마리 봉인', emoji: '🛡️', rarity: 2,
     visual: { shape: 'shield', palette: 'silver', glyph: 'shield' }, earned: (s) => s.bossesCleared >= 6 },
-  { id: 'boss-12', name: '한 학기의 정복자', desc: '보스 12마리 격파', emoji: '⚔️', rarity: 3,
+  { id: 'boss-12', name: '한 학기의 정복자', desc: '보스 12마리 봉인', emoji: '⚔️', rarity: 3,
     visual: { shape: 'shield', palette: 'gold', glyph: 'crown', ring: true }, earned: (s) => s.bossesCleared >= 12 },
-  { id: 'boss-24', name: '용을 다루는 자', desc: '보스 24마리 격파', emoji: '🐉', rarity: 3,
+  { id: 'boss-24', name: '용을 다루는 자', desc: '보스 24마리 봉인', emoji: '🐉', rarity: 3,
     visual: { shape: 'shield', palette: 'violet', glyph: 'dragon', ring: true }, earned: (s) => s.bossesCleared >= 24 },
-  { id: 'boss-48', name: '전설의 사냥꾼', desc: '모든 보스 격파', emoji: '👑', rarity: 3,
+  { id: 'boss-48', name: '전설의 봉인가', desc: '모든 보스 봉인', emoji: '👑', rarity: 3,
     visual: { shape: 'shield', palette: 'indigo', glyph: 'crown', ring: true }, earned: (s) => s.bossesCleared >= 48 },
 
   // ── 완벽 클리어 ──
