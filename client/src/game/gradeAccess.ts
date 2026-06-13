@@ -34,15 +34,24 @@ export function semesterIndex(semesterId: string | null | undefined): number {
 }
 
 /**
+ * 학생 현재 학기와 대상 학기로 접근 영역 판정.
+ * 학생 학기 미설정 또는 학기 미상이면 'current'(제한 없음).
+ */
+export function accessZoneForSemester(studentSemester: string | null, semesterId: string): AccessZone {
+  if (!studentSemester) return 'current';
+  const si = SEMESTER_ORDER.indexOf(studentSemester);
+  const gi = SEMESTER_ORDER.indexOf(semesterId);
+  if (si < 0 || gi < 0 || gi === si) return 'current';
+  return gi < si ? 'review' : 'ahead';
+}
+
+/**
  * 학생 현재 학기와 스테이지(unitId)로 접근 영역 판정.
- * 학생 학기 미설정 또는 스테이지 학기 미상이면 'current'(제한 없음).
+ * 스테이지 학기 미상이면 'current'(제한 없음).
  */
 export function accessZone(studentSemester: string | null, unitId: string): AccessZone {
   if (!studentSemester) return 'current';
   const stageSemester = UNIT_TO_SEMESTER.get(unitId);
   if (!stageSemester) return 'current';
-  const si = SEMESTER_ORDER.indexOf(studentSemester);
-  const gi = SEMESTER_ORDER.indexOf(stageSemester);
-  if (si < 0 || gi < 0 || gi === si) return 'current';
-  return gi < si ? 'review' : 'ahead';
+  return accessZoneForSemester(studentSemester, stageSemester);
 }

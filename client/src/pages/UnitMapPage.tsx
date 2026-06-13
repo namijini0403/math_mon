@@ -7,7 +7,7 @@ import DailyRewardModal from '../components/DailyRewardModal';
 import DragonWidget from '../components/DragonWidget';
 import { DragonAvatar } from '../components/DragonAvatar';
 import { SEMESTERS, STAGES, UNIT_TITLES, type StageDef } from '../game/stages';
-import { parseGradeSemester, semesterIndex, type AccessZone } from '../game/gradeAccess';
+import { parseGradeSemester, accessZoneForSemester, type AccessZone } from '../game/gradeAccess';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
 import { DAILY_MISSIONS, todayStr } from '../game/missions';
@@ -122,13 +122,7 @@ export default function UnitMapPage() {
   );
   const semester = SEMESTERS.find((s) => s.id === semesterId) ?? SEMESTERS[0];
   // 선택한 학기가 학생 현재 학기 대비 어느 영역인지 (배너·라벨용)
-  const viewZone: AccessZone = !studentSem
-    ? 'current'
-    : semester.id === studentSem
-      ? 'current'
-      : semesterIndex(semester.id) < semesterIndex(studentSem)
-        ? 'review'
-        : 'ahead';
+  const viewZone: AccessZone = accessZoneForSemester(studentSem, semester.id);
   const selectSemester = (id: string) => {
     setSemesterId(id);
     localStorage.setItem('mathmon-semester', id);

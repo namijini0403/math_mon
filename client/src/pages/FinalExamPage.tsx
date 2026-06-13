@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
 import type { Problem, SkillDef } from '../generator/types';
 import { SEMESTERS, STAGES, UNIT_TITLES } from '../game/stages';
+import { accessZoneForSemester, parseGradeSemester } from '../game/gradeAccess';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { answerToText } from '../generator/render-text';
 import { useGame } from '../game/store';
@@ -75,7 +76,9 @@ function gradeOf(score: number): { title: string; emoji: string; line: string } 
 
 export default function FinalExamPage() {
   const { semesterId = '' } = useParams<{ semesterId: string }>();
-  const { showAnswers, recordAnswer, addXp, syncNow, stages } = useGame();
+  const { showAnswers, recordAnswer, addXp, syncNow, stages, classCode } = useGame();
+  // 복습/선행 학기 총괄평가는 보상(XP·카드·배지·메달) 미지급
+  const rewarded = accessZoneForSemester(parseGradeSemester(classCode), semesterId) === 'current';
 
   const semester = SEMESTERS.find((s) => s.id === semesterId);
 
@@ -163,26 +166,28 @@ export default function FinalExamPage() {
       // 총괄평가 종료
       const game = useGame.getState();
       const passed = score >= PASS_SCORE;
-      addXp(score * 3 + 10);
-      const { grantCard } = game.recordFinalExam(semesterId, passed);
-      game.evaluateDragonItems();
+      if (rewarded) {
+        addXp(score * 3 + 10);
+        const { grantCard } = game.recordFinalExam(semesterId, passed);
+        game.evaluateDragonItems();
 
-      const newTreasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[] = [];
-      if (grantCard) {
-        const t = game.drawTreasureCard();
-        newTreasures.push({ ...t, label: '총괄평가 통과 보상' });
+        const newTreasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[] = [];
+        if (grantCard) {
+          const t = game.drawTreasureCard();
+          newTreasures.push({ ...t, label: '총괄평가 통과 보상' });
+        }
+        const hidden = game.checkHiddenMissions().map((h) => ({
+          drawn: h.drawn,
+          duplicate: h.duplicate,
+          label: `히든 미션: ${h.mission.name}`,
+        }));
+        newTreasures.push(...hidden);
+        setTreasures(newTreasures);
+
+        const earnedBadges = game.evaluateBadges();
+        setBadges(earnedBadges.map((b) => ({ emoji: b.emoji, name: b.name })));
+        setAlreadyGranted(passed && !grantCard);
       }
-      const hidden = game.checkHiddenMissions().map((h) => ({
-        drawn: h.drawn,
-        duplicate: h.duplicate,
-        label: `히든 미션: ${h.mission.name}`,
-      }));
-      newTreasures.push(...hidden);
-      setTreasures(newTreasures);
-
-      const earnedBadges = game.evaluateBadges();
-      setBadges(earnedBadges.map((b) => ({ emoji: b.emoji, name: b.name })));
-      setAlreadyGranted(passed && !grantCard);
 
       void track('exam.complete', { unit_id: semesterId, score: score * 4, policy_tag: 'final' });
       syncNow();
@@ -225,7 +230,13 @@ export default function FinalExamPage() {
         </div>
         <p className="opacity-80">{grade.line}</p>
         <div className="rounded-2xl bg-night-800 px-6 py-3">
-          <span className="text-coin">+{score * 3 + 10} XP</span>
+          {rewarded ? (
+            <span className="text-coin">+{score * 3 + 10} XP</span>
+          ) : (
+            <span className="text-sm opacity-80">
+              {accessZoneForSemester(parseGradeSemester(classCode), semesterId) === 'review' ? '복습' : '선행'} 학기 — 경험치·보상은 오르지 않아요
+            </span>
+          )}
         </div>
         {passed && alreadyGranted && (
           <div className="rounded-2xl bg-night-900 border border-coin/30 px-5 py-3 text-sm opacity-80">

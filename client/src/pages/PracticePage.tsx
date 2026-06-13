@@ -8,6 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
 import { UNIT_TITLES } from '../game/stages';
+import { accessZone, parseGradeSemester } from '../game/gradeAccess';
 import type { Problem, SkillDef } from '../generator/types';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { answerToText } from '../generator/render-text';
@@ -93,7 +94,10 @@ export default function PracticePage() {
 }
 
 function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }) {
-  const { recordAnswer, addXp, syncNow, showAnswers } = useGame();
+  const { recordAnswer, addXp, syncNow, showAnswers, classCode } = useGame();
+  // 학년 접근: 복습/선행 단원 연습은 보상(XP·드래곤 성장) 미지급(파밍 방지)
+  const zone = accessZone(parseGradeSemester(classCode), unitId);
+  const rewarded = zone === 'current';
   const [problem, setProblem] = useState<Problem>(() =>
     pickProblem(mode, unitId, useGame.getState().skillStats),
   );
@@ -130,15 +134,15 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
     if (ok) {
       setCorrect((c) => c + 1);
       setStreak((s) => s + 1);
-      addXp(1); // 연습은 문제당 1 XP
+      if (rewarded) addXp(1); // 연습은 문제당 1 XP (현재 학기만)
       sfx.correct();
     } else {
       setStreak(0);
       sfx.wrong();
     }
-    // 드래곤 성장: 연습 10문제 = 1세트
+    // 드래곤 성장: 연습 10문제 = 1세트 (복습/선행은 미적립)
     const game = useGame.getState();
-    const completedSet = game.addPracticeAnswer(mode);
+    const completedSet = rewarded ? game.addPracticeAnswer(mode) : null;
     setSetToast(completedSet !== null);
     if (completedSet) {
       game.evaluateDragonItems();
@@ -177,6 +181,18 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
         </div>
         {streak >= 2 && <div className="text-coin text-sm">🔥 {streak}연속</div>}
       </div>
+
+      {!rewarded && (
+        <div
+          className={`mx-4 mb-1 rounded-xl px-3 py-2 text-[0.7rem] leading-snug border ${
+            zone === 'review' ? 'bg-mana/10 border-mana/40 text-mana' : 'bg-night-800 border-night-700 opacity-80'
+          }`}
+        >
+          {zone === 'review'
+            ? '⏳ 복습 연습이에요 — 실력은 쌓이지만 경험치·드래곤 성장은 오르지 않아요.'
+            : '🚀 선행 연습이에요 — 도전은 좋지만 경험치·드래곤 성장은 오르지 않아요.'}
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col items-center justify-center gap-7 px-5 pb-44">
         <AnimatePresence mode="wait">
@@ -240,7 +256,7 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
                 className={`rounded-t-3xl p-5 pb-7 ${lastCorrect ? 'bg-lime-950' : 'bg-rose-950'}`}
               >
                 <div className={`text-2xl mb-1 ${lastCorrect ? 'text-glow' : 'text-hurt'}`}>
-                  {lastCorrect ? '정답! +1 XP ✨' : '아쉬워요! 😢'}
+                  {lastCorrect ? (rewarded ? '정답! +1 XP ✨' : '정답! ✨') : '아쉬워요! 😢'}
                 </div>
                 {setToast && (
                   <div className="text-sm text-coin mb-1">

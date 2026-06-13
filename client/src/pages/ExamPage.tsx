@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
 import type { Problem, SkillDef } from '../generator/types';
 import { SEMESTERS, UNIT_TITLES } from '../game/stages';
+import { accessZone, parseGradeSemester } from '../game/gradeAccess';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { answerToText } from '../generator/render-text';
 import { useGame } from '../game/store';
@@ -52,8 +53,10 @@ function gradeOf(score: number): { title: string; emoji: string; line: string } 
 }
 
 export default function ExamPage() {
-  const { showAnswers, recordAnswer, addXp, syncNow } = useGame();
+  const { showAnswers, recordAnswer, addXp, syncNow, classCode } = useGame();
   const [unitId, setUnitId] = useState<string | null>(null);
+  // 복습/선행 단원 시험은 보상(XP·메달·미션카드) 미지급
+  const rewarded = unitId ? accessZone(parseGradeSemester(classCode), unitId) === 'current' : true;
   const [index, setIndex] = useState(0);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [answer, setAnswer] = useState<UserAnswer | null>(null);
@@ -118,15 +121,17 @@ export default function ExamPage() {
     if (index + 1 >= TOTAL) {
       // 시험 종료
       const game = useGame.getState();
-      game.recordExam();
-      addXp(score * 2 + 5);
-      game.evaluateDragonItems();
-      const hidden = game.checkHiddenMissions().map((h) => ({
-        drawn: h.drawn,
-        duplicate: h.duplicate,
-        label: `히든 미션: ${h.mission.name}`,
-      }));
-      setTreasures(hidden);
+      if (rewarded) {
+        game.recordExam();
+        addXp(score * 2 + 5);
+        game.evaluateDragonItems();
+        const hidden = game.checkHiddenMissions().map((h) => ({
+          drawn: h.drawn,
+          duplicate: h.duplicate,
+          label: `히든 미션: ${h.mission.name}`,
+        }));
+        setTreasures(hidden);
+      }
       void track('exam.complete', { unit_id: unitId, score: score * 10 });
       syncNow();
       sfx.fanfare();
@@ -181,7 +186,13 @@ export default function ExamPage() {
         </div>
         <p className="opacity-80">{grade.line}</p>
         <div className="rounded-2xl bg-night-800 px-6 py-3">
-          <span className="text-coin">+{score * 2 + 5} XP</span>
+          {rewarded ? (
+            <span className="text-coin">+{score * 2 + 5} XP</span>
+          ) : (
+            <span className="text-sm opacity-80">
+              {accessZone(parseGradeSemester(classCode), unitId ?? '') === 'review' ? '복습' : '선행'} 시험 — 경험치는 오르지 않아요
+            </span>
+          )}
         </div>
         {treasures.map((t, i) => (
           <TreasureReveal key={i} drawn={t.drawn} duplicate={t.duplicate} label={t.label} delay={0.8 + i * 0.5} />
