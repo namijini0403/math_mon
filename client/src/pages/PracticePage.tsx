@@ -15,6 +15,7 @@ import { answerToText } from '../generator/render-text';
 import { useGame } from '../game/store';
 import { sfx } from '../game/sounds';
 import { MathView } from '../components/MathView';
+import { SolutionReveal } from '../components/SolutionReveal';
 import { ChoiceView } from '../components/problem/ChoiceView';
 import { ComparisonView } from '../components/problem/ComparisonView';
 import { FractionInputView } from '../components/problem/FractionInputView';
@@ -268,6 +269,7 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
                     <MathView expr={problem.explanation} size="md" className="justify-start" />
                   </div>
                 )}
+                {lastCorrect && <SolutionReveal explanation={problem.explanation} />}
                 <button
                   onClick={next}
                   autoFocus

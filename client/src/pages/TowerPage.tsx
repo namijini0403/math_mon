@@ -15,6 +15,7 @@ import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { useGame } from '../game/store';
 import { sfx } from '../game/sounds';
 import { MathView } from '../components/MathView';
+import { SolutionReveal } from '../components/SolutionReveal';
 import { ProblemBody } from '../components/problem/ProblemBody';
 import { track } from '../analytics';
 
@@ -162,6 +163,7 @@ function TowerRunner({ skill }: { skill: SkillDef }) {
                     <MathView expr={problem.explanation} size="md" className="justify-start" />
                   </div>
                 )}
+                {lastCorrect && <SolutionReveal explanation={problem.explanation} />}
                 <button
                   onClick={next}
                   autoFocus

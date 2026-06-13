@@ -40,7 +40,7 @@ const num9Count: SkillDef = {
       prompt: `${display}\n개수를 세어 쓰세요.`,
       expr,
       blankAnswers: [count],
-      explanation: [txt(`${emoji}이(가) ${count}개 있어요.`)],
+      explanation: [txt(`하나씩 차례로 세어 보면 ${emoji}이(가) 모두 ${count}개예요.`)],
     };
   },
 };
@@ -59,26 +59,27 @@ const num9Order: SkillDef = {
 
     let promptStr: string;
     let answer: number;
-    let expr: MathExpr;
+    const expr: MathExpr = [{ kind: 'blank', slot: 0 }];
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 1 큰 수: 1~8 → 2~9
       const n = rng.int(1, 8);
       answer = n + 1;
       promptStr = `${n}보다 1 큰 수는 얼마인가요?`;
-      expr = [{ kind: 'blank', slot: 0 }];
+      explanation = [txt(`${n} 다음 수를 세면 ${answer}이에요. 그래서 ${n}보다 1 큰 수는 ${answer}이에요.`)];
     } else if (pat === 1) {
       // 1 작은 수: 2~9 → 1~8
       const n = rng.int(2, 9);
       answer = n - 1;
       promptStr = `${n}보다 1 작은 수는 얼마인가요?`;
-      expr = [{ kind: 'blank', slot: 0 }];
+      explanation = [txt(`${n} 바로 앞의 수는 ${answer}예요. 그래서 ${n}보다 1 작은 수는 ${answer}예요.`)];
     } else {
       // 사이 수: a, _, a+2 → 빈칸에 a+1
       const a = rng.int(1, 7);
       answer = a + 1;
       promptStr = `${a}과 ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      expr = [{ kind: 'blank', slot: 0 }];
+      explanation = [txt(`${a}, ${answer}, ${a + 2}을 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
     }
 
     return {
@@ -89,7 +90,7 @@ const num9Order: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}`)],
+      explanation,
     };
   },
 };
@@ -123,8 +124,9 @@ const num9Compare: SkillDef = {
       left: [{ kind: 'decimal', v: a }],
       right: [{ kind: 'decimal', v: b }],
       answer,
+      // 1학년은 부등호 기호 대신 '더 크다/작다' 말로 설명한다 (docs/curriculum/g1.md).
       explanation: [
-        txt(`${a}${answer === '<' ? '이 더 작아요' : '이 더 커요'}. ${a} ${answer} ${b}`),
+        txt(`수를 순서대로 늘어놓으면 뒤에 오는 수가 더 커요. ${a}은(는) ${b}보다 ${a < b ? '작아요' : '커요'}.`),
       ],
     };
   },
@@ -170,7 +172,7 @@ const num9Ordinal: SkillDef = {
       choices,
       answerIndex,
       explanation: [
-        txt(`${fromFront ? '앞' : '뒤'}에서 ${ordinalIdx + 1}번째이므로 ${answer}예요.`),
+        txt(`${fromFront ? '앞' : '뒤'}에서부터 하나씩 세면 ${ordinalIdx + 1}번째에 있어요. 그래서 ${answer}예요.`),
       ],
     };
   },
@@ -194,6 +196,7 @@ const num9Word: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 더 세기: a개 있는데 b개 더 받으면 (합 ≤ 9)
@@ -205,6 +208,7 @@ const num9Word: SkillDef = {
       }
       answer = a + b;
       promptStr = `${item}가 ${a}개 있어요. ${b}개를 더 받으면 모두 몇 개인가요?`;
+      explanation = [txt(`${a}개에서 ${b}개를 더 세면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
     } else if (pat === 1) {
       // 남은 수 세기: a개에서 b개 먹으면 (차 ≥ 1)
       let a = 5, b = 2;
@@ -215,6 +219,7 @@ const num9Word: SkillDef = {
       }
       answer = a - b;
       promptStr = `${item}가 ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
+      explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} − ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
     } else {
       // 비교: 두 묶음 중 더 많은 쪽
       let a = 3, b = 5;
@@ -226,6 +231,7 @@ const num9Word: SkillDef = {
       answer = Math.max(a, b);
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
       promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. 더 많은 것은 몇 개인가요?`;
+      explanation = [txt(`${a}개와 ${b}개를 비교하면 ${answer}개가 더 많아요. 그래서 답은 ${answer}개예요.`)];
     }
 
     const expr: MathExpr = [
@@ -242,7 +248,7 @@ const num9Word: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}개`)],
+      explanation,
     };
   },
 };

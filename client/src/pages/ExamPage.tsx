@@ -18,6 +18,7 @@ import { sfx } from '../game/sounds';
 import { TreasureReveal } from '../components/TreasureReveal';
 import type { RewardCardDef } from '../game/rewardCards';
 import { MathView } from '../components/MathView';
+import { SolutionReveal } from '../components/SolutionReveal';
 import { ChoiceView } from '../components/problem/ChoiceView';
 import { ComparisonView } from '../components/problem/ComparisonView';
 import { FractionInputView } from '../components/problem/FractionInputView';
@@ -332,6 +333,7 @@ export default function ExamPage() {
                     <MathView expr={problem.explanation} size="md" className="justify-start" />
                   </div>
                 )}
+                {lastCorrect && <SolutionReveal explanation={problem.explanation} />}
                 <button
                   onClick={next}
                   autoFocus

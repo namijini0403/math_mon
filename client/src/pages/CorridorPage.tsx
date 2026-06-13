@@ -16,6 +16,7 @@ import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { useGame } from '../game/store';
 import { sfx } from '../game/sounds';
 import { MathView } from '../components/MathView';
+import { SolutionReveal } from '../components/SolutionReveal';
 import { ProblemBody } from '../components/problem/ProblemBody';
 
 /** 단원 선택 — 흐려진 별이 있는 단원만 보여준다 */
@@ -235,6 +236,7 @@ function CorridorRunner({ unitId }: { unitId: string }) {
                 <div className={`text-2xl mb-1 ${lastCorrect ? 'text-glow' : 'text-hurt'}`}>
                   {lastCorrect ? '별빛이 되살아났어요! 🌟' : '아직 흐려요 — 풀이를 보고 다시!'}
                 </div>
+                {lastCorrect && <SolutionReveal explanation={slot.problem.explanation} />}
                 {!lastCorrect && (
                   <>
                     <div className="text-sm leading-relaxed opacity-90 mb-1">

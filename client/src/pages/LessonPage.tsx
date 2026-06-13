@@ -19,6 +19,7 @@ import { COMBO_BONUS, type BadgeDef } from '../game/badges';
 import { type RewardCardDef } from '../game/rewardCards';
 import { TreasureReveal } from '../components/TreasureReveal';
 import { ItemGachaReveal } from '../components/ItemGachaReveal';
+import { SolutionReveal } from '../components/SolutionReveal';
 import type { DragonItemDef } from '../game/dragon';
 import { MedalView } from '../components/MedalView';
 import { answerToText } from '../generator/render-text';
@@ -739,6 +740,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
                     <MathView expr={problem.explanation} size="md" className="justify-start" />
                   </div>
                 )}
+                {lastCorrect && <SolutionReveal explanation={problem.explanation} />}
                 <button
                   onClick={next}
                   autoFocus
