@@ -35,7 +35,7 @@ const num3dCompose: SkillDef = {
         prompt: `백 모형이 ${h}개, 십 모형이 ${t}개, 일 모형이 ${u}개이면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${h}×100 + ${t}×10 + ${u} = ${ans}`)],
+        explanation: [txt(`백 모형 ${h}개는 ${h * 100}, 십 모형 ${t}개는 ${t * 10}, 일 모형 ${u}개는 ${u}이에요. 모두 더하면 ${h * 100} + ${t * 10} + ${u} = ${ans}이에요.`)],
       };
     } else if (pat === 1) {
       // 수 → 백 자리 숫자
@@ -52,7 +52,7 @@ const num3dCompose: SkillDef = {
         prompt: `${num}은 백 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [h],
-        explanation: [txt(`${num}에서 백의 자리 숫자는 ${h}이에요. 백 모형 ${h}개예요.`)],
+        explanation: [txt(`${num}을 백·십·일로 나누면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
       };
     } else {
       // 수 → 십 자리 숫자
@@ -69,7 +69,7 @@ const num3dCompose: SkillDef = {
         prompt: `${num}은 십 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [t],
-        explanation: [txt(`${num}에서 십의 자리 숫자는 ${t}이에요. 십 모형 ${t}개예요.`)],
+        explanation: [txt(`${num}을 백·십·일로 나누면 십의 자리 숫자가 ${t}이에요. 그래서 십 모형은 ${t}개예요.`)],
       };
     }
   },
@@ -113,7 +113,7 @@ const num3dPlace: SkillDef = {
       prompt: `${num}에서 ${posName}의 자리 숫자가 나타내는 값은 얼마인가요?`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${num}의 ${posName}의 자리 숫자는 ${pos === 0 ? h : pos === 1 ? t : u}이고, 이것이 나타내는 값은 ${ans}이에요.`)],
+      explanation: [txt(`${num}에서 ${posName}의 자리 숫자는 ${pos === 0 ? h : pos === 1 ? t : u}이에요. ${posName}의 자리에 있으므로 ${ans}을 나타내요.`)],
     };
   },
 };
@@ -150,7 +150,7 @@ const num3dSkip: SkillDef = {
       prompt: `${step}씩 뛰어 셀 때 □에 알맞은 수를 쓰세요.\n${display}`,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`${step}씩 뛰어 세면: ${nums.join(', ')}. □에는 ${answer}가 들어가요.`)],
+      explanation: [txt(`${step}씩 뛰어 세면 ${step === 100 ? '백' : step === 10 ? '십' : '일'}의 자리 숫자가 1씩 커져요: ${nums.join(', ')}. 그래서 □에는 ${answer}가 들어가요.`)],
     };
   },
 };
@@ -172,6 +172,18 @@ const num3dCompare: SkillDef = {
       if (ta !== tb) { a = ta; b = tb; break; }
     }
     const answer: '<' | '>' | '=' = a < b ? '<' : '>';
+    const bigger = Math.max(a, b);
+    const ah = Math.floor(a / 100), bh = Math.floor(b / 100);
+    const at = Math.floor(a / 10) % 10, bt = Math.floor(b / 10) % 10;
+    const au = a % 10, bu = b % 10;
+    let reason: string;
+    if (ah !== bh) {
+      reason = `백의 자리를 비교하면 ${ah}과 ${bh}이라서, ${bigger}가 더 큽니다`;
+    } else if (at !== bt) {
+      reason = `백의 자리는 ${ah}로 같으니 십의 자리를 비교하면 ${at}과 ${bt}이라서, ${bigger}가 더 큽니다`;
+    } else {
+      reason = `백·십의 자리가 같으니 일의 자리를 비교하면 ${au}과 ${bu}이라서, ${bigger}가 더 큽니다`;
+    }
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -181,7 +193,7 @@ const num3dCompare: SkillDef = {
       left: [{ kind: 'decimal', v: a }],
       right: [{ kind: 'decimal', v: b }],
       answer,
-      explanation: [txt(`${a}와 ${b}를 비교하면: ${a} ${answer} ${b}이에요.`)],
+      explanation: [txt(`${reason}. (${a} ${answer} ${b})`)],
     };
   },
 };
@@ -215,7 +227,7 @@ const num3dWord: SkillDef = {
         prompt: `${item}이 100개짜리 상자 ${h}개, 10개짜리 묶음 ${t}개, 낱개 ${u}개 있어요. 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${h}×100 + ${t}×10 + ${u} = ${ans}개`)],
+        explanation: [txt(`100개짜리 ${h}상자는 ${h * 100}개, 10개짜리 ${t}묶음은 ${t * 10}개, 낱개 ${u}개. 모두 더하면 ${h * 100} + ${t * 10} + ${u} = ${ans}개예요.`)],
       };
     } else {
       const step = rng.pick([100, 10] as const);
@@ -234,7 +246,7 @@ const num3dWord: SkillDef = {
         prompt: `${start}에서 ${step}씩 3번 뛰어 세면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${start} → ${start + step} → ${start + step * 2} → ${ans}`)],
+        explanation: [txt(`${step}씩 3번 뛰어 세요: ${start} → ${start + step} → ${start + step * 2} → ${ans}. 그래서 ${ans}이에요.`)],
       };
     }
   },

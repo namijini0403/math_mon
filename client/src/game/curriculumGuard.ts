@@ -29,6 +29,13 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unitAS12b', // ④ 덧셈과 뺄셈(2)
   'unitClock1', // ⑤ 시계 보기와 규칙 찾기
   'unitAS12c', // ⑥ 덧셈과 뺄셈(3)
+  // 2-1
+  'unitNum3d', // ① 세 자리 수
+  'unitFigure2', // ② 여러 가지 도형
+  'unitAddSub2', // ③ 덧셈과 뺄셈
+  'unitLength2', // ④ 길이 재기
+  'unitClassify', // ⑤ 분류하기
+  'unitMulIntro', // ⑥ 곱셈
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {

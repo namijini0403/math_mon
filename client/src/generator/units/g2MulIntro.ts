@@ -42,7 +42,7 @@ const muliGroup: SkillDef = {
       prompt: `${emoji}이 ${n}개씩 ${m}묶음 있어요. 모두 몇 개인가요?\n${display}`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${n}씩 ${m}묶음 = ${n} × ${m} = ${ans}개`)],
+      explanation: [txt(`${n}개씩 ${m}묶음이니 ${n}을 ${m}번 더해요: ${Array(m).fill(String(n)).join(' + ')} = ${ans}. 곱셈식으로는 ${n} × ${m} = ${ans}개예요.`)],
     };
   },
 };
@@ -73,7 +73,7 @@ const muliTimes: SkillDef = {
         prompt: `${a}의 ${b}배는 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a}의 ${b}배 = ${a} × ${b} = ${ans}`)],
+        explanation: [txt(`${a}의 ${b}배는 ${a}을 ${b}번 더한 것이에요: ${Array(b).fill(String(a)).join(' + ')} = ${ans}. 곱셈식으로는 ${a} × ${b} = ${ans}이에요.`)],
       };
     } else {
       // 몇 배인지 구하기
@@ -86,7 +86,7 @@ const muliTimes: SkillDef = {
         prompt: `${a}의 몇 배가 ${ans}인가요?`,
         expr,
         blankAnswers: [b],
-        explanation: [txt(`${ans} ÷ ${a} = ${b}배`)],
+        explanation: [txt(`${a}씩 뛰어 세 보면 ${Array(b).fill(0).map((_, i) => a * (i + 1)).join(', ')}이에요. ${a}을 ${b}번 더하면 ${ans}가 되니까 ${a}의 ${b}배예요.`)],
       };
     }
   },
@@ -226,7 +226,7 @@ const muliWord: SkillDef = {
         prompt: `${emoji} ${item}이 ${n}개씩 ${m}봉지 있어요. ${item}은 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${n} × ${m} = ${ans}개`)],
+        explanation: [txt(`한 봉지에 ${n}개씩 ${m}봉지니까 ${n}을 ${m}번 더해요. 곱셈식으로 ${n} × ${m} = ${ans}개예요.`)],
       };
     } else {
       // 몇 배 문장제

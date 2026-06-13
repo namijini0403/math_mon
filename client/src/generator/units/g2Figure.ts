@@ -123,17 +123,17 @@ const fig2Classify: SkillDef = {
       prompt: `다음 도형들 중에서 ${targetName}은 몇 개인가요?\n${shuffled.join(' ')}`,
       expr,
       blankAnswers: [count],
-      explanation: [txt(`${targetName}은 ${count}개예요.`)],
+      explanation: [txt(`${targetName} 모양을 하나씩 찾아 세어 보면 ${count}개예요.`)],
     };
   },
 };
 
 // ── 4. fig2-circle  원의 특징 (choice)  난이도 2 ────────────────────────────
 const CIRCLE_FACTS = [
-  { q: '원에는 꼭짓점이 몇 개인가요?', a: '없어요(0개)', wrong: ['1개', '2개', '4개'] },
-  { q: '원에는 변이 몇 개인가요?', a: '없어요(0개)', wrong: ['1개', '2개', '4개'] },
-  { q: '원의 중심에서 원 위의 점까지 거리는 어떤가요?', a: '모두 같아요', wrong: ['제각각이에요', '중심에서 멀수록 길어요', '중심에서 가까울수록 길어요'] },
-  { q: '원을 반으로 접었을 때 포개어지나요?', a: '완전히 포개어져요', wrong: ['조금 어긋나요', '안 포개어져요', '한쪽이 더 커요'] },
+  { q: '원에는 꼭짓점이 몇 개인가요?', a: '없어요(0개)', wrong: ['1개', '2개', '4개'], why: '원은 곧은 선과 뾰족한 모서리가 없는 매끈한 곡선이라 꼭짓점이 없어요.' },
+  { q: '원에는 변이 몇 개인가요?', a: '없어요(0개)', wrong: ['1개', '2개', '4개'], why: '원은 굽은 곡선 하나로 되어 있어 곧은 변이 없어요.' },
+  { q: '원의 중심에서 원 위의 점까지 거리는 어떤가요?', a: '모두 같아요', wrong: ['제각각이에요', '중심에서 멀수록 길어요', '중심에서 가까울수록 길어요'], why: '원은 중심에서 같은 거리에 있는 점들이 모여 만든 모양이라 그 거리가 모두 같아요.' },
+  { q: '원을 반으로 접었을 때 포개어지나요?', a: '완전히 포개어져요', wrong: ['조금 어긋나요', '안 포개어져요', '한쪽이 더 커요'], why: '원은 어느 방향으로 반을 접어도 양쪽이 똑같아서 완전히 포개어져요.' },
 ];
 
 const fig2Circle: SkillDef = {
@@ -157,7 +157,7 @@ const fig2Circle: SkillDef = {
       prompt: fact.q,
       choices,
       answerIndex,
-      explanation: [txt(`${fact.q.replace('?', '')}? → ${fact.a}`)],
+      explanation: [txt(`${fact.a}. ${fact.why}`)],
     };
   },
 };
@@ -192,7 +192,7 @@ const fig2Word: SkillDef = {
         prompt: `${shape.name} ${count}개의 ${thing}은 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${shape.name} 1개에 ${thing}이 ${perShape}개이므로, ${count}개면 ${perShape}×${count}=${ans}개`)],
+        explanation: [txt(`${shape.name} 1개에 ${thing}이 ${perShape}개예요. ${count}개면 ${perShape}을 ${count}번 더해요: ${Array(count).fill(String(perShape)).join(' + ')} = ${ans}개예요.`)],
       };
     } else {
       // 도형 이름 맞히기 문장제

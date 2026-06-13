@@ -33,6 +33,7 @@ const as2Add: SkillDef = {
     }
     const ans = a + b;
     const expr: MathExpr = [txt(`${a} + ${b} = `), { kind: 'blank', slot: 0 }];
+    const u1 = a % 10, u2 = b % 10, at = Math.floor(a / 10), bt = Math.floor(b / 10);
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -41,7 +42,7 @@ const as2Add: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} + ${b} = ${ans}. 일의 자리 ${a % 10}+${b % 10}=${(a % 10) + (b % 10)}에서 받아올림 1이 생겨요.`)],
+      explanation: [txt(`일의 자리끼리 더하면 ${u1} + ${u2} = ${u1 + u2}이라서, 10을 십의 자리로 받아올려요. 십의 자리는 ${at} + ${bt}에 받아올린 1을 더해 ${at + bt + 1}이에요. 그래서 ${a} + ${b} = ${ans}이에요.`)],
     };
   },
 };
@@ -68,6 +69,7 @@ const as2Sub: SkillDef = {
     }
     const ans = a - b;
     const expr: MathExpr = [txt(`${a} - ${b} = `), { kind: 'blank', slot: 0 }];
+    const u1 = a % 10, u2 = b % 10, at = Math.floor(a / 10), bt = Math.floor(b / 10);
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -76,7 +78,7 @@ const as2Sub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} - ${b} = ${ans}. 일의 자리 ${a % 10}<${b % 10}이므로 받아내림이 필요해요.`)],
+      explanation: [txt(`일의 자리 ${u1}에서 ${u2}를 뺄 수 없어요. 십의 자리에서 10을 받아내리면 ${10 + u1} - ${u2} = ${10 + u1 - u2}이에요. 십의 자리는 1을 빌려줬으니 ${at} - 1 - ${bt} = ${at - 1 - bt}이에요. 그래서 ${a} - ${b} = ${ans}이에요.`)],
     };
   },
 };
@@ -92,6 +94,7 @@ const as2Three: SkillDef = {
   generate(seed) {
     const rng = new RNG(seed);
     let ans = 30, opStr = '';
+    let n1 = 10, n2 = 10, n3 = 10;
     const pat = rng.int(0, 2);
     for (let tries = 0; tries < 200; tries++) {
       let ta: number, tb: number, tc: number, tans: number, top: string;
@@ -102,7 +105,7 @@ const as2Three: SkillDef = {
         tc = rng.int(1, 20);
         tans = ta + tb + tc;
         top = `${ta} + ${tb} + ${tc}`;
-        if (tans <= 99) { ans = tans; opStr = top; break; }
+        if (tans <= 99) { ans = tans; opStr = top; n1 = ta; n2 = tb; n3 = tc; break; }
       } else if (pat === 1) {
         // a + b - c
         ta = rng.int(10, 50);
@@ -110,7 +113,7 @@ const as2Three: SkillDef = {
         tc = rng.int(1, 20);
         tans = ta + tb - tc;
         top = `${ta} + ${tb} - ${tc}`;
-        if (tans > 0 && tans <= 99) { ans = tans; opStr = top; break; }
+        if (tans > 0 && tans <= 99) { ans = tans; opStr = top; n1 = ta; n2 = tb; n3 = tc; break; }
       } else {
         // a - b + c
         ta = rng.int(30, 99);
@@ -118,8 +121,20 @@ const as2Three: SkillDef = {
         tc = rng.int(1, 20);
         tans = ta - tb + tc;
         top = `${ta} - ${tb} + ${tc}`;
-        if (tans > 0 && tans <= 99) { ans = tans; opStr = top; break; }
+        if (tans > 0 && tans <= 99) { ans = tans; opStr = top; n1 = ta; n2 = tb; n3 = tc; break; }
       }
+    }
+    // 앞에서부터 두 수씩 차례로 계산하는 풀이
+    let step1: number, expStr: string;
+    if (pat === 0) {
+      step1 = n1 + n2;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기에 ${n3}을 더하면 ${step1} + ${n3} = ${ans}이에요.`;
+    } else if (pat === 1) {
+      step1 = n1 + n2;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기서 ${n3}을 빼면 ${step1} - ${n3} = ${ans}이에요.`;
+    } else {
+      step1 = n1 - n2;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} - ${n2} = ${step1}, 거기에 ${n3}을 더하면 ${step1} + ${n3} = ${ans}이에요.`;
     }
     const expr: MathExpr = [txt(`${opStr} = `), { kind: 'blank', slot: 0 }];
     return {
@@ -130,7 +145,7 @@ const as2Three: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${opStr} = ${ans}`)],
+      explanation: [txt(expStr)],
     };
   },
 };
@@ -160,7 +175,7 @@ const as2Missing: SkillDef = {
       ans = a;
       const total = a + b;
       promptStr = `□ + ${b} = ${total}`;
-      expStr = `□ = ${total} - ${b} = ${ans}`;
+      expStr = `□와 ${b}를 더해 ${total}이 되었어요. □를 구하려면 전체 ${total}에서 ${b}를 빼면 돼요: ${total} - ${b} = ${ans}.`;
     } else {
       // a - □ = a-b  →  □ = b
       for (let tries = 0; tries < 200; tries++) {
@@ -171,7 +186,7 @@ const as2Missing: SkillDef = {
       ans = b;
       const diff = a - b;
       promptStr = `${a} - □ = ${diff}`;
-      expStr = `□ = ${a} - ${diff} = ${ans}`;
+      expStr = `${a}에서 □를 빼서 ${diff}가 남았어요. □를 구하려면 ${a}에서 남은 ${diff}를 빼면 돼요: ${a} - ${diff} = ${ans}.`;
     }
 
     const expr: MathExpr = [{ kind: 'blank', slot: 0 }];
@@ -223,7 +238,7 @@ const as2Word: SkillDef = {
         prompt: `${item}이 ${a}개 있었어요. ${b}개를 더 받았어요. 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a} + ${b} = ${ans}개`)],
+        explanation: [txt(`처음 ${a}개에 받은 ${b}개를 더해요. ${a} + ${b} = ${ans}개예요.`)],
       };
     } else {
       // 뺄셈 문장제
@@ -245,7 +260,7 @@ const as2Word: SkillDef = {
         prompt: `${item}이 ${a}개 있었어요. ${b}개를 먹었어요. 남은 것은 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a} - ${b} = ${ans}개`)],
+        explanation: [txt(`처음 ${a}개에서 먹은 ${b}개를 빼요. ${a} - ${b} = ${ans}개예요.`)],
       };
     }
   },

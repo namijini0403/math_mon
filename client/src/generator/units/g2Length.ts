@@ -35,7 +35,7 @@ const len2Cm: SkillDef = {
         prompt: `자로 재었더니 ${cm} 센티미터예요. 숫자로 쓰면 몇 cm인가요?`,
         expr,
         blankAnswers: [cm],
-        explanation: [txt(`${cm} 센티미터 = ${cm} cm`)],
+        explanation: [txt(`'센티미터'는 'cm'로 써요. 그래서 ${cm} 센티미터는 ${cm} cm예요.`)],
       };
     } else {
       // 두 길이 합
@@ -51,7 +51,7 @@ const len2Cm: SkillDef = {
         prompt: `연필의 길이가 ${a} cm이고 자의 길이가 ${b} cm예요. 두 길이의 합은 몇 cm인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a} + ${b} = ${ans} cm`)],
+        explanation: [txt(`두 길이를 더해요. ${a} + ${b} = ${ans}이라서 ${ans} cm예요.`)],
       };
     }
   },
@@ -129,7 +129,7 @@ const len2Compare: SkillDef = {
         prompt: `A의 길이는 ${a} cm이고 B의 길이는 ${b} cm예요. 어느 것이 더 긴가요?`,
         choices,
         answerIndex,
-        explanation: [txt(`${a} cm ${a > b ? '>' : '<'} ${b} cm이므로 ${longer}가 더 길어요.`)],
+        explanation: [txt(`A는 ${a} cm, B는 ${b} cm예요. ${Math.max(a, b)} cm가 ${Math.min(a, b)} cm보다 더 기니까 ${longer}가 더 길어요.`)],
       };
     } else {
       // 같은 물건, 다른 임의 단위로 쟀을 때 — 단위가 클수록 횟수가 적다
@@ -181,7 +181,7 @@ const len2Word: SkillDef = {
         prompt: `${obj}의 길이가 ${a} cm예요. ${b} cm를 잘라내면 남은 길이는 몇 cm인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a} - ${b} = ${ans} cm`)],
+        explanation: [txt(`전체 ${a} cm에서 잘라낸 ${b} cm를 빼요. ${a} - ${b} = ${ans}이라서 ${ans} cm예요.`)],
       };
     } else {
       const a = rng.int(5, 20);
@@ -196,7 +196,7 @@ const len2Word: SkillDef = {
         prompt: `${obj} 두 개의 길이가 각각 ${a} cm와 ${b} cm예요. 두 ${obj}를 이으면 몇 cm인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a} + ${b} = ${ans} cm`)],
+        explanation: [txt(`두 길이를 이으면 더해요. ${a} + ${b} = ${ans}이라서 ${ans} cm예요.`)],
       };
     }
   },

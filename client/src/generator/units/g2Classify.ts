@@ -44,7 +44,7 @@ const class2Count: SkillDef = {
       prompt: `다음 중 ${NAMES[target]}(${target})은 몇 개인가요?\n${shuffled.join(' ')}`,
       expr,
       blankAnswers: [count],
-      explanation: [txt(`${NAMES[target]}(${target})은 ${count}개예요.`)],
+      explanation: [txt(`${NAMES[target]}(${target})만 하나씩 찾아 세어 보면 ${count}개예요.`)],
     };
   },
 };
@@ -78,7 +78,7 @@ const class2Table: SkillDef = {
         prompt: `분류 결과입니다. 합계는 몇 개인가요?\n${tableStr}`,
         expr,
         blankAnswers: [total],
-        explanation: [txt(`${counts.join(' + ')} = ${total}개`)],
+        explanation: [txt(`각 종류의 개수를 모두 더해요. ${counts.join(' + ')} = ${total}개예요.`)],
       };
     } else {
       // 합계와 일부를 알 때 나머지 구하기
@@ -101,7 +101,7 @@ const class2Table: SkillDef = {
         prompt: `분류 결과입니다. 합계가 ${total}개일 때 □에 알맞은 수는 얼마인가요?\n${tableStr}`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${total} - ${knownSum} = ${ans}`)],
+        explanation: [txt(`전체 ${total}개에서 이미 아는 종류의 합 ${knownSum}개를 빼면 □를 구해요. ${total} - ${knownSum} = ${ans}개예요.`)],
       };
     }
   },
@@ -145,7 +145,7 @@ const class2Most: SkillDef = {
       prompt: `분류 결과입니다. ${word} 종류는 무엇인가요?\n${tableStr}`,
       choices,
       answerIndex,
-      explanation: [txt(`${word} 것은 ${cats[ansIdx]}(${counts[ansIdx]}개)예요.`)],
+      explanation: [txt(`종류별 개수를 비교하면 ${word} 것은 ${cats[ansIdx]}(${counts[ansIdx]}개)예요.`)],
     };
   },
 };
