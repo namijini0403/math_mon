@@ -27,9 +27,9 @@
 - 4자리 PIN(1만 가지) + `/api/auth/join`에 시도 제한·계정 잠금 없음 → 같은 반 친구 계정 탈취 가능.
 - 보완: (classCode, nickname)별 실패 횟수 카운터 + 지연/잠금(예: 5회 실패 시 5분), IP 단위 rate limit.
 
-**H2. 공유 기기 localStorage 잔존 (학교 태블릿 시나리오)**
-- 학생 A가 로그아웃 없이 자리를 뜨면 `localStorage['math-mon-save']`(닉네임·반코드·studentId)와 refresh 토큰(`draconis-refresh`)이 남아 **다음 학생 B가 A의 계정·기록에 접근**.
-- 보완: 명시적 **"다른 친구로 바꾸기/로그아웃"** — localStorage + IndexedDB + 메모리 토큰 전부 clear. (현 `resetAll`은 진도까지 지우는 초기화라 용도가 다름.)
+**H2. 공유 기기 localStorage 잔존 (학교 태블릿 시나리오)** — ✅ **보완 완료(2026-06-13)**
+- 학생 A가 로그아웃 없이 자리를 뜨면 `localStorage['math-mon-save']`(닉네임·반코드·studentId)와 refresh 토큰(`draconis-refresh`)이 남아 다음 학생 B가 A의 계정·기록에 접근하는 위험.
+- 적용: 프로필에 **"다른 친구로 바꾸기(로그아웃)"** 버튼 추가. `clearAuth()`(메모리 access 토큰 + localStorage·IndexedDB refresh 토큰 제거) + `resetAll()`(로컬 게임상태·식별자 초기화) → 로그인 화면. 등록 학생은 서버 세이브로 재로그인 시 복원. **로그인 절차 자체는 그대로(마찰 없음).**
 
 ### 🟠 MEDIUM
 

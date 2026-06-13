@@ -1,7 +1,8 @@
 /** 프로필 — 통계 + 보물창고 바로가기 + 교사용 체험 도구 */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { clearAuth } from '../api';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
 import { DragonAvatar } from '../components/DragonAvatar';
@@ -15,6 +16,7 @@ export default function ProfilePage() {
     showAnswers, toggleShowAnswers, devUnlockAll, dragonGain, resetDragon, resetAll,
   } = useGame();
   const [devOpen, setDevOpen] = useState(false);
+  const navigate = useNavigate();
   const { level } = levelFromXp(xp);
 
   const totalCorrect = Object.values(skillStats).reduce((s, v) => s + v.c, 0);
@@ -114,6 +116,24 @@ export default function ProfilePage() {
           </div>
         )}
       </div>
+
+      {/* 공유 기기 보호 — 로그아웃 시 이 기기의 인증·기록을 모두 지운다 (SECURITY-PLAN H2) */}
+      <button
+        onClick={async () => {
+          if (
+            window.confirm(
+              '다른 친구로 바꿀까요?\n이 기기에서 내 정보가 지워져요. (반 코드로 로그인했다면 다시 로그인하면 돌아와요.)',
+            )
+          ) {
+            await clearAuth();
+            resetAll();
+            navigate('/login');
+          }
+        }}
+        className="mt-8 btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-6 py-3 text-sm self-start"
+      >
+        🔄 다른 친구로 바꾸기 (로그아웃)
+      </button>
 
       <button
         onClick={() => {

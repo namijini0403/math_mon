@@ -120,6 +120,32 @@ async function storeRefreshToken(token: string): Promise<void> {
   await idbSet(IDB_REFRESH_KEY, token);
 }
 
+/** refresh 토큰을 IndexedDB에서 삭제 */
+async function idbDel(key: string): Promise<void> {
+  try {
+    const db = await openIdb();
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).delete(key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  } catch {
+    /* noop */
+  }
+}
+
+/**
+ * 로그아웃/기기 전환 — 메모리·localStorage·IndexedDB의 인증 흔적을 모두 제거.
+ * (공유 기기에서 다음 학생이 이전 학생 계정에 접근하지 못하게. SECURITY-PLAN H2)
+ */
+export async function clearAuth(): Promise<void> {
+  _accessToken = null;
+  _serverAnalyticsOn = false;
+  try { localStorage.removeItem(LS_REFRESH_KEY); } catch { /* noop */ }
+  await idbDel(IDB_REFRESH_KEY);
+}
+
 /** refresh 토큰을 읽기 (localStorage 우선, 없으면 IndexedDB) */
 async function loadRefreshToken(): Promise<string | null> {
   try {
