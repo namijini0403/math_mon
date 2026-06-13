@@ -50,7 +50,7 @@ npm run build -w client               # PWA 빌드
 - 이미지는 절대 직접 생성하지 않는다. `assets/ASSET_SPEC*.md`에 명세만 작성(파일명·해상도·투명배경·스타일 가이드 "cute cartoon, dark indigo night, thick outlines, glowing accents, no text"·컨셉 프롬프트 영문).
 - Codex가 `client/public/assets/`에 제작물 커밋 → **앱은 emoji/플레이스홀더 폴백이라 이미지 부재가 블로커 아님**. 파일명만 코드와 일치하면 자동 반영.
 - Codex가 새 에셋·manifest를 커밋해 두면: 코드 연결 여부를 grep으로 확인 → 미연결이면 연결 작업(에이전트 위임 가능). manifest.json을 새로 쓰는 경우 한글 라벨 인코딩 깨짐 주의(UTF-8 확인).
-- 타로 카드류는 **제작 중단됨** — 인증은 코드 렌더 메달(MedalView), 이미지 필요 없음. 이미지가 필요한 것: 보스 본체, 드래곤 성장 일러스트, 보물카드(rewardCards).
+- 타로 카드류는 **제작 중단됨** — 인증은 코드 렌더 메달(MedalView). **배지도 코드 렌더 SVG 엠블럼**(components/BadgeEmblem.tsx: shape×palette×glyph×ring 조합, badges.ts의 각 배지 visual). 둘 다 이미지 불필요. 이미지가 필요한 것: 보스 본체, 드래곤 성장 일러스트, 보물카드(rewardCards).
 
 ## 5. 게임 경제·UX 불변 결정 (사용자가 명시 — 되돌리지 말 것)
 

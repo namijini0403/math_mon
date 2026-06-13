@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGame } from '../game/store';
 import { BADGES, type BadgeDef } from '../game/badges';
 import { MedalView } from '../components/MedalView';
+import { BadgeEmblem } from '../components/BadgeEmblem';
 import {
   RARITY_COLOR,
   RARITY_LABEL,
@@ -18,13 +19,6 @@ import { downloadTreasurePng } from '../card/renderTreasurePng';
 import { sfx } from '../game/sounds';
 
 const RARITY_ORDER: RewardRarity[] = ['legendary', 'rare', 'common'];
-
-/** 배지 희귀도별 테두리 + glow */
-function badgeStyle(rarity: 1 | 2 | 3): string {
-  if (rarity === 3) return 'border-coin shadow-[0_0_10px_2px_rgba(251,191,36,0.55)]';
-  if (rarity === 2) return 'border-[#c0c0c0] shadow-[0_0_8px_1px_rgba(192,192,192,0.45)]';
-  return 'border-[#cd7f32] shadow-[0_0_6px_1px_rgba(205,127,50,0.35)]';
-}
 
 function CardCell({
   card,
@@ -129,11 +123,11 @@ export default function CardGalleryPage() {
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setSelectedBadge(selectedBadge?.id === b.id ? null : b)}
                 aria-label={owned ? `${b.name}: ${b.desc}` : '잠긴 배지'}
-                className={`flex flex-col items-center rounded-2xl border-2 p-2 gap-1 transition-all ${
-                  owned ? badgeStyle(b.rarity) : 'border-night-700 opacity-30 grayscale'
-                } ${selectedBadge?.id === b.id ? 'ring-2 ring-white/40' : ''}`}
+                className={`flex flex-col items-center rounded-2xl p-1.5 gap-1 transition-all ${
+                  selectedBadge?.id === b.id ? 'bg-night-800 ring-2 ring-white/30' : ''
+                }`}
               >
-                <span className="text-2xl leading-none">{owned ? b.emoji : '🔒'}</span>
+                <BadgeEmblem visual={b.visual} owned={owned} id={`g-${b.id}`} size={46} />
                 <span className="text-[9px] leading-tight text-center line-clamp-2 opacity-80">
                   {owned ? b.name : '???'}
                 </span>
@@ -152,16 +146,13 @@ export default function CardGalleryPage() {
               transition={{ duration: 0.22 }}
               className="overflow-hidden"
             >
-              <div
-                className={`mt-4 rounded-2xl border-2 p-4 flex items-center gap-3 ${
-                  badges.includes(selectedBadge.id)
-                    ? badgeStyle(selectedBadge.rarity)
-                    : 'border-night-700 opacity-50'
-                } bg-night-800`}
-              >
-                <span className="text-4xl">
-                  {badges.includes(selectedBadge.id) ? selectedBadge.emoji : '🔒'}
-                </span>
+              <div className="mt-4 rounded-2xl border-2 border-night-700 p-4 flex items-center gap-3 bg-night-800">
+                <BadgeEmblem
+                  visual={selectedBadge.visual}
+                  owned={badges.includes(selectedBadge.id)}
+                  id={`d-${selectedBadge.id}`}
+                  size={60}
+                />
                 <div className="flex-1">
                   <div className="font-bold text-sm">
                     {badges.includes(selectedBadge.id) ? selectedBadge.name : '???'}

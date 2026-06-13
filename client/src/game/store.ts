@@ -479,6 +479,10 @@ export const useGame = create<GameState>()(
           attendanceDays: s.attendance.totalDays,
           lessonsCompleted: s.records.lessonsCompleted,
           finalExamsPassed: s.records.finalExamsPassed,
+          challengeCleared: s.records.challengeCleared,
+          examCount: s.examCount,
+          feedCount: s.dragon.feedCount,
+          dragonAdult: !!s.dragon.adult,
         };
         const earned = newlyEarned(stats, s.badges);
         if (earned.length > 0) {
