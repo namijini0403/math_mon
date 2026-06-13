@@ -31,6 +31,16 @@ import { sfx } from '../game/sounds';
 
 const SEEN_STAGE_KEY = 'mathmon-dragon-seen-stage';
 
+/** 드래곤 주변을 떠다니는 장식 입자 (결정적 배치 — 렌더마다 흔들리지 않게) */
+const STAGE_SPARKLES = [
+  { dx: -78, size: 8, delay: 0, dur: 3.2, rise: 54 },
+  { dx: 70, size: 6, delay: 0.6, dur: 3.8, rise: 64 },
+  { dx: -44, size: 5, delay: 1.4, dur: 4.2, rise: 48 },
+  { dx: 52, size: 9, delay: 0.9, dur: 3.5, rise: 58 },
+  { dx: 14, size: 5, delay: 2.0, dur: 4.6, rise: 70 },
+  { dx: -20, size: 7, delay: 1.1, dur: 4.0, rise: 60 },
+] as const;
+
 /** 장식 아이콘 — Codex PNG 우선, 없으면 이모지 폴백 */
 function DecorIcon({ decor, size }: { decor: RoomDecorDef; size: number }) {
   const [ok, setOk] = useState(true);
@@ -62,36 +72,84 @@ function DragonStage({ dragon, fullness, mood }: {
   const imgSrc = art.src;
   const fallbackEmoji = art.fallbackEmoji;
 
-  // 무드별 애니메이션
+  // 오라 색 — 성체면 확정 속성색, 아니면 우세 속성, 기본은 달빛 보라
+  const auraColor = dragon.adult
+    ? AFFINITY_INFO[dragon.adult.affinity].color
+    : Object.values(dragon.affinities).some((v) => v > 0)
+      ? AFFINITY_INFO[topAffinity(dragon.affinities)].color
+      : '#a78bfa';
+
+  // 무드별 애니메이션 — 항상 숨쉬는 느낌(scale)을 깔고 무드 동작을 얹는다
   const moodAnimate: Record<string, TargetAndTransition> = {
-    happy: { y: [0, -12, 0] },
-    normal: { scale: [1, 1.03, 1] },
+    happy: { y: [0, -12, 0], scale: [1, 1.04, 1] },
+    normal: { y: [0, -5, 0], scale: [1, 1.035, 1] },
     hungry: { rotate: [-3, 3, -3], y: [0, 4, 0] },
-    sad: { rotate: [-5, 5, -5] },
+    sad: { rotate: [-5, 5, -5], y: [0, 3, 0] },
   };
   const moodTransition: Record<string, Transition> = {
-    happy: { repeat: Infinity, duration: 0.8, ease: 'easeInOut' },
-    normal: { repeat: Infinity, duration: 2.2, ease: 'easeInOut' },
+    happy: { repeat: Infinity, duration: 0.9, ease: 'easeInOut' },
+    normal: { repeat: Infinity, duration: 2.4, ease: 'easeInOut' },
     hungry: { repeat: Infinity, duration: 2.8, ease: 'easeInOut' },
     sad: { repeat: Infinity, duration: 3.2, ease: 'easeInOut' },
   };
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="relative flex flex-col items-center justify-center w-60 h-60">
+      {/* 오라 글로우 — 속성색으로 은은하게 맥동 */}
+      <motion.div
+        aria-hidden
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
+        style={{ width: 220, height: 220, background: `radial-gradient(circle, ${auraColor}3a 0%, transparent 68%)` }}
+        animate={{ opacity: [0.45, 0.85, 0.45], scale: [0.9, 1.08, 0.9] }}
+        transition={{ repeat: Infinity, duration: 3.4, ease: 'easeInOut' }}
+      />
+
+      {/* 떠다니는 입자 — 속성색 반짝이가 위로 흘러오른다 */}
+      {STAGE_SPARKLES.map((s, i) => (
+        <motion.span
+          key={i}
+          aria-hidden
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left: `calc(50% + ${s.dx}px)`,
+            bottom: 18,
+            width: s.size,
+            height: s.size,
+            background: auraColor,
+            boxShadow: `0 0 ${s.size}px ${s.size / 2}px ${auraColor}aa`,
+          }}
+          animate={{ y: [0, -s.rise], opacity: [0, 0.9, 0], scale: [0.6, 1, 0.5] }}
+          transition={{ repeat: Infinity, duration: s.dur, delay: s.delay, ease: 'easeOut' }}
+        />
+      ))}
+
+      {/* 바닥 그림자 — 떠오를 때 옅고 작게 */}
+      <motion.div
+        aria-hidden
+        className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-[100%] pointer-events-none"
+        style={{ width: 120, height: 18, background: 'radial-gradient(ellipse, rgba(0,0,0,0.45) 0%, transparent 72%)' }}
+        animate={{ scaleX: [1, 0.82, 1], opacity: [0.5, 0.3, 0.5] }}
+        transition={{ repeat: Infinity, duration: moodTransition[mood].duration as number, ease: 'easeInOut' }}
+      />
+
       <motion.div
         animate={moodAnimate[mood]}
         transition={moodTransition[mood]}
-        className="relative"
+        className="relative z-10"
       >
         {!imgError && imgSrc ? (
           <img
             src={imgSrc}
             alt="드래곤"
-            className="w-56 h-56 object-contain drop-shadow-[0_0_24px_rgba(167,139,250,0.6)]"
+            className="w-56 h-56 object-contain"
+            style={{ filter: `drop-shadow(0 0 24px ${auraColor}99)` }}
             onError={() => setImgError(true)}
           />
         ) : (
-          <span className="text-8xl drop-shadow-[0_0_16px_rgba(167,139,250,0.5)] select-none">
+          <span
+            className="text-8xl select-none"
+            style={{ filter: `drop-shadow(0 0 16px ${auraColor}88)` }}
+          >
             {fallbackEmoji}
           </span>
         )}
@@ -233,29 +291,65 @@ function EndingOverlay({ affinity, form, nickname, title, onClose }: {
         🌟 전설의 엔딩!
       </div>
 
-      {!imgError ? (
-        <img
-          src={`assets/dragon/ending/${affinity}-${form}.png`}
-          alt={title}
-          className="w-56 h-56 object-contain rounded-3xl"
-          style={{ boxShadow: `0 0 32px 8px ${info.color}55` }}
-          onError={() => setImgError(true)}
-        />
-      ) : (
-        <div
-          className="w-56 h-56 rounded-3xl flex flex-col items-center justify-center gap-3"
+      {/* 짜자잔! — 빛줄기 + 플래시 위로 성체가 스프링으로 등장 */}
+      <div className="relative flex items-center justify-center w-64 h-64">
+        {/* 회전하는 빛줄기 */}
+        <motion.div
+          aria-hidden
+          className="absolute w-72 h-72 pointer-events-none"
           style={{
-            background: `radial-gradient(circle at 50% 50%, ${info.color}44 0%, transparent 80%)`,
-            boxShadow: `0 0 32px 8px ${info.color}55`,
-            border: `2px solid ${info.color}88`,
+            background: `conic-gradient(from 0deg, transparent 0deg, ${info.color}33 12deg, transparent 26deg, transparent 90deg, ${info.color}33 102deg, transparent 116deg, transparent 180deg, ${info.color}33 192deg, transparent 206deg, transparent 270deg, ${info.color}33 282deg, transparent 296deg)`,
+            maskImage: 'radial-gradient(circle, black 30%, transparent 72%)',
+            WebkitMaskImage: 'radial-gradient(circle, black 30%, transparent 72%)',
           }}
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 14, ease: 'linear' }}
+        />
+        {/* 등장 순간 흰 플래시 */}
+        <motion.div
+          aria-hidden
+          className="absolute inset-0 rounded-full pointer-events-none bg-white"
+          initial={{ opacity: 0.9, scale: 0.4 }}
+          animate={{ opacity: 0, scale: 1.6 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+        />
+        <motion.div
+          initial={{ scale: 0, rotate: -16, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.15 }}
+          className="relative z-10"
         >
-          <span className="text-7xl">{info.emoji}</span>
-          <span className="text-lg font-bold text-center px-2" style={{ color: info.color }}>
-            {title}
-          </span>
-        </div>
-      )}
+          {!imgError ? (
+            <img
+              src={`assets/dragon/ending/${affinity}-${form}.png`}
+              alt={title}
+              className="w-56 h-56 object-contain rounded-3xl"
+              style={{ filter: `drop-shadow(0 0 32px ${info.color}cc)` }}
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div
+              className="w-56 h-56 rounded-3xl flex flex-col items-center justify-center gap-3"
+              style={{
+                background: `radial-gradient(circle at 50% 50%, ${info.color}44 0%, transparent 80%)`,
+                boxShadow: `0 0 32px 8px ${info.color}55`,
+                border: `2px solid ${info.color}88`,
+              }}
+            >
+              <motion.span
+                className="text-7xl"
+                animate={{ y: [0, -6, 0], scale: [1, 1.06, 1] }}
+                transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+              >
+                {info.emoji}
+              </motion.span>
+              <span className="text-lg font-bold text-center px-2" style={{ color: info.color }}>
+                {title}
+              </span>
+            </div>
+          )}
+        </motion.div>
+      </div>
 
       <div className="text-center">
         <div className="text-xl font-bold">{nickname}의 드래곤</div>

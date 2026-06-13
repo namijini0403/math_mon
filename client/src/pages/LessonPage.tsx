@@ -446,7 +446,8 @@ function LessonRunner({ stageId }: { stageId: string }) {
           <div className="flex-1 flex items-center gap-2">
             <motion.span
               key={hitFx}
-              animate={hitFx > 0 ? { x: [0, -6, 6, -4, 0], rotate: [0, -8, 6, 0] } : {}}
+              animate={hitFx > 0 ? { x: [0, -6, 6, -4, 0], rotate: [0, -8, 6, 0] } : { y: [0, -3, 0], rotate: [-2, 2, -2] }}
+              transition={hitFx > 0 ? { duration: 0.4 } : { repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
               className="text-4xl flex-shrink-0"
             >
               {bossImgOk && stage.boss.image ? (
