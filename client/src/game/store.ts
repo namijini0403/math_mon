@@ -64,12 +64,16 @@ interface GameState {
   hiddenDone: string[];
   /** 명예의 시험 응시 횟수 */
   examCount: number;
+  /** 총괄평가 던전에서 이미 카드를 받은 학기 id (카드는 학기당 1회만) */
+  finalExamCleared: string[];
   /** 통산 기록 (배지 조건용) */
   records: {
     bestCombo: number;
     perfectLessons: number;
     lessonsCompleted: number;
     challengeCleared: number;
+    /** 총괄평가 90%↑ 통과 누적 횟수 */
+    finalExamsPassed: number;
   };
   /** 드래곤 육성 상태 */
   dragon: DragonState;
@@ -114,6 +118,8 @@ interface GameState {
   recordChallengeClear: () => void;
   /** 명예의 시험 응시 기록 */
   recordExam: () => void;
+  /** 총괄평가 결과 기록. passed(90%↑)이고 그 학기 첫 통과면 grantCard=true (카드 1회) */
+  recordFinalExam: (semesterId: string, passed: boolean) => { grantCard: boolean };
   /** 히든 미션 재평가 — 새로 달성한 미션마다 카드 1장씩 뽑아 반환 */
   checkHiddenMissions: () => { mission: HiddenMissionDef; drawn: RewardCardDef; duplicate: boolean }[];
   claimMission: (missionId: number) => EarnedCard[];
@@ -164,7 +170,8 @@ export const useGame = create<GameState>()(
       rewardCardCounts: {},
       hiddenDone: [],
       examCount: 0,
-      records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0 },
+      finalExamCleared: [],
+      records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0, finalExamsPassed: 0 },
       dragon: emptyDragon(),
       practice: {
         basicAnswered: 0,
@@ -310,6 +317,20 @@ export const useGame = create<GameState>()(
         })),
 
       recordExam: () => set((s) => ({ examCount: s.examCount + 1 })),
+
+      recordFinalExam: (semesterId, passed) => {
+        const s = get();
+        // 카드는 학기당 첫 90%↑ 통과에만 (반복은 카드 없음 — 배지로만 보상)
+        const grantCard = passed && !s.finalExamCleared.includes(semesterId);
+        set({
+          finalExamCleared: grantCard ? [...s.finalExamCleared, semesterId] : s.finalExamCleared,
+          records: {
+            ...s.records,
+            finalExamsPassed: s.records.finalExamsPassed + (passed ? 1 : 0),
+          },
+        });
+        return { grantCard };
+      },
 
       checkHiddenMissions: () => {
         const s = get();
@@ -457,6 +478,7 @@ export const useGame = create<GameState>()(
           level: levelFromXp(s.xp).level,
           attendanceDays: s.attendance.totalDays,
           lessonsCompleted: s.records.lessonsCompleted,
+          finalExamsPassed: s.records.finalExamsPassed,
         };
         const earned = newlyEarned(stats, s.badges);
         if (earned.length > 0) {
@@ -510,7 +532,8 @@ export const useGame = create<GameState>()(
           rewardCardCounts: {},
           hiddenDone: [],
           examCount: 0,
-          records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0 },
+          finalExamCleared: [],
+          records: { bestCombo: 0, perfectLessons: 0, lessonsCompleted: 0, challengeCleared: 0, finalExamsPassed: 0 },
           dragon: emptyDragon(),
           practice: {
             basicAnswered: 0,

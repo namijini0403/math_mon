@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
-import { SEMESTERS } from '../game/stages';
+import { UNIT_TITLES } from '../game/stages';
 import type { Problem, SkillDef } from '../generator/types';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { answerToText } from '../generator/render-text';
@@ -22,12 +22,9 @@ import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
 import { track } from '../analytics';
 
-/** 유닛맵에서 선택한 학기까지의 단원만 연습 풀에 포함 (이전 학기는 복습으로 누적) */
-function semesterScopedSkills(): SkillDef[] {
-  const semId = localStorage.getItem('mathmon-semester') ?? 'g5s1';
-  const idx = SEMESTERS.findIndex((s) => s.id === semId);
-  const unitIds = new Set(SEMESTERS.slice(0, (idx < 0 ? 0 : idx) + 1).flatMap((s) => s.units));
-  return SKILLS.filter((s) => unitIds.has(s.unitId));
+/** 선택한 단원의 스킬만 (선행/누적 없음 — '이 단원'만 정확히) */
+function unitSkills(unitId: string): SkillDef[] {
+  return SKILLS.filter((s) => s.unitId === unitId);
 }
 
 const MODES = {
@@ -35,31 +32,45 @@ const MODES = {
     title: '기초 연산 연습',
     emoji: '🏋️',
     desc: '계산 문제만 무한으로!',
-    pool: () => semesterScopedSkills().filter((s) => !s.word && !s.challenge && s.difficulty <= 2),
+    pool: (unitId: string) => {
+      const u = unitSkills(unitId);
+      const p = u.filter((s) => !s.word && !s.challenge && s.difficulty <= 2);
+      // 기초 풀이 비면 그 단원의 비심화 스킬 전체로 폴백
+      return p.length > 0 ? p : u.filter((s) => !s.challenge);
+    },
   },
   word: {
     title: '문장제 연습',
     emoji: '📖',
     desc: '줄글 문제만 모아서 연습!',
-    pool: () => semesterScopedSkills().filter((s) => s.word === true && !s.challenge),
+    pool: (unitId: string) => {
+      const u = unitSkills(unitId);
+      const p = u.filter((s) => s.word === true && !s.challenge);
+      return p.length > 0 ? p : u.filter((s) => !s.challenge);
+    },
   },
   challenge: {
     title: '심화 연습',
     emoji: '🌌',
     desc: '고난도 문제 도전!',
-    pool: () => {
-      const scoped = semesterScopedSkills();
-      const ch = scoped.filter((s) => s.challenge === true);
-      // 심화 스킬이 아직 없는 학기는 도전 난이도 문제로 대체
-      return ch.length > 0 ? ch : scoped.filter((s) => s.difficulty === 3);
+    pool: (unitId: string) => {
+      const u = unitSkills(unitId);
+      const ch = u.filter((s) => s.challenge === true);
+      // 심화 스킬이 아직 없는 단원은 도전(난이도 3) 문제로 대체
+      const d3 = u.filter((s) => s.difficulty === 3);
+      return ch.length > 0 ? ch : d3.length > 0 ? d3 : u;
     },
   },
 } as const;
 
 export type PracticeMode = keyof typeof MODES;
 
-function pickProblem(mode: PracticeMode, stats: Record<string, { c: number; w: number }>): Problem {
-  const pool = MODES[mode].pool();
+function pickProblem(
+  mode: PracticeMode,
+  unitId: string,
+  stats: Record<string, { c: number; w: number }>,
+): Problem {
+  const pool = MODES[mode].pool(unitId);
   // 약한 스킬 가중
   const entries = pool.map((s) => {
     const st = stats[s.id];
@@ -76,14 +87,16 @@ function pickProblem(mode: PracticeMode, stats: Record<string, { c: number; w: n
 }
 
 export default function PracticePage() {
-  const { mode = 'basic' } = useParams();
+  const { mode = 'basic', unitId = '' } = useParams();
   const m = (mode in MODES ? mode : 'basic') as PracticeMode;
-  return <PracticeRunner key={m} mode={m} />;
+  return <PracticeRunner key={`${m}:${unitId}`} mode={m} unitId={unitId} />;
 }
 
-function PracticeRunner({ mode }: { mode: PracticeMode }) {
+function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }) {
   const { recordAnswer, addXp, syncNow, showAnswers } = useGame();
-  const [problem, setProblem] = useState<Problem>(() => pickProblem(mode, useGame.getState().skillStats));
+  const [problem, setProblem] = useState<Problem>(() =>
+    pickProblem(mode, unitId, useGame.getState().skillStats),
+  );
   const [answer, setAnswer] = useState<UserAnswer | null>(null);
   const [phase, setPhase] = useState<'answering' | 'feedback'>('answering');
   const [lastCorrect, setLastCorrect] = useState(false);
@@ -138,7 +151,7 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
   };
 
   const next = () => {
-    setProblem(pickProblem(mode, useGame.getState().skillStats));
+    setProblem(pickProblem(mode, unitId, useGame.getState().skillStats));
     servedAtRef.current = Date.now();
     setAnswer(null);
     setPhase('answering');
@@ -154,8 +167,9 @@ function PracticeRunner({ mode }: { mode: PracticeMode }) {
         </Link>
         <div className="flex-1">
           <div className="text-lg leading-tight">
-            {meta.emoji} {meta.title}
+            {meta.emoji} {UNIT_TITLES[unitId] ?? meta.title}
           </div>
+          <div className="text-[0.7rem] opacity-50 leading-tight">{meta.title}</div>
           <div className="text-xs opacity-60">
             {solved}문제 중 {correct}개 정답
             {solved > 0 && ` (${Math.round((correct / solved) * 100)}%)`}

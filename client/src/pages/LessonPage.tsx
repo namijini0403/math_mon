@@ -46,6 +46,10 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const isBoss = stage.type === 'boss';
   // 심화 탐험: 하트 없음, 10문제를 전부 풀고 8개 이상 맞히면 클리어
   const isChallenge = stage.type === 'challenge';
+  // 보스전은 문제별이 아니라 스테이지 전체에 넉넉한 제한시간(문제당 30초)을 준다.
+  // 계산이 많은 단원 마무리에서도 시간에 쫓기지 않게 — 시간 초과 시에만 패배.
+  const BOSS_SECONDS_PER_Q = 30;
+  const stageTimeBudget = isBoss ? total * BOSS_SECONDS_PER_Q : 0;
 
   const [served, setServed] = useState<Served>(() =>
     nextProblem(stage, skillStats, 0, useGame.getState().recentWrong),
@@ -59,7 +63,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const [combo, setCombo] = useState(0);
   const [wrongCount, setWrongCount] = useState(0);
   const [hitFx, setHitFx] = useState(0);
-  const [timeLeft, setTimeLeft] = useState<number | null>(served.timeLimit);
+  const [timeLeft, setTimeLeft] = useState<number | null>(isBoss ? stageTimeBudget : null);
   const [comboBonus, setComboBonus] = useState(0);
   const [bonusToast, setBonusToast] = useState<string | null>(null);
   const [bossImgOk, setBossImgOk] = useState(true);
@@ -73,6 +77,8 @@ function LessonRunner({ stageId }: { stageId: string }) {
   } | null>(null);
   const maxComboRef = useRef(0);
   const servedAtRef = useRef<number>(Date.now());
+  // 보스전 전체 제한시간 마감 시각 (restart 시 갱신)
+  const stageDeadlineRef = useRef<number>(Date.now() + stageTimeBudget * 1000);
 
   const problem = served.problem;
   const phaseRef = useRef(phase);
@@ -87,22 +93,24 @@ function LessonRunner({ stageId }: { stageId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── 보스전 타이머: 0이 되면 시간 초과 처리 ──
+  // ── 보스전 전체 제한시간 타이머: 스테이지 통째로 카운트다운, 0이 되면 패배 ──
+  // (문제별 타이머 아님 — 계산이 많아도 시간에 쫓기지 않게 넉넉한 총량을 준다)
   useEffect(() => {
-    if (!isBoss || phase !== 'answering' || served.timeLimit === null) return;
-    const startedAt = Date.now();
+    if (!isBoss) return;
     const id = setInterval(() => {
-      const left = served.timeLimit! - (Date.now() - startedAt) / 1000;
+      if (phaseRef.current === 'result' || phaseRef.current === 'failed') return;
+      const left = (stageDeadlineRef.current - Date.now()) / 1000;
       if (left <= 0) {
-        clearInterval(id);
-        if (phaseRef.current === 'answering') miss(true);
+        setTimeLeft(0);
+        setTimedOut(true);
+        setPhase('failed');
       } else {
         setTimeLeft(left);
       }
-    }, 100);
+    }, 200);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problem.id, phase === 'answering']);
+  }, [isBoss]);
 
   const miss = (timeout: boolean) => {
     recordAnswer(problem.skillId, false);
@@ -184,7 +192,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
     const nextServed = nextProblem(stage, s.skillStats, done, s.recentWrong);
     setServed(nextServed);
     servedAtRef.current = Date.now();
-    setTimeLeft(nextServed.timeLimit);
+    // 보스 제한시간은 스테이지 전체 카운트다운이므로 문제마다 리셋하지 않는다
     setAnswer(null);
     setPhase('answering');
   };
@@ -262,7 +270,10 @@ function LessonRunner({ stageId }: { stageId: string }) {
     const nextServed = nextProblem(stage, s.skillStats, 0, s.recentWrong);
     setServed(nextServed);
     servedAtRef.current = Date.now();
-    setTimeLeft(nextServed.timeLimit);
+    // 보스 전체 제한시간 다시 채우기
+    setTimedOut(false);
+    stageDeadlineRef.current = Date.now() + stageTimeBudget * 1000;
+    setTimeLeft(isBoss ? stageTimeBudget : null);
     setAnswer(null);
     setPhase('answering');
   };
@@ -372,10 +383,12 @@ function LessonRunner({ stageId }: { stageId: string }) {
   if (phase === 'failed') {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center gap-6 p-6 text-center">
-        <div className="text-7xl">{isBoss ? '🧱' : isChallenge ? '🌫️' : '💔'}</div>
+        <div className="text-7xl">{isBoss ? (timedOut ? '⏰' : '🧱') : isChallenge ? '🌫️' : '💔'}</div>
         <h1 className="text-2xl">
           {isBoss
-            ? '문제가 다 쌓여버렸어요!'
+            ? timedOut
+              ? '시간이 다 됐어요!'
+              : '문제가 다 쌓여버렸어요!'
             : isChallenge
               ? `${correctCount}/${total} — 아깝다!`
               : '하트를 다 잃었어요...'}
@@ -403,7 +416,8 @@ function LessonRunner({ stageId }: { stageId: string }) {
   }
 
   const locked = phase === 'feedback';
-  const timeRatio = served.timeLimit && timeLeft !== null ? Math.max(0, timeLeft / served.timeLimit) : 1;
+  // 보스 전체 제한시간 잔량 비율 (스테이지 통째)
+  const timeRatio = isBoss && timeLeft !== null ? Math.max(0, timeLeft / stageTimeBudget) : 1;
 
   return (
     <div
@@ -484,16 +498,18 @@ function LessonRunner({ stageId }: { stageId: string }) {
         )}
       </div>
 
-      {/* 보스전: 제한시간 바 (문제가 떨어지는 높이) */}
-      {isBoss && phase === 'answering' && (
+      {/* 보스전: 스테이지 전체 제한시간 바 (문제별 아님 — 통째로 줄어든다) */}
+      {isBoss && phase !== 'result' && (
         <div className="px-4">
           <div className="h-2.5 rounded-full bg-night-800 overflow-hidden">
             <div
-              className={`h-full transition-[width] duration-100 ${timeRatio > 0.35 ? 'bg-gradient-to-r from-mana to-sky-400' : 'bg-gradient-to-r from-hurt to-rose-500'}`}
+              className={`h-full transition-[width] duration-200 ${timeRatio > 0.35 ? 'bg-gradient-to-r from-mana to-sky-400' : 'bg-gradient-to-r from-hurt to-rose-500'}`}
               style={{ width: `${timeRatio * 100}%` }}
             />
           </div>
-          <div className="text-right text-xs mt-0.5 opacity-60">⏱ {Math.ceil(timeLeft ?? 0)}초</div>
+          <div className="text-right text-xs mt-0.5 opacity-60">
+            ⏱ 남은 시간 {Math.floor((timeLeft ?? 0) / 60)}:{String(Math.ceil((timeLeft ?? 0) % 60)).padStart(2, '0')}
+          </div>
         </div>
       )}
 

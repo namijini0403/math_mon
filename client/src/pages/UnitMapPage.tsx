@@ -179,41 +179,18 @@ export default function UnitMapPage() {
         <DragonWidget />
       </div>
 
-      {/* ── 연습·시험 모드 ── */}
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <Link
-          to="/practice/basic"
-          className="btn-3d rounded-3xl bg-night-900 border-2 border-night-700 border-b-night-700 p-4 text-center hover:bg-night-800"
-        >
-          <div className="text-3xl mb-1">🏋️</div>
-          <div className="text-sm">기초 연산 연습</div>
-          <div className="text-[0.65rem] opacity-50">무한 모드</div>
-        </Link>
-        <Link
-          to="/practice/word"
-          className="btn-3d rounded-3xl bg-night-900 border-2 border-night-700 border-b-night-700 p-4 text-center hover:bg-night-800"
-        >
-          <div className="text-3xl mb-1">📖</div>
-          <div className="text-sm">문장제 연습</div>
-          <div className="text-[0.65rem] opacity-50">무한 모드</div>
-        </Link>
-        <Link
-          to="/practice/challenge"
-          className="btn-3d rounded-3xl bg-night-900 border-2 border-violet-700/60 border-b-violet-700/60 p-4 text-center hover:bg-night-800"
-        >
-          <div className="text-3xl mb-1">🌌</div>
-          <div className="text-sm">심화 연습</div>
-          <div className="text-[0.65rem] opacity-50">고난도 문제 무한 모드</div>
-        </Link>
-        <Link
-          to="/exam"
-          className="btn-3d rounded-3xl bg-night-900 border-2 border-coin/50 border-b-coin/50 p-4 text-center hover:bg-night-800"
-        >
-          <div className="text-3xl mb-1">🏟️</div>
-          <div className="text-sm">명예의 시험장</div>
-          <div className="text-[0.65rem] opacity-50">단원 시험 10문제</div>
-        </Link>
-      </div>
+      {/* ── 연습·평가 던전 입구 ── */}
+      <Link
+        to="/hub"
+        className="mt-4 btn-3d rounded-3xl bg-night-900 border-2 border-night-700 border-b-night-700 p-4 flex items-center gap-4 hover:bg-night-800"
+      >
+        <span className="text-4xl">🗺️</span>
+        <div className="flex-1">
+          <div className="text-sm">연습·평가 던전</div>
+          <div className="text-[0.65rem] opacity-50">학년·단원을 골라 연습하거나 단원평가에 도전!</div>
+        </div>
+        <span className="text-lg opacity-50">→</span>
+      </Link>
 
       {/* ── 보물창고 (배지·메달·보물 카드) ── */}
       <Link

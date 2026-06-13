@@ -569,13 +569,12 @@ const wordTemplates: WordProblemTemplate[] = [
   {
     unit: '개',
     makePrompt(rng) {
-      const perPack = rng.int(4, 8);
-      const packs = rng.int(3, 6);
       const friends = rng.int(2, 4);
+      // perPack을 friends의 배수로 잡아 총개수가 항상 정확히 나누어떨어지게 (문장-계산 일치)
+      const perPack = friends * rng.int(2, 3);
+      const packs = rng.int(3, 6);
       const total = perPack * packs;
-      // friends가 total을 나눌 수 있도록 조정
-      const base = Math.floor(total / friends) * friends;
-      const each = base / friends;
+      const each = total / friends;
       return {
         question: `붕어빵이 한 봉지에 ${perPack}개씩 ${packs}봉지 있어요. 이것을 ${friends}명이 똑같이 나누면 한 명이 받는 붕어빵은 몇 개인가요?`,
         answer: each,

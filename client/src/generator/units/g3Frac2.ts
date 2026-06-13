@@ -245,8 +245,9 @@ const frac32Word: SkillDef = {
       const total = d * k;
       ans = k * n;
       unit = '개';
-      prompt = `요정이 보물 ${total}개를 ${d}묶음으로 나누었어요. 그 중 ${n}묶음은 몇 개인가요?`;
-      expl = `${total} ÷ ${d} × ${n} = ${k} × ${n} = ${ans}개`;
+      prompt = `요정이 보물 ${total}개를 ${d}묶음으로 똑같이 나누었어요. 그 중 ${n}묶음은 몇 개인가요?`;
+      // 3학년은 혼합계산(÷×) 전이므로 두 단계로 따로 설명
+      expl = `한 묶음은 ${total} ÷ ${d} = ${k}개예요. ${n}묶음은 ${k} × ${n} = ${ans}개예요.`;
     } else if (pat === 1) {
       // 가분수→대분수 변환 후 자연수부 구하기
       const d = rng.int(2, 10);

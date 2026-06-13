@@ -1,7 +1,6 @@
 /**
- * 명예의 시험장 — 단원평가 연습.
- * 단원을 골라 10문제(난이도 상승, 후반 심화 혼합)를 풀고 점수·등급을 받는다.
- * 하트 없음, 보스전과 비슷한 난이도. 교사는 단원평가 대비용으로 활용.
+ * 학기말 총괄평가 던전 — 한 학기 6단원에서 25문제 출제.
+ * ExamPage를 기반으로 확장. 해금 조건: 그 학기 단원 3개 이상 별 획득.
  */
 
 import { useState, useRef, useEffect } from 'react';
@@ -9,7 +8,7 @@ import { Link, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
 import type { Problem, SkillDef } from '../generator/types';
-import { SEMESTERS, UNIT_TITLES } from '../game/stages';
+import { SEMESTERS, STAGES, UNIT_TITLES } from '../game/stages';
 import { checkAnswer, isAnswerReady, type UserAnswer } from '../game/check';
 import { answerToText } from '../generator/render-text';
 import { useGame } from '../game/store';
@@ -25,12 +24,34 @@ import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
 import { track } from '../analytics';
 
-const TOTAL = 10;
+const TOTAL = 25;
+const PASS_SCORE = 23; // 92%↑
 
-/** 시험 문제 선택 — 앞 3문제 기초, 중간 보통, 마지막 3문제 도전(심화 혼합) */
-function pickExamProblem(unitId: string, index: number): Problem {
+/** 한 단원이 클리어됐다 = 심화 제외 스테이지 중 별 있는 스테이지가 1개 이상 */
+function isUnitCleared(unitId: string, stages: Record<string, { stars: number }>): boolean {
+  return STAGES.filter((st) => st.unitId === unitId && st.type !== 'challenge').some(
+    (st) => (stages[st.id]?.stars ?? 0) > 0,
+  );
+}
+
+/** 총괄평가 해금 조건: 그 학기 단원 중 3개 이상 클리어 */
+function isFinalUnlocked(
+  semesterUnits: string[],
+  stages: Record<string, { stars: number }>,
+): boolean {
+  return semesterUnits.filter((u) => isUnitCleared(u, stages)).length >= 3;
+}
+
+/**
+ * 총괄평가 문제 선택.
+ * - unit = units[index % units.length] 로 균등 분배
+ * - 난이도 램프: index<8→1, index<17→2, else→3
+ * - target===3 이면 challenge 스킬 50% 혼합
+ */
+function pickFinalProblem(units: string[], index: number): Problem {
+  const unitId = units[index % units.length];
+  const target: 1 | 2 | 3 = index < 8 ? 1 : index < 17 ? 2 : 3;
   const unitSkills = SKILLS.filter((s) => s.unitId === unitId);
-  const target: 1 | 2 | 3 = index < 3 ? 1 : index < 7 ? 2 : 3;
   let pool: SkillDef[];
   if (target === 3) {
     const ch = unitSkills.filter((s) => s.challenge === true);
@@ -40,55 +61,77 @@ function pickExamProblem(unitId: string, index: number): Problem {
     pool = unitSkills.filter((s) => !s.challenge && s.difficulty === target);
     if (pool.length === 0) pool = unitSkills.filter((s) => !s.challenge);
   }
+  if (pool.length === 0) pool = unitSkills;
   const skill = pool[Math.floor(Math.random() * pool.length)];
   return generateProblem(skill.id, randomSeed());
 }
 
 function gradeOf(score: number): { title: string; emoji: string; line: string } {
-  if (score === 10) return { title: '전설의 용사!', emoji: '👑', line: '완벽해요! 단원을 완전히 정복했어요!' };
-  if (score >= 8) return { title: '명예 합격!', emoji: '🏆', line: '훌륭해요! 단원평가 준비 완료!' };
-  if (score >= 5) return { title: '조금만 더!', emoji: '🛡️', line: '거의 다 왔어요. 틀린 유형을 복습해 봐요!' };
-  return { title: '수련이 필요해요', emoji: '🌱', line: '괜찮아요! 레슨을 다시 돌고 도전해 봐요!' };
+  if (score === 25) return { title: '전설의 졸업생!', emoji: '👑', line: '25문제 완벽! 이번 학기 완전 정복!' };
+  if (score >= PASS_SCORE) return { title: '총괄 합격!', emoji: '🏰', line: '훌륭해요! 학기말 평가를 통과했어요!' };
+  if (score >= 18) return { title: '한 걸음 더!', emoji: '🛡️', line: '거의 다 왔어요. 틀린 단원을 복습해 봐요!' };
+  return { title: '수련 필요', emoji: '🌱', line: '괜찮아요! 레슨을 다시 돌고 재도전해 봐요!' };
 }
 
-export default function ExamPage() {
-  const { showAnswers, recordAnswer, addXp, syncNow } = useGame();
-  const [unitId, setUnitId] = useState<string | null>(null);
+export default function FinalExamPage() {
+  const { semesterId = '' } = useParams<{ semesterId: string }>();
+  const { showAnswers, recordAnswer, addXp, syncNow, stages } = useGame();
+
+  const semester = SEMESTERS.find((s) => s.id === semesterId);
+
   const [index, setIndex] = useState(0);
   const [problem, setProblem] = useState<Problem | null>(null);
   const [answer, setAnswer] = useState<UserAnswer | null>(null);
-  const [phase, setPhase] = useState<'pick' | 'answering' | 'feedback' | 'result'>('pick');
+  const [phase, setPhase] = useState<'answering' | 'feedback' | 'result'>('answering');
   const [lastCorrect, setLastCorrect] = useState(false);
   const [score, setScore] = useState(0);
-  const [treasures, setTreasures] = useState<{ drawn: RewardCardDef; duplicate: boolean; label: string }[]>([]);
+  const [treasures, setTreasures] = useState<
+    { drawn: RewardCardDef; duplicate: boolean; label: string }[]
+  >([]);
+  const [badges, setBadges] = useState<{ emoji: string; name: string }[]>([]);
+  const [alreadyGranted, setAlreadyGranted] = useState(false);
 
   const servedAtRef = useRef<number>(Date.now());
 
-  // 런처에서 단원을 지정해 들어오면(/exam/:unitId) 그 단원으로 바로 시작
-  const { unitId: routeUnitId } = useParams();
-  // 시험 단원이 속한 학기를 우선 사용 (없으면 마지막 선택 학기 → 기본)
-  const semId =
-    (routeUnitId && SEMESTERS.find((s) => s.units.includes(routeUnitId))?.id) ??
-    localStorage.getItem('mathmon-semester') ??
-    'g5s1';
-  const semester = SEMESTERS.find((s) => s.id === semId) ?? SEMESTERS[0];
-
-  const begin = (uid: string) => {
-    setUnitId(uid);
-    setIndex(0);
-    setScore(0);
-    setProblem(pickExamProblem(uid, 0));
-    servedAtRef.current = Date.now();
-    setAnswer(null);
-    void track('exam.start', { unit_id: uid });
-    setPhase('answering');
-  };
-
-  // 라우트로 단원이 지정된 경우 자동 시작 (마운트 1회)
+  // 최초 마운트 시 첫 문제 생성 + exam.start 이벤트
   useEffect(() => {
-    if (routeUnitId) begin(routeUnitId);
+    if (!semester) return;
+    setProblem(pickFinalProblem(semester.units, 0));
+    servedAtRef.current = Date.now();
+    void track('exam.start', { unit_id: semesterId, policy_tag: 'final' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // ── 방어: 학기 없거나 해금 미충족 ──
+  if (!semester) {
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-5 p-6 text-center max-w-xl mx-auto">
+        <div className="text-6xl">🔒</div>
+        <h1 className="text-2xl">알 수 없는 학기예요</h1>
+        <Link to="/" className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-7 py-3">
+          홈으로
+        </Link>
+      </div>
+    );
+  }
+
+  if (!isFinalUnlocked(semester.units, stages)) {
+    const cleared = semester.units.filter((u) => isUnitCleared(u, stages)).length;
+    return (
+      <div className="min-h-dvh flex flex-col items-center justify-center gap-5 p-6 text-center max-w-xl mx-auto">
+        <div className="text-6xl">🔒</div>
+        <h1 className="text-2xl">아직 잠긴 던전이에요</h1>
+        <p className="opacity-70 max-w-xs">
+          {semester.label} 단원 3개 이상 클리어하면 열려요
+          <br />
+          (현재 {cleared}/3)
+        </p>
+        <Link to="/hub" className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-7 py-3">
+          던전 허브로
+        </Link>
+      </div>
+    );
+  }
 
   const confirm = (forced?: UserAnswer) => {
     const a = forced ?? answer;
@@ -97,11 +140,12 @@ export default function ExamPage() {
     const ok = checkAnswer(problem, a);
     recordAnswer(problem.skillId, ok);
     void track('exam.answer', {
-      unit_id: unitId ?? undefined,
+      unit_id: semesterId,
       skill_id: problem.skillId,
       problem_id: problem.id,
       correct: ok,
       elapsed_ms,
+      policy_tag: 'final',
     });
     setLastCorrect(ok);
     if (ok) {
@@ -114,64 +158,64 @@ export default function ExamPage() {
   };
 
   const next = () => {
-    if (!unitId) return;
+    if (!semester) return;
     if (index + 1 >= TOTAL) {
-      // 시험 종료
+      // 총괄평가 종료
       const game = useGame.getState();
-      game.recordExam();
-      addXp(score * 2 + 5);
+      const passed = score >= PASS_SCORE;
+      addXp(score * 3 + 10);
+      const { grantCard } = game.recordFinalExam(semesterId, passed);
       game.evaluateDragonItems();
+
+      const newTreasures: { drawn: RewardCardDef; duplicate: boolean; label: string }[] = [];
+      if (grantCard) {
+        const t = game.drawTreasureCard();
+        newTreasures.push({ ...t, label: '총괄평가 통과 보상' });
+      }
       const hidden = game.checkHiddenMissions().map((h) => ({
         drawn: h.drawn,
         duplicate: h.duplicate,
         label: `히든 미션: ${h.mission.name}`,
       }));
-      setTreasures(hidden);
-      void track('exam.complete', { unit_id: unitId, score: score * 10 });
+      newTreasures.push(...hidden);
+      setTreasures(newTreasures);
+
+      const earnedBadges = game.evaluateBadges();
+      setBadges(earnedBadges.map((b) => ({ emoji: b.emoji, name: b.name })));
+      setAlreadyGranted(passed && !grantCard);
+
+      void track('exam.complete', { unit_id: semesterId, score: score * 4, policy_tag: 'final' });
       syncNow();
       sfx.fanfare();
       setPhase('result');
       return;
     }
     setIndex((i) => i + 1);
-    setProblem(pickExamProblem(unitId, index + 1));
+    setProblem(pickFinalProblem(semester.units, index + 1));
     servedAtRef.current = Date.now();
     setAnswer(null);
     setPhase('answering');
   };
 
-  // ── 단원 선택 ──
-  if (phase === 'pick') {
-    return (
-      <div className="max-w-xl mx-auto px-5 pb-16">
-        <div className="flex items-center gap-3 py-4">
-          <Link to="/" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">←</Link>
-          <div>
-            <h1 className="text-xl">🏟️ 명예의 시험장</h1>
-            <p className="text-xs opacity-60">단원을 골라 10문제 시험에 도전! (보스전 수준 · {semester.label})</p>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2.5 mt-2">
-          {semester.units.map((uid) => (
-            <button
-              key={uid}
-              onClick={() => begin(uid)}
-              className="btn-3d rounded-2xl bg-night-900 border-2 border-night-700 border-b-night-700 px-5 py-4 text-left hover:bg-night-800 flex items-center"
-            >
-              <span className="flex-1">{UNIT_TITLES[uid]}</span>
-              <span className="opacity-50">⚔️ 도전</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const restart = () => {
+    setIndex(0);
+    setScore(0);
+    setTreasures([]);
+    setBadges([]);
+    setAlreadyGranted(false);
+    setProblem(pickFinalProblem(semester.units, 0));
+    servedAtRef.current = Date.now();
+    setAnswer(null);
+    void track('exam.start', { unit_id: semesterId, policy_tag: 'final' });
+    setPhase('answering');
+  };
 
-  // ── 결과 ──
+  // ── 결과 화면 ──
   if (phase === 'result') {
     const grade = gradeOf(score);
+    const passed = score >= PASS_SCORE;
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center gap-5 p-6 text-center max-w-xl mx-auto">
+      <div className="min-h-dvh flex flex-col items-center gap-5 p-6 pt-10 text-center max-w-xl mx-auto">
         <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring' }}>
           <div className="text-7xl mb-2">{grade.emoji}</div>
           <h1 className="text-3xl text-glow">{grade.title}</h1>
@@ -181,20 +225,33 @@ export default function ExamPage() {
         </div>
         <p className="opacity-80">{grade.line}</p>
         <div className="rounded-2xl bg-night-800 px-6 py-3">
-          <span className="text-coin">+{score * 2 + 5} XP</span>
+          <span className="text-coin">+{score * 3 + 10} XP</span>
         </div>
+        {passed && alreadyGranted && (
+          <div className="rounded-2xl bg-night-900 border border-coin/30 px-5 py-3 text-sm opacity-80">
+            이미 보상 카드를 받은 학기예요 — 이번엔 배지로 보답! 🏅
+          </div>
+        )}
+        {badges.length > 0 && (
+          <div className="rounded-2xl bg-night-900 border border-violet-500/40 px-5 py-3 text-sm">
+            🎖️ 새 배지 획득: {badges.map((b) => `${b.emoji} ${b.name}`).join(', ')}
+          </div>
+        )}
         {treasures.map((t, i) => (
           <TreasureReveal key={i} drawn={t.drawn} duplicate={t.duplicate} label={t.label} delay={0.8 + i * 0.5} />
         ))}
         <div className="flex gap-3 mt-2">
           <button
-            onClick={() => setPhase('pick')}
+            onClick={restart}
             className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-7 py-3 text-lg text-night-950"
           >
-            다른 단원 도전
+            다시 도전
           </button>
-          <Link to="/" className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-7 py-3 text-lg">
-            지도로
+          <Link
+            to="/"
+            className="btn-3d rounded-2xl bg-night-800 border-night-800 border-b-night-700 px-7 py-3 text-lg"
+          >
+            홈으로
           </Link>
         </div>
       </div>
@@ -206,13 +263,16 @@ export default function ExamPage() {
 
   return (
     <div className="min-h-dvh flex flex-col max-w-xl mx-auto">
+      {/* ── 진행 헤더 ── */}
       <div className="flex items-center gap-3 p-4">
-        <Link to="/" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">✕</Link>
+        <Link to="/hub" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">
+          ✕
+        </Link>
         <div className="flex-1">
-          <div className="text-sm leading-tight">🏟️ {unitId ? UNIT_TITLES[unitId] : ''} 시험</div>
+          <div className="text-sm leading-tight">🏰 {semester.label} 총괄평가</div>
           <div className="h-3 mt-1 rounded-full bg-night-800 overflow-hidden border border-night-700">
             <motion.div
-              className="h-full bg-gradient-to-r from-coin to-amber-500"
+              className="h-full bg-gradient-to-r from-violet-500 to-coin"
               animate={{ width: `${(index / TOTAL) * 100}%` }}
             />
           </div>
@@ -222,6 +282,14 @@ export default function ExamPage() {
         </div>
       </div>
 
+      {/* ── 현재 단원 표시 ── */}
+      <div className="px-4 pb-1">
+        <div className="text-xs opacity-40">
+          {UNIT_TITLES[semester.units[index % semester.units.length]] ?? ''}
+        </div>
+      </div>
+
+      {/* ── 문제 영역 ── */}
       <div className="flex-1 flex flex-col items-center justify-center gap-7 px-5 pb-44">
         <AnimatePresence mode="wait">
           <motion.div
@@ -271,6 +339,7 @@ export default function ExamPage() {
         </AnimatePresence>
       </div>
 
+      {/* ── 하단 확인/피드백 패널 ── */}
       <div className="fixed bottom-0 left-0 right-0 z-10">
         <div className="max-w-xl mx-auto">
           <AnimatePresence>
@@ -295,7 +364,9 @@ export default function ExamPage() {
                   onClick={next}
                   autoFocus
                   className={`btn-3d w-full mt-3 rounded-2xl py-3.5 text-xl text-night-950 ${
-                    lastCorrect ? 'bg-glow border-glow border-b-lime-600' : 'bg-hurt border-hurt border-b-rose-600'
+                    lastCorrect
+                      ? 'bg-glow border-glow border-b-lime-600'
+                      : 'bg-hurt border-hurt border-b-rose-600'
                   }`}
                 >
                   {index + 1 >= TOTAL ? '결과 보기' : '다음 문제'}

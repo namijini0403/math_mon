@@ -9,6 +9,8 @@ import PracticePage from './pages/PracticePage';
 import DragonPage from './pages/DragonPage';
 import ExamPage from './pages/ExamPage';
 import CardGalleryPage from './pages/CardGalleryPage';
+import PracticeHubPage from './pages/PracticeHubPage';
+import FinalExamPage from './pages/FinalExamPage';
 
 export default function App() {
   const nickname = useGame((s) => s.nickname);
@@ -20,10 +22,13 @@ export default function App() {
         <>
           <Route path="/" element={<UnitMapPage />} />
           <Route path="/lesson/:stageId" element={<LessonPage />} />
-          <Route path="/practice/:mode" element={<PracticePage />} />
+          <Route path="/hub" element={<PracticeHubPage />} />
+          <Route path="/practice/:mode/:unitId" element={<PracticePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/dragon" element={<DragonPage />} />
           <Route path="/exam" element={<ExamPage />} />
+          <Route path="/exam/:unitId" element={<ExamPage />} />
+          <Route path="/finalexam/:semesterId" element={<FinalExamPage />} />
           <Route path="/cards" element={<CardGalleryPage />} />
         </>
       ) : (

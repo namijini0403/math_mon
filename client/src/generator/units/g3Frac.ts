@@ -244,10 +244,12 @@ const frac3Word: SkillDef = {
       const d = rng.int(2, 10);
       const n = rng.int(1, d - 1);
       const total = d * rng.int(2, 8);
-      ans = total * n / d;
+      const per = total / d;
+      ans = per * n;
       unit = '개';
-      prompt = `마법사가 구슬 ${total}개를 ${d}묶음으로 나누었어요. 그 중 ${n}묶음은 몇 개인가요?`;
-      expl = `${total} ÷ ${d} × ${n} = ${total / d} × ${n} = ${ans}개`;
+      prompt = `마법사가 구슬 ${total}개를 ${d}묶음으로 똑같이 나누었어요. 그 중 ${n}묶음은 몇 개인가요?`;
+      // 3학년은 혼합계산(÷×) 전이므로 두 단계로 따로 설명
+      expl = `한 묶음은 ${total} ÷ ${d} = ${per}개예요. ${n}묶음은 ${per} × ${n} = ${ans}개예요.`;
     } else if (pat === 1) {
       // 소수 → 분수 문장제: 길이를 소수로 나타내기
       const n = rng.int(1, 9);

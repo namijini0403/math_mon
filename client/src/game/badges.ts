@@ -10,6 +10,8 @@ export interface BadgeStats {
   level: number;
   attendanceDays: number;
   lessonsCompleted: number;
+  /** 총괄평가 던전 90%↑ 통과 누적 횟수 */
+  finalExamsPassed: number;
 }
 
 export interface BadgeDef {
@@ -41,6 +43,8 @@ export const BADGES: BadgeDef[] = [
   { id: 'perfect-5', name: '완벽주의자', desc: '하트 무손실 클리어 5회', emoji: '💎', rarity: 2, earned: (s) => s.perfectLessons >= 5 },
   { id: 'card-10', name: '메달 수집가', desc: '인증 메달 10개 모으기', emoji: '🏅', rarity: 2, earned: (s) => s.cardCount >= 10 },
   { id: 'level-10', name: '베테랑 모험가', desc: '레벨 10 달성', emoji: '🐲', rarity: 2, earned: (s) => s.level >= 10 },
+  { id: 'final-1', name: '총괄의 증표', desc: '총괄평가 던전 1회 통과(90점↑)', emoji: '🏰', rarity: 2, earned: (s) => s.finalExamsPassed >= 1 },
+  { id: 'final-5', name: '학기의 정복자', desc: '총괄평가 던전 5회 통과', emoji: '👑', rarity: 3, earned: (s) => s.finalExamsPassed >= 5 },
 ];
 
 export function getBadge(id: string): BadgeDef | undefined {

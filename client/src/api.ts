@@ -32,6 +32,7 @@ export const SAVE_KEYS = [
   'rewardCardCounts',
   'hiddenDone',
   'examCount',
+  'finalExamCleared',
   'records',
   'dragon',
   'practice',
