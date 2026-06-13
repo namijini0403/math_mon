@@ -46,10 +46,9 @@ function LessonRunner({ stageId }: { stageId: string }) {
   const isBoss = stage.type === 'boss';
   // 심화 탐험: 하트 없음, 10문제를 전부 풀고 8개 이상 맞히면 클리어
   const isChallenge = stage.type === 'challenge';
-  // 보스전은 문제별이 아니라 스테이지 전체에 넉넉한 제한시간(문제당 30초)을 준다.
-  // 계산이 많은 단원 마무리에서도 시간에 쫓기지 않게 — 시간 초과 시에만 패배.
-  const BOSS_SECONDS_PER_Q = 30;
-  const stageTimeBudget = isBoss ? total * BOSS_SECONDS_PER_Q : 0;
+  // 보스전은 문제별이 아니라 스테이지 전체에 10분의 넉넉한 제한시간을 준다.
+  // 문장제 위주라 읽고 생각할 시간이 필요 — 시간 초과 시에만 패배.
+  const stageTimeBudget = isBoss ? 600 : 0;
 
   const [served, setServed] = useState<Served>(() =>
     nextProblem(stage, skillStats, 0, useGame.getState().recentWrong),

@@ -59,11 +59,6 @@ function targetDifficulty(
   return wanted;
 }
 
-/** 난이도별 보스전 제한시간(초) — 쉬운 문제일수록 짧다 */
-export function bossTimeLimit(difficulty: 1 | 2 | 3): number {
-  return { 1: 15, 2: 25, 3: 45 }[difficulty];
-}
-
 /** 단원의 심화 스킬 (challenge: true) */
 export function challengeSkillsOf(unitId: string): SkillDef[] {
   return SKILLS.filter((s) => s.unitId === unitId && s.challenge === true);
@@ -89,41 +84,35 @@ export function nextProblem(
   const progress = position / stage.problemCount;
   const stageSkills = stage.skillIds.map(getSkill);
 
-  // ── 보스전 후반: 심화 문제 1~2개 혼합 (마지막 30% 구간에서 50% 확률) ──
-  if (stage.type === 'boss' && progress >= 0.7) {
-    const chPool = challengeSkillsOf(stage.unitId);
-    if (chPool.length > 0 && Math.random() < 0.5) {
-      const skill = chPool[Math.floor(Math.random() * chPool.length)];
-      return {
-        problem: generateProblem(skill.id, randomSeed()),
-        isReview: false,
-        timeLimit: 60, // 심화는 넉넉히
-      };
-    }
-  }
-
   // 오답 retrieval: 첫 문제 이후 25% 확률로 최근 틀린 유형 재출제
+  // (보스 제한시간은 스테이지 전체 카운트다운이므로 timeLimit은 사용하지 않음 → null)
   if (position > 0 && recentWrong.length > 0 && Math.random() < 0.25) {
     const skillId = recentWrong[Math.floor(Math.random() * recentWrong.length)];
     if (SKILLS.some((s) => s.id === skillId)) {
-      const skill = getSkill(skillId);
       return {
         problem: generateProblem(skillId, randomSeed()),
         isReview: true,
-        timeLimit: stage.type === 'boss' ? bossTimeLimit(skill.difficulty) : null,
+        timeLimit: null,
       };
     }
   }
 
-  // 보스전은 기초 유지 게이트 없이 무조건 난이도가 올라간다 (도전적이어야 함)
-  const target: 1 | 2 | 3 =
-    stage.type === 'boss'
-      ? progress < 1 / 3
-        ? 1
-        : progress < 2 / 3
-          ? 2
-          : 3
-      : targetDifficulty(progress, stageSkills, stats);
+  // ── 보스전: 문장제 위주로 출제 (단순계산 ≈25%, 문장제 ≈75%) ──
+  // 아이들이 계산 자체보다 문장 이해·적용을 더 연습하도록. 후반 심화 강제 혼합은 없앰.
+  if (stage.type === 'boss') {
+    const wordSkills = stageSkills.filter((s) => s.word);
+    const calcSkills = stageSkills.filter((s) => !s.word);
+    const wantWord = Math.random() >= 0.25;
+    let pool = wantWord ? wordSkills : calcSkills;
+    if (pool.length === 0) pool = wantWord ? calcSkills : wordSkills; // 한쪽이 비면 다른 쪽
+    if (pool.length === 0) pool = stageSkills;
+    const entries = pool.map((skill) => ({ skill, w: weight(stats[skill.id]) }));
+    const skill = pickWeighted(entries);
+    return { problem: generateProblem(skill.id, randomSeed()), isReview: false, timeLimit: null };
+  }
+
+  // ── 레슨: 난이도 램프 + 기초 유지 게이트 ──
+  const target = targetDifficulty(progress, stageSkills, stats);
 
   // 목표 난이도의 스킬 우선, 없으면 가까운 난이도로
   let pool = stageSkills.filter((s) => s.difficulty === target);
@@ -132,19 +121,13 @@ export function nextProblem(
   }
   if (pool.length === 0) pool = stageSkills;
 
-  // 복습 스킬은 낮은 가중치로 섞기 (레슨만)
+  // 복습 스킬은 낮은 가중치로 섞기
   const entries = pool.map((skill) => ({ skill, w: weight(stats[skill.id]) }));
-  if (stage.type === 'lesson') {
-    for (const id of stage.reviewSkillIds) {
-      const skill = getSkill(id);
-      entries.push({ skill, w: weight(stats[id]) * 0.35 });
-    }
+  for (const id of stage.reviewSkillIds) {
+    const skill = getSkill(id);
+    entries.push({ skill, w: weight(stats[id]) * 0.35 });
   }
 
   const skill = pickWeighted(entries);
-  return {
-    problem: generateProblem(skill.id, randomSeed()),
-    isReview: false,
-    timeLimit: stage.type === 'boss' ? bossTimeLimit(skill.difficulty) : null,
-  };
+  return { problem: generateProblem(skill.id, randomSeed()), isReview: false, timeLimit: null };
 }
