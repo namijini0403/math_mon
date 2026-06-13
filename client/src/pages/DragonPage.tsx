@@ -59,6 +59,22 @@ function DecorIcon({ decor, size }: { decor: RoomDecorDef; size: number }) {
   return <span style={{ fontSize: size * 0.8 }} className="leading-none drop-shadow">{decor.emoji}</span>;
 }
 
+/** 과일 아이콘 — Codex PNG(assets/dragon/fruits/{id}.png) 우선, 없으면 이모지 폴백 */
+function FruitIcon({ id, emoji }: { id: string; emoji: string }) {
+  const [ok, setOk] = useState(true);
+  if (ok) {
+    return (
+      <img
+        src={`assets/dragon/fruits/${id}.png`}
+        alt=""
+        className="w-9 h-9 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]"
+        onError={() => setOk(false)}
+      />
+    );
+  }
+  return <span className="text-3xl leading-none">{emoji}</span>;
+}
+
 // ── 드래곤 무대 ─────────────────────────────────────────────────────────────
 
 function DragonStage({ dragon, fullness, mood }: {
@@ -734,7 +750,7 @@ export default function DragonPage() {
                     {count}
                   </div>
                 )}
-                <span className="text-3xl leading-none">{fruit.emoji}</span>
+                <FruitIcon id={fruit.id} emoji={fruit.emoji} />
                 <span className="text-[10px] opacity-70 text-center leading-tight">{fruit.name}</span>
               </motion.button>
             );
