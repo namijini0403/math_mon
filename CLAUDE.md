@@ -79,8 +79,8 @@ npm run build -w client               # PWA 빌드
 
 ## 8. 자주 쓰는 사실
 
-- 테스트 수 기준선: 1504개(2026-06-14: 1472 + curriculumGuard 32 — 1-1 5단원 audit). 줄어들면 뭔가 깨진 것.
-- 학습강화 Phase B(풀이 보기, 진행 중): 정답에도 풀이 노출=components/SolutionReveal.tsx(💡 접이식, 5개 풀이화면 정답분기에 연결). 풀이 표기 교육과정 가드=game/curriculumGuard.ts(학년별 금지표기 ×<2·÷<3·분수<3·소수<3·숫자거듭제곱). **AUDITED_UNITS에 등록된 단원만 위반=실패로 강제** — 1단원부터 순차 audit하며 추가. 미등록 단원의 알려진 위반은 docs/curriculum/notation-violations.md. 학년별 누적 교육과정 기준=docs/curriculum/g{N}.md. ⚠️1·2학년 풀이는 부등호 기호 대신 '말'로(도입학년 불명). 완료: **1-1 전체**(unitNum9·unitShape1·unitAddSub1·unitCompare1·unitNum50). 다음=1-2.
+- 테스트 수 기준선: 1533개(2026-06-14: 1472 + curriculumGuard 61 — 1학년 11단원 audit). 줄어들면 뭔가 깨진 것.
+- 학습강화 Phase B(풀이 보기, 진행 중): 정답에도 풀이 노출=components/SolutionReveal.tsx(💡 접이식, 5개 풀이화면 정답분기에 연결). 풀이 표기 교육과정 가드=game/curriculumGuard.ts(학년별 금지표기 ×<2·÷<3·분수<3·소수<3·숫자거듭제곱). **AUDITED_UNITS에 등록된 단원만 위반=실패로 강제** — 1단원부터 순차 audit하며 추가. 미등록 단원의 알려진 위반은 docs/curriculum/notation-violations.md. 학년별 누적 교육과정 기준=docs/curriculum/g{N}.md. ⚠️1·2학년 풀이는 부등호 기호 대신 '말'로(도입학년 불명). 완료: **1학년 전체**(1-1 5단원 + 1-2 6단원). 다음=2학년(곱셈기호 ×는 2학년부터 OK). 주의: 가드는 표기만 봄 — '2로 나누면'(나눗셈 말)처럼 텍스트 위반은 수동 적발 필요.
 - 학습강화(Phase A, 2026-06-14): 틀린 문제 다시보기 store.wrongLog(단원별 (skillId,seed), game/wrongLog.ts 순수 reducer). recordAnswer(skillId,correct,seed?)에 seed 주면 오답=pushWrong·정답=clearWrong. 「흐려진 별의 회랑」=CorridorPage(/corridor[/:unitId], 저장 seed로 문제 그대로 재현·맞히면 별 점등). 「수련의 첨탑」=TowerPage(/tower/:skillId, 단일스킬 무한). 단원평가 「약점 봉인 모드」=ExamPage ?focus=weak(skillStats.w 가중). 공통 문제뷰=components/problem/ProblemBody.tsx(회랑·첨탑만 사용, 기존 3페이지는 회귀방지로 미변경). 진입점=PracticeHubPage. 나머지 Phase B~D는 docs/learning-features-plan.md.
 - 학기: g1s1~g6s2 전 12학기 완성(스테이지 312개·보스 71종). 1·2학년 청사진 docs/g1g2-design.md, 보스 명세 ASSET_SPEC_G12.md. 스테이지 접두사 전체 목록은 stages.ts grep이 정답.
 - 1·2학년 특이: 이모지를 시각 자료로 사용(세기·모양·반복 패턴), fill-blanks 답 0 금지(0의 곱/합은 choice·식 빈칸), 복수 빈칸 blankAnswers 배열([시,분]·[m,cm]).

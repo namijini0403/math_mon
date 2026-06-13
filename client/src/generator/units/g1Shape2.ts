@@ -21,6 +21,13 @@ const ALL_OBJECTS = [
   ...CIRCLE_OBJECTS.map(o => ({ name: o, shape: '동그라미' as const })),
 ];
 
+// 평면 모양 특징 (1학년 눈높이 — 곧은 변·뾰족한 곳으로 구별)
+const PLANE_TRAIT: Record<string, string> = {
+  '네모': '곧은 변이 4개, 뾰족한 곳이 4개 있어요',
+  '세모': '곧은 변이 3개, 뾰족한 곳이 3개 있어요',
+  '동그라미': '뾰족한 곳 없이 동그랗게 굽어 있어요',
+};
+
 // ── 1. shape12-classify  평면 모양 분류 (choice)  난이도 1 ──────────────────
 const shape12Classify: SkillDef = {
   id: 'shape12-classify',
@@ -49,7 +56,7 @@ const shape12Classify: SkillDef = {
       prompt: `${obj.name}은 어떤 모양인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${obj.name}은 ${obj.shape} 모양이에요.`)],
+      explanation: [txt(`${obj.name}은 ${PLANE_TRAIT[obj.shape]}. 그래서 ${obj.shape} 모양이에요.`)],
     };
   },
 };
@@ -102,7 +109,7 @@ const shape12Count: SkillDef = {
       prompt: `${display}\n${target} 모양은 몇 개인가요?`,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`${target} 모양은 ${answer}개예요.`)],
+      explanation: [txt(`${target} 모양만 하나씩 골라 세면 ${answer}개예요.`)],
     };
   },
 };
@@ -180,7 +187,7 @@ const shape12Word: SkillDef = {
       prompt: `여러 모양이 모두 ${total}개 있어요. 네모 ${sq}개, 세모 ${tr}개, 동그라미 ${ci}개예요. ${target} 모양은 몇 개인가요?`,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`${target} 모양은 ${answer}개예요.`)],
+      explanation: [txt(`네모 ${sq}개, 세모 ${tr}개, 동그라미 ${ci}개 중에서 ${target} 모양만 세면 ${answer}개예요.`)],
     };
   },
 };

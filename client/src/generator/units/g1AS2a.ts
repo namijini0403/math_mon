@@ -43,7 +43,7 @@ const as12aAdd1: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} + ${add} = ${ans}`)],
+      explanation: [txt(`낱개끼리 더하면 ${ones} + ${add} = ${ones + add}이에요. 그래서 ${a} + ${add} = ${ans}.`)],
     };
   },
 };
@@ -81,7 +81,7 @@ const as12aSub1: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} - ${sub} = ${ans}`)],
+      explanation: [txt(`낱개끼리 빼면 ${ones} - ${sub} = ${ones - sub}이에요. 그래서 ${a} - ${sub} = ${ans}.`)],
     };
   },
 };
@@ -130,7 +130,7 @@ const as12aTens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} ${op} ${b} = ${ans}`)],
+      explanation: [txt(`10개씩 묶음끼리 ${op === '+' ? '더해요' : '빼요'}. ${a} ${op} ${b} = ${ans}.`)],
     };
   },
 };
@@ -216,6 +216,7 @@ const as12aWord: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 덧셈
@@ -229,6 +230,7 @@ const as12aWord: SkillDef = {
       const a = tens * 10 + ones;
       answer = a + add;
       promptStr = `${item}가 ${a}개 있어요. ${add}개를 더 가져오면 모두 몇 개인가요?`;
+      explanation = [txt(`${a}개에 ${add}개를 더하면 ${a} + ${add} = ${answer}이에요. 모두 ${answer}개예요.`)];
     } else {
       // 뺄셈
       let tens = 3, ones = 5, sub = 2;
@@ -241,6 +243,7 @@ const as12aWord: SkillDef = {
       const a = tens * 10 + ones;
       answer = a - sub;
       promptStr = `${item}가 ${a}개 있어요. ${sub}개를 먹으면 몇 개가 남나요?`;
+      explanation = [txt(`${a}개에서 ${sub}개를 덜어 내면 ${a} - ${sub} = ${answer}이에요. ${answer}개가 남아요.`)];
     }
 
     const expr: MathExpr = [
@@ -257,7 +260,7 @@ const as12aWord: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}개`)],
+      explanation,
     };
   },
 };

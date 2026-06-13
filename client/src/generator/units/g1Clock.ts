@@ -179,12 +179,14 @@ const clock1Word: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 몇 시 문장제
       const hour = rng.int(1, 12);
       answer = hour;
       promptStr = `민준이가 시계를 보니 짧은바늘이 ${hour}, 긴바늘이 12를 가리켜요. 지금은 몇 시인가요?`;
+      explanation = [txt(`긴바늘이 12를 가리키면 정각이에요. 짧은바늘이 ${hour}이므로 ${hour}시예요.`)];
     } else {
       // 수 배열 규칙 문장제
       const step = rng.pick([1, 2, 5, 10]);
@@ -192,6 +194,7 @@ const clock1Word: SkillDef = {
       const n = rng.int(3, 5); // n번째를 물어봄
       answer = start + (n - 1) * step;
       promptStr = `${start}부터 ${step}씩 커지는 규칙으로 수를 쓰고 있어요. ${n}번째 수는 얼마인가요?`;
+      explanation = [txt(`${start}부터 ${step}씩 더해 가며 세면 ${n}번째 수는 ${answer}예요.`)];
     }
 
     const expr: MathExpr = [{ kind: 'blank', slot: 0 }];
@@ -204,7 +207,7 @@ const clock1Word: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}`)],
+      explanation,
     };
   },
 };

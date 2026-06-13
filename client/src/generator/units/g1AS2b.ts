@@ -37,7 +37,7 @@ const as12bMake10: SkillDef = {
       prompt: `${a}에 얼마를 더하면 10이 되나요?`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} + ${ans} = 10이에요.`)],
+      explanation: [txt(`${a}에 ${ans}를 더하면 10이 돼요. ${a} + ${ans} = 10.`)],
     };
   },
 };
@@ -68,7 +68,7 @@ const as12bFrom10: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`10 - ${a} = ${ans}`)],
+      explanation: [txt(`10에서 ${a}를 덜어 내면 ${ans}가 남아요. 10 - ${a} = ${ans}.`)],
     };
   },
 };
@@ -164,6 +164,7 @@ const as12bWord: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 10이 되는 더하기 활용
@@ -171,6 +172,7 @@ const as12bWord: SkillDef = {
       const need = 10 - a;
       answer = 10;
       promptStr = `바구니에 ${item}가 ${a}개 있어요. 10개가 되려면 ${need}개를 더 담으면 돼요. 그러면 모두 몇 개인가요?`;
+      explanation = [txt(`${a}개에 ${need}개를 더하면 ${a} + ${need} = 10개예요.`)];
     } else {
       // 이어 세기 덧셈 활용
       let a = 7, b = 4;
@@ -181,6 +183,7 @@ const as12bWord: SkillDef = {
       }
       answer = a + b;
       promptStr = `${item}가 ${a}개 있어요. ${b}개를 더 가져오면 모두 몇 개인가요?`;
+      explanation = [txt(`${a}개에서 ${b}칸 이어 세면 ${a} + ${b} = ${answer}개예요.`)];
     }
 
     const expr: MathExpr = [
@@ -197,7 +200,7 @@ const as12bWord: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}개`)],
+      explanation,
     };
   },
 };
