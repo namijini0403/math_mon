@@ -24,6 +24,448 @@ export interface StageDef {
 }
 
 export const STAGES: StageDef[] = [
+  // ════════ 1학년 1학기 ════════
+  // ── 1-1-1: 9까지의 수 ──
+  {
+    id: 'n9-1', unitId: 'unitNum9', title: '수 세기 마을', type: 'lesson', emoji: '🌷',
+    skillIds: ['num9-count', 'num9-order'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'n9-2', unitId: 'unitNum9', title: '크기 비교 들판', type: 'lesson', emoji: '🌻',
+    skillIds: ['num9-compare', 'num9-ordinal'], reviewSkillIds: ['num9-count'], problemCount: 8,
+  },
+  {
+    id: 'n9-3', unitId: 'unitNum9', title: '수 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['num9-word'], reviewSkillIds: ['num9-compare', 'num9-ordinal'], problemCount: 8,
+  },
+  {
+    id: 'n9-boss', unitId: 'unitNum9', title: '숫자 병아리', type: 'boss', emoji: '🐤',
+    skillIds: ['num9-count', 'num9-order', 'num9-compare', 'num9-ordinal', 'num9-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '숫자 병아리', emoji: '🐤', hp: 10, image: 'assets/boss/chick.png', taunt: '9까지 셀 수 있겠어? 도전해 봐!' },
+  },
+  // ── 1-1-2: 여러 가지 모양 ──
+  {
+    id: 'sh1-1', unitId: 'unitShape1', title: '모양 분류 마을', type: 'lesson', emoji: '⚽',
+    skillIds: ['shape1-classify', 'shape1-same'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'sh1-2', unitId: 'unitShape1', title: '모양 세기 들판', type: 'lesson', emoji: '📦',
+    skillIds: ['shape1-count'], reviewSkillIds: ['shape1-classify'], problemCount: 8,
+  },
+  {
+    id: 'sh1-3', unitId: 'unitShape1', title: '모양 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['shape1-word'], reviewSkillIds: ['shape1-same', 'shape1-count'], problemCount: 8,
+  },
+  {
+    id: 'sh1-boss', unitId: 'unitShape1', title: '모양 문어', type: 'boss', emoji: '🐙',
+    skillIds: ['shape1-classify', 'shape1-same', 'shape1-count', 'shape1-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '모양 문어', emoji: '🐙', hp: 10, image: 'assets/boss/shapes-octo.png', taunt: '공, 상자, 기둥 모양을 모두 알고 있니?' },
+  },
+  // ── 1-1-3: 덧셈과 뺄셈 ──
+  {
+    id: 'as1-1', unitId: 'unitAddSub1', title: '모으기·가르기 마을', type: 'lesson', emoji: '➕',
+    skillIds: ['as1-gather', 'as1-add'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'as1-2', unitId: 'unitAddSub1', title: '뺄셈 들판', type: 'lesson', emoji: '➖',
+    skillIds: ['as1-sub', 'as1-zero'], reviewSkillIds: ['as1-add'], problemCount: 8,
+  },
+  {
+    id: 'as1-3', unitId: 'unitAddSub1', title: '□ 구하기 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['as1-missing', 'as1-word'], reviewSkillIds: ['as1-sub', 'as1-zero'], problemCount: 8,
+  },
+  {
+    id: 'as1-boss', unitId: 'unitAddSub1', title: '덧셈 강아지', type: 'boss', emoji: '🐶',
+    skillIds: ['as1-gather', 'as1-add', 'as1-sub', 'as1-zero', 'as1-missing', 'as1-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '덧셈 강아지', emoji: '🐶', hp: 10, image: 'assets/boss/puppy.png', taunt: '9까지 더하고 빼는 거 쉬워 보이지? 해 봐!' },
+  },
+  // ── 1-1-4: 비교하기 ──
+  {
+    id: 'cp1-1', unitId: 'unitCompare1', title: '이모지 비교 마을', type: 'lesson', emoji: '🌈',
+    skillIds: ['comp1-emoji', 'comp1-vocab'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'cp1-2', unitId: 'unitCompare1', title: '가장 ~한 것 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['comp1-most'], reviewSkillIds: ['comp1-emoji'], problemCount: 8,
+  },
+  {
+    id: 'cp1-3', unitId: 'unitCompare1', title: '비교 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['comp1-word'], reviewSkillIds: ['comp1-most', 'comp1-vocab'], problemCount: 8,
+  },
+  {
+    id: 'cp1-boss', unitId: 'unitCompare1', title: '비교 기린', type: 'boss', emoji: '🦒',
+    skillIds: ['comp1-emoji', 'comp1-most', 'comp1-vocab', 'comp1-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '비교 기린', emoji: '🦒', hp: 10, image: 'assets/boss/giraffe.png', taunt: '누가 더 많은지, 더 큰지 알 수 있겠어?' },
+  },
+  // ── 1-1-5: 50까지의 수 ──
+  {
+    id: 'n50-1', unitId: 'unitNum50', title: '묶음·낱개 마을', type: 'lesson', emoji: '🔢',
+    skillIds: ['num50-compose', 'num50-split'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'n50-2', unitId: 'unitNum50', title: '수 순서 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['num50-order', 'num50-compare'], reviewSkillIds: ['num50-compose'], problemCount: 8,
+  },
+  {
+    id: 'n50-3', unitId: 'unitNum50', title: '50까지 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['num50-word'], reviewSkillIds: ['num50-order', 'num50-compare'], problemCount: 8,
+  },
+  {
+    id: 'n50-boss', unitId: 'unitNum50', title: '묶음 양', type: 'boss', emoji: '🐑',
+    skillIds: ['num50-compose', 'num50-split', 'num50-order', 'num50-compare', 'num50-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '묶음 양', emoji: '🐑', hp: 10, image: 'assets/boss/sheep.png', taunt: '50까지 셀 수 있어? 양을 다 세어 봐!' },
+  },
+  // ════════ 1학년 2학기 ════════
+  // ── 1-2-1: 100까지의 수 ──
+  {
+    id: 'n100-1', unitId: 'unitNum100', title: '묶음·낱개 마을', type: 'lesson', emoji: '🔢',
+    skillIds: ['num100-compose', 'num100-order'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'n100-2', unitId: 'unitNum100', title: '크기 비교 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['num100-compare', 'num100-evenodd'], reviewSkillIds: ['num100-compose'], problemCount: 8,
+  },
+  {
+    id: 'n100-3', unitId: 'unitNum100', title: '100까지 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['num100-word'], reviewSkillIds: ['num100-compare', 'num100-evenodd'], problemCount: 8,
+  },
+  {
+    id: 'n100-boss', unitId: 'unitNum100', title: '숫자 고래', type: 'boss', emoji: '🐳',
+    skillIds: ['num100-compose', 'num100-order', 'num100-compare', 'num100-evenodd', 'num100-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '숫자 고래', emoji: '🐳', hp: 10, image: 'assets/boss/whale100.png', taunt: '100까지 셀 수 있겠어? 고래만큼 큰 수도 알아 봐!' },
+  },
+  // ── 1-2-2: 덧셈과 뺄셈(1) ──
+  {
+    id: 'asa-1', unitId: 'unitAS12a', title: '받아올림 없는 덧셈 마을', type: 'lesson', emoji: '➕',
+    skillIds: ['as12a-add1', 'as12a-sub1'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'asa-2', unitId: 'unitAS12a', title: '몇십 더하기 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['as12a-tens'], reviewSkillIds: ['as12a-add1'], problemCount: 8,
+  },
+  {
+    id: 'asa-3', unitId: 'unitAS12a', title: '세 수 계산 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['as12a-three', 'as12a-word'], reviewSkillIds: ['as12a-tens'], problemCount: 8,
+  },
+  {
+    id: 'asa-boss', unitId: 'unitAS12a', title: '덧셈 판다', type: 'boss', emoji: '🐼',
+    skillIds: ['as12a-add1', 'as12a-sub1', 'as12a-tens', 'as12a-three', 'as12a-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '덧셈 판다', emoji: '🐼', hp: 10, image: 'assets/boss/panda.png', taunt: '받아올림 없는 덧뺄셈, 판다도 할 수 있어! 해 봐!' },
+  },
+  // ── 1-2-3: 여러 가지 모양 ──
+  {
+    id: 'sh2-1', unitId: 'unitShape12', title: '모양 분류 광장', type: 'lesson', emoji: '🔺',
+    skillIds: ['shape12-classify', 'shape12-count'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'sh2-2', unitId: 'unitShape12', title: '본뜬 모양 들판', type: 'lesson', emoji: '🟦',
+    skillIds: ['shape12-trace'], reviewSkillIds: ['shape12-classify'], problemCount: 8,
+  },
+  {
+    id: 'sh2-3', unitId: 'unitShape12', title: '모양 이야기 마을', type: 'lesson', emoji: '🌟',
+    skillIds: ['shape12-word'], reviewSkillIds: ['shape12-count', 'shape12-trace'], problemCount: 8,
+  },
+  {
+    id: 'sh2-boss', unitId: 'unitShape12', title: '모양 개구리', type: 'boss', emoji: '🐸',
+    skillIds: ['shape12-classify', 'shape12-count', 'shape12-trace', 'shape12-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '모양 개구리', emoji: '🐸', hp: 10, image: 'assets/boss/frog.png', taunt: '네모, 세모, 동그라미 모두 알아? 나를 이겨 봐!' },
+  },
+  // ── 1-2-4: 덧셈과 뺄셈(2) ──
+  {
+    id: 'asb-1', unitId: 'unitAS12b', title: '10 만들기 마을', type: 'lesson', emoji: '🔟',
+    skillIds: ['as12b-make10', 'as12b-from10'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'asb-2', unitId: 'unitAS12b', title: '이어 세기 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['as12b-use10', 'as12b-counting'], reviewSkillIds: ['as12b-make10'], problemCount: 8,
+  },
+  {
+    id: 'asb-3', unitId: 'unitAS12b', title: '10 이용 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['as12b-word'], reviewSkillIds: ['as12b-use10', 'as12b-counting'], problemCount: 8,
+  },
+  {
+    id: 'asb-boss', unitId: 'unitAS12b', title: '십 만들기 다람쥐', type: 'boss', emoji: '🐿️',
+    skillIds: ['as12b-make10', 'as12b-from10', 'as12b-use10', 'as12b-counting', 'as12b-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '십 만들기 다람쥐', emoji: '🐿️', hp: 10, image: 'assets/boss/ten-squirrel.png', taunt: '10을 만들면 쉬워져! 다람쥐처럼 빠르게 계산해 봐!' },
+  },
+  // ── 1-2-5: 시계 보기와 규칙 찾기 ──
+  {
+    id: 'ck-1', unitId: 'unitClock1', title: '시계 마을', type: 'lesson', emoji: '🕐',
+    skillIds: ['clock1-oclock', 'clock1-half'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'ck-2', unitId: 'unitClock1', title: '반복 규칙 들판', type: 'lesson', emoji: '🔁',
+    skillIds: ['clock1-pattern', 'clock1-numrule'], reviewSkillIds: ['clock1-oclock'], problemCount: 8,
+  },
+  {
+    id: 'ck-3', unitId: 'unitClock1', title: '시계와 규칙 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['clock1-word'], reviewSkillIds: ['clock1-pattern', 'clock1-numrule'], problemCount: 8,
+  },
+  {
+    id: 'ck-boss', unitId: 'unitClock1', title: '시계 수탉', type: 'boss', emoji: '🐓',
+    skillIds: ['clock1-oclock', 'clock1-half', 'clock1-pattern', 'clock1-numrule', 'clock1-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '시계 수탉', emoji: '🐓', hp: 10, image: 'assets/boss/rooster.png', taunt: '꼬끼오! 몇 시인지 맞혀 봐! 규칙도 찾아야 해!' },
+  },
+  // ── 1-2-6: 덧셈과 뺄셈(3) ──
+  {
+    id: 'asc-1', unitId: 'unitAS12c', title: '받아올림 덧셈 마을', type: 'lesson', emoji: '➕',
+    skillIds: ['as12c-carry', 'as12c-borrow'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'asc-2', unitId: 'unitAS12c', title: '관계식 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['as12c-relation', 'as12c-missing'], reviewSkillIds: ['as12c-carry'], problemCount: 8,
+  },
+  {
+    id: 'asc-3', unitId: 'unitAS12c', title: '받아올림 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['as12c-word'], reviewSkillIds: ['as12c-borrow', 'as12c-relation'], problemCount: 8,
+  },
+  {
+    id: 'asc-boss', unitId: 'unitAS12c', title: '받아올림 고양이', type: 'boss', emoji: '🐱',
+    skillIds: ['as12c-carry', 'as12c-borrow', 'as12c-relation', 'as12c-missing', 'as12c-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '받아올림 고양이', emoji: '🐱', hp: 10, image: 'assets/boss/cat.png', taunt: '십몇이 되는 덧셈, 나한테 통하지 않아! 해 봐!' },
+  },
+  // ════════ 2학년 1학기 ════════
+  // ── 2-1-1: 세 자리 수 ──
+  {
+    id: 'n3d-1', unitId: 'unitNum3d', title: '백·십·일 마을', type: 'lesson', emoji: '🏛️',
+    skillIds: ['num3d-compose', 'num3d-place'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'n3d-2', unitId: 'unitNum3d', title: '뛰어 세기 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['num3d-skip', 'num3d-compare'], reviewSkillIds: ['num3d-compose'], problemCount: 8,
+  },
+  {
+    id: 'n3d-3', unitId: 'unitNum3d', title: '세 자리 수 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['num3d-word'], reviewSkillIds: ['num3d-skip', 'num3d-compare'], problemCount: 8,
+  },
+  {
+    id: 'n3d-boss', unitId: 'unitNum3d', title: '백 단위 코뿔소', type: 'boss', emoji: '🦏',
+    skillIds: ['num3d-compose', 'num3d-place', 'num3d-skip', 'num3d-compare', 'num3d-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '백 단위 코뿔소', emoji: '🦏', hp: 10, image: 'assets/boss/rhino.png', taunt: '세 자리 수도 알아? 백의 자리까지 도전해 봐!' },
+  },
+  // ── 2-1-2: 여러 가지 도형 ──
+  {
+    id: 'fig-1', unitId: 'unitFigure2', title: '도형 변·꼭짓점 마을', type: 'lesson', emoji: '🔺',
+    skillIds: ['fig2-sides', 'fig2-name'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'fig-2', unitId: 'unitFigure2', title: '도형 분류 들판', type: 'lesson', emoji: '🟦',
+    skillIds: ['fig2-classify', 'fig2-circle'], reviewSkillIds: ['fig2-sides'], problemCount: 8,
+  },
+  {
+    id: 'fig-3', unitId: 'unitFigure2', title: '도형 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['fig2-word'], reviewSkillIds: ['fig2-name', 'fig2-classify'], problemCount: 8,
+  },
+  {
+    id: 'fig-boss', unitId: 'unitFigure2', title: '도형 펭귄', type: 'boss', emoji: '🐧',
+    skillIds: ['fig2-sides', 'fig2-name', 'fig2-classify', 'fig2-circle', 'fig2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '도형 펭귄', emoji: '🐧', hp: 10, image: 'assets/boss/figure-penguin.png', taunt: '삼각형, 사각형, 원까지! 도형을 다 알고 있니?' },
+  },
+  // ── 2-1-3: 덧셈과 뺄셈 ──
+  {
+    id: 'as2-1', unitId: 'unitAddSub2', title: '받아올림 덧셈 마을', type: 'lesson', emoji: '➕',
+    skillIds: ['as2-add', 'as2-sub'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'as2-2', unitId: 'unitAddSub2', title: '세 수 계산 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['as2-three', 'as2-missing'], reviewSkillIds: ['as2-add'], problemCount: 8,
+  },
+  {
+    id: 'as2-3', unitId: 'unitAddSub2', title: '덧뺄셈 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['as2-word'], reviewSkillIds: ['as2-sub', 'as2-three'], problemCount: 8,
+  },
+  {
+    id: 'as2-boss', unitId: 'unitAddSub2', title: '받아올림 여우', type: 'boss', emoji: '🦊',
+    skillIds: ['as2-add', 'as2-sub', 'as2-three', 'as2-missing', 'as2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '받아올림 여우', emoji: '🦊', hp: 10, image: 'assets/boss/carry-fox.png', taunt: '두 자리 덧뺄셈, 받아올림까지 잘 할 수 있어?' },
+  },
+  // ── 2-1-4: 길이 재기 ──
+  {
+    id: 'ln2-1', unitId: 'unitLength2', title: 'cm 재기 마을', type: 'lesson', emoji: '📏',
+    skillIds: ['len2-cm', 'len2-unit'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'ln2-2', unitId: 'unitLength2', title: '길이 비교 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['len2-compare'], reviewSkillIds: ['len2-cm'], problemCount: 8,
+  },
+  {
+    id: 'ln2-3', unitId: 'unitLength2', title: '길이 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['len2-word'], reviewSkillIds: ['len2-unit', 'len2-compare'], problemCount: 8,
+  },
+  {
+    id: 'ln2-boss', unitId: 'unitLength2', title: '길이 악어', type: 'boss', emoji: '🐊',
+    skillIds: ['len2-cm', 'len2-unit', 'len2-compare', 'len2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '길이 악어', emoji: '🐊', hp: 10, image: 'assets/boss/croc.png', taunt: '내 꼬리 길이가 몇 cm인지 맞혀 봐!' },
+  },
+  // ── 2-1-5: 분류하기 ──
+  {
+    id: 'cl2-1', unitId: 'unitClassify', title: '기준 분류 마을', type: 'lesson', emoji: '🍎',
+    skillIds: ['class2-count', 'class2-table'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'cl2-2', unitId: 'unitClassify', title: '분류 표 들판', type: 'lesson', emoji: '📊',
+    skillIds: ['class2-most'], reviewSkillIds: ['class2-count'], problemCount: 8,
+  },
+  {
+    id: 'cl2-3', unitId: 'unitClassify', title: '분류 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['class2-word'], reviewSkillIds: ['class2-table', 'class2-most'], problemCount: 8,
+  },
+  {
+    id: 'cl2-boss', unitId: 'unitClassify', title: '정리 코알라', type: 'boss', emoji: '🐨',
+    skillIds: ['class2-count', 'class2-table', 'class2-most', 'class2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '정리 코알라', emoji: '🐨', hp: 10, image: 'assets/boss/koala.png', taunt: '기준에 따라 분류할 수 있겠어? 나를 이겨 봐!' },
+  },
+  // ── 2-1-6: 곱셈 ──
+  {
+    id: 'mi-1', unitId: 'unitMulIntro', title: '묶어 세기 마을', type: 'lesson', emoji: '✖️',
+    skillIds: ['muli-group', 'muli-times'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'mi-2', unitId: 'unitMulIntro', title: '곱셈식 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['muli-expr', 'muli-convert'], reviewSkillIds: ['muli-group'], problemCount: 8,
+  },
+  {
+    id: 'mi-3', unitId: 'unitMulIntro', title: '곱셈 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['muli-word'], reviewSkillIds: ['muli-times', 'muli-expr'], problemCount: 8,
+  },
+  {
+    id: 'mi-boss', unitId: 'unitMulIntro', title: '곱셈 문어', type: 'boss', emoji: '🐙',
+    skillIds: ['muli-group', 'muli-times', 'muli-expr', 'muli-convert', 'muli-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '곱셈 문어', emoji: '🐙', hp: 10, image: 'assets/boss/multi-octo.png', taunt: '다리가 몇 개씩 몇 묶음인지 계산해 봐!' },
+  },
+  // ════════ 2학년 2학기 ════════
+  // ── 2-2-1: 네 자리 수 ──
+  {
+    id: 'n4d-1', unitId: 'unitNum4d', title: '천·백·십·일 마을', type: 'lesson', emoji: '🏛️',
+    skillIds: ['num4d-compose', 'num4d-place'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'n4d-2', unitId: 'unitNum4d', title: '뛰어 세기 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['num4d-skip', 'num4d-compare'], reviewSkillIds: ['num4d-compose'], problemCount: 8,
+  },
+  {
+    id: 'n4d-3', unitId: 'unitNum4d', title: '네 자리 수 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['num4d-word'], reviewSkillIds: ['num4d-skip', 'num4d-compare'], problemCount: 8,
+  },
+  {
+    id: 'n4d-boss', unitId: 'unitNum4d', title: '사천왕 거위', type: 'boss', emoji: '🦢',
+    skillIds: ['num4d-compose', 'num4d-place', 'num4d-skip', 'num4d-compare', 'num4d-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '사천왕 거위', emoji: '🦢', hp: 10, image: 'assets/boss/goose.png', taunt: '천 단위까지 셀 수 있어? 나를 이겨 봐!' },
+  },
+  // ── 2-2-2: 곱셈구구 ──
+  {
+    id: 'gg-1', unitId: 'unitGugu', title: '2단·5단 마을', type: 'lesson', emoji: '✖️',
+    skillIds: ['gugu-25', 'gugu-zero'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'gg-2', unitId: 'unitGugu', title: '3단·6단·4단·8단 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['gugu-36', 'gugu-48'], reviewSkillIds: ['gugu-25'], problemCount: 8,
+  },
+  {
+    id: 'gg-3', unitId: 'unitGugu', title: '7단·9단·빈칸 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['gugu-79', 'gugu-missing', 'gugu-word'], reviewSkillIds: ['gugu-36', 'gugu-48'], problemCount: 8,
+  },
+  {
+    id: 'gg-boss', unitId: 'unitGugu', title: '구구 공룡', type: 'boss', emoji: '🦕',
+    skillIds: ['gugu-25', 'gugu-36', 'gugu-48', 'gugu-79', 'gugu-missing', 'gugu-zero', 'gugu-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '구구 공룡', emoji: '🦕', hp: 10, image: 'assets/boss/dino.png', taunt: '구구단을 다 외웠어? 나를 이겨 봐!' },
+  },
+  // ── 2-2-3: 길이 재기 ──
+  {
+    id: 'ln3-1', unitId: 'unitLength22', title: 'm↔cm 변환 마을', type: 'lesson', emoji: '📏',
+    skillIds: ['len22-conv', 'len22-unit'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'ln3-2', unitId: 'unitLength22', title: '길이 합·차 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['len22-add', 'len22-sub'], reviewSkillIds: ['len22-conv'], problemCount: 8,
+  },
+  {
+    id: 'ln3-3', unitId: 'unitLength22', title: '길이 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['len22-word'], reviewSkillIds: ['len22-add', 'len22-sub'], problemCount: 8,
+  },
+  {
+    id: 'ln3-boss', unitId: 'unitLength22', title: '길이 지렁이', type: 'boss', emoji: '🐛',
+    skillIds: ['len22-conv', 'len22-add', 'len22-sub', 'len22-unit', 'len22-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '길이 지렁이', emoji: '🐛', hp: 10, image: 'assets/boss/worm.png', taunt: '내 몸길이는 몇 m 몇 cm일까? 계산해 봐!' },
+  },
+  // ── 2-2-4: 시각과 시간 ──
+  {
+    id: 'tk2-1', unitId: 'unitTime2', title: '시계 마을', type: 'lesson', emoji: '🕐',
+    skillIds: ['time2-read', 'time2-units'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'tk2-2', unitId: 'unitTime2', title: '시간 변환 들판', type: 'lesson', emoji: '⏱️',
+    skillIds: ['time2-conv', 'time2-elapsed'], reviewSkillIds: ['time2-read'], problemCount: 8,
+  },
+  {
+    id: 'tk2-3', unitId: 'unitTime2', title: '시각과 시간 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['time2-word'], reviewSkillIds: ['time2-conv', 'time2-elapsed'], problemCount: 8,
+  },
+  {
+    id: 'tk2-boss', unitId: 'unitTime2', title: '시간 올빼미', type: 'boss', emoji: '🦉',
+    skillIds: ['time2-read', 'time2-conv', 'time2-elapsed', 'time2-units', 'time2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '시간 올빼미', emoji: '🦉', hp: 10, image: 'assets/boss/time-owl.png', taunt: '몇 시 몇 분인지 맞혀 봐! 시간은 기다려 주지 않아!' },
+  },
+  // ── 2-2-5: 표와 그래프 ──
+  {
+    id: 'tg-1', unitId: 'unitTableGraph', title: '표 채우기 마을', type: 'lesson', emoji: '📊',
+    skillIds: ['tbg2-table', 'tbg2-total'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'tg-2', unitId: 'unitTableGraph', title: '그래프 들판', type: 'lesson', emoji: '📈',
+    skillIds: ['tbg2-graph', 'tbg2-most'], reviewSkillIds: ['tbg2-table'], problemCount: 8,
+  },
+  {
+    id: 'tg-3', unitId: 'unitTableGraph', title: '표와 그래프 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['tbg2-word'], reviewSkillIds: ['tbg2-total', 'tbg2-most'], problemCount: 8,
+  },
+  {
+    id: 'tg-boss', unitId: 'unitTableGraph', title: '그래프 돌고래', type: 'boss', emoji: '🐬',
+    skillIds: ['tbg2-table', 'tbg2-graph', 'tbg2-total', 'tbg2-most', 'tbg2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '그래프 돌고래', emoji: '🐬', hp: 10, image: 'assets/boss/dolphin.png', taunt: '표와 그래프를 읽을 수 있어? 나를 이겨 봐!' },
+  },
+  // ── 2-2-6: 규칙 찾기 ──
+  {
+    id: 'rl2-1', unitId: 'unitRule2', title: '수 규칙 마을', type: 'lesson', emoji: '🔢',
+    skillIds: ['rule2-numseq', 'rule2-stack'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'rl2-2', unitId: 'unitRule2', title: '표·모양 규칙 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['rule2-table', 'rule2-shape'], reviewSkillIds: ['rule2-numseq'], problemCount: 8,
+  },
+  {
+    id: 'rl2-3', unitId: 'unitRule2', title: '규칙 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['rule2-word'], reviewSkillIds: ['rule2-table', 'rule2-shape'], problemCount: 8,
+  },
+  {
+    id: 'rl2-boss', unitId: 'unitRule2', title: '규칙 카멜레온', type: 'boss', emoji: '🦎',
+    skillIds: ['rule2-numseq', 'rule2-table', 'rule2-shape', 'rule2-stack', 'rule2-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '규칙 카멜레온', emoji: '🦎', hp: 10, image: 'assets/boss/rule-chameleon.png', taunt: '내 색깔 변화에서 규칙을 찾을 수 있어?' },
+  },
+
   // ════════ 3학년 1학기 (전반) ════════
   // ── 3-1-1: 덧셈과 뺄셈 ──
   {
@@ -995,6 +1437,22 @@ export interface SemesterDef {
 
 export const SEMESTERS: SemesterDef[] = [
   {
+    id: 'g1s1', label: '1학년 1학기', emoji: '🌷',
+    units: ['unitNum9', 'unitShape1', 'unitAddSub1', 'unitCompare1', 'unitNum50'],
+  },
+  {
+    id: 'g1s2', label: '1학년 2학기', emoji: '⭐',
+    units: ['unitNum100', 'unitAS12a', 'unitShape12', 'unitAS12b', 'unitClock1', 'unitAS12c'],
+  },
+  {
+    id: 'g2s1', label: '2학년 1학기', emoji: '🌈',
+    units: ['unitNum3d', 'unitFigure2', 'unitAddSub2', 'unitLength2', 'unitClassify', 'unitMulIntro'],
+  },
+  {
+    id: 'g2s2', label: '2학년 2학기', emoji: '🎈',
+    units: ['unitNum4d', 'unitGugu', 'unitLength22', 'unitTime2', 'unitTableGraph', 'unitRule2'],
+  },
+  {
     id: 'g3s1', label: '3학년 1학기', emoji: '🐣',
     units: ['unitAdd3', 'unitPlane3', 'unitDiv3', 'unitMul31', 'unitTime3', 'unitFrac3'],
   },
@@ -1029,6 +1487,29 @@ export const SEMESTERS: SemesterDef[] = [
 ];
 
 export const UNIT_TITLES: Record<string, string> = {
+  unitNum9: '1. 9까지의 수',
+  unitShape1: '2. 여러 가지 모양',
+  unitAddSub1: '3. 덧셈과 뺄셈',
+  unitCompare1: '4. 비교하기',
+  unitNum50: '5. 50까지의 수',
+  unitNum100: '1. 100까지의 수',
+  unitAS12a: '2. 덧셈과 뺄셈(1)',
+  unitShape12: '3. 여러 가지 모양',
+  unitAS12b: '4. 덧셈과 뺄셈(2)',
+  unitClock1: '5. 시계 보기와 규칙 찾기',
+  unitAS12c: '6. 덧셈과 뺄셈(3)',
+  unitNum3d: '1. 세 자리 수',
+  unitFigure2: '2. 여러 가지 도형',
+  unitAddSub2: '3. 덧셈과 뺄셈',
+  unitLength2: '4. 길이 재기',
+  unitClassify: '5. 분류하기',
+  unitMulIntro: '6. 곱셈',
+  unitNum4d: '1. 네 자리 수',
+  unitGugu: '2. 곱셈구구',
+  unitLength22: '3. 길이 재기',
+  unitTime2: '4. 시각과 시간',
+  unitTableGraph: '5. 표와 그래프',
+  unitRule2: '6. 규칙 찾기',
   unitAdd3: '1. 덧셈과 뺄셈',
   unitPlane3: '2. 평면도형',
   unitDiv3: '3. 나눗셈',

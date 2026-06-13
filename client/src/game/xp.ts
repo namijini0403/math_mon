@@ -62,6 +62,33 @@ export interface BossCardDef {
 }
 
 export const BOSS_CARDS: Record<string, BossCardDef> = {
+  // ── 1-1 보스 ──
+  'n9-boss': { name: '병아리 탐험가', subtitle: 'CHICK EXPLORER', colors: ['#713f12', '#fbbf24'], accent: '#fef9c3', emoji: '🐤' },
+  // ── 1-2 보스 ──
+  'n100-boss': { name: '고래의 항해', subtitle: 'WHALE VOYAGE', colors: ['#082f49', '#0284c7'], accent: '#bae6fd', emoji: '🐳' },
+  'asa-boss': { name: '판다 탐험가', subtitle: 'PANDA EXPLORER', colors: ['#1c1917', '#4ade80'], accent: '#dcfce7', emoji: '🐼' },
+  'sh2-boss': { name: '개구리 모험가', subtitle: 'FROG ADVENTURER', colors: ['#14532d', '#22c55e'], accent: '#bbf7d0', emoji: '🐸' },
+  'asb-boss': { name: '다람쥐의 10', subtitle: 'SQUIRREL TEN', colors: ['#3f2d12', '#d97706'], accent: '#fde68a', emoji: '🐿️' },
+  'ck-boss': { name: '수탉의 시각', subtitle: 'ROOSTER TIME', colors: ['#450a0a', '#dc2626'], accent: '#fecaca', emoji: '🐓' },
+  'asc-boss': { name: '고양이 계산사', subtitle: 'CAT CALCULATOR', colors: ['#2e1065', '#a855f7'], accent: '#f3e8ff', emoji: '🐱' },
+  // ── 2-1 보스 ──
+  'n3d-boss': { name: '코뿔소 정복자', subtitle: 'RHINO CONQUEROR', colors: ['#1c1917', '#78716c'], accent: '#e7e5e4', emoji: '🦏' },
+  'fig-boss': { name: '도형 펭귄의 친구', subtitle: 'FIGURE PENGUIN FRIEND', colors: ['#0f172a', '#0284c7'], accent: '#bae6fd', emoji: '🐧' },
+  'as2-boss': { name: '여우 계산사', subtitle: 'FOX CALCULATOR', colors: ['#422006', '#f97316'], accent: '#ffedd5', emoji: '🦊' },
+  'ln2-boss': { name: '길이 악어의 도전', subtitle: 'CROC LENGTH CHALLENGE', colors: ['#14532d', '#15803d'], accent: '#d9f99d', emoji: '🐊' },
+  'cl2-boss': { name: '코알라 정리왕', subtitle: 'KOALA ORGANIZER', colors: ['#3f2d12', '#854d0e'], accent: '#fef9c3', emoji: '🐨' },
+  'mi-boss': { name: '곱셈 문어의 지혜', subtitle: 'OCTO MULTIPLY WISDOM', colors: ['#0c4a6e', '#7c3aed'], accent: '#ede9fe', emoji: '🐙' },
+  'sh1-boss': { name: '모양 문어의 친구', subtitle: 'SHAPE OCTO FRIEND', colors: ['#0c4a6e', '#0ea5e9'], accent: '#e0f2fe', emoji: '🐙' },
+  'as1-boss': { name: '강아지 수호자', subtitle: 'PUPPY GUARDIAN', colors: ['#14532d', '#16a34a'], accent: '#dcfce7', emoji: '🐶' },
+  'cp1-boss': { name: '기린의 눈', subtitle: 'GIRAFFE EYE', colors: ['#713f12', '#d97706'], accent: '#fde68a', emoji: '🦒' },
+  'n50-boss': { name: '양떼 목동', subtitle: 'SHEEP SHEPHERD', colors: ['#1e3a5f', '#7c3aed'], accent: '#ede9fe', emoji: '🐑' },
+  // ── 2-2 보스 ──
+  'n4d-boss': { name: '사천왕 거위', subtitle: 'THOUSAND GOOSE', colors: ['#0f4c81', '#38bdf8'], accent: '#e0f2fe', emoji: '🦢' },
+  'gg-boss': { name: '구구 공룡', subtitle: 'GUGU DINO', colors: ['#14532d', '#84cc16'], accent: '#ecfccb', emoji: '🦕' },
+  'ln3-boss': { name: '길이 지렁이', subtitle: 'LENGTH WORM', colors: ['#3f2d12', '#854d0e'], accent: '#fef9c3', emoji: '🐛' },
+  'tk2-boss': { name: '시간 올빼미', subtitle: 'TIME OWL', colors: ['#1e1b4b', '#7c3aed'], accent: '#ede9fe', emoji: '🦉' },
+  'tg-boss': { name: '그래프 돌고래', subtitle: 'GRAPH DOLPHIN', colors: ['#0c4a6e', '#06b6d4'], accent: '#cffafe', emoji: '🐬' },
+  'rl2-boss': { name: '규칙 카멜레온', subtitle: 'RULE CHAMELEON', colors: ['#14532d', '#22c55e'], accent: '#dcfce7', emoji: '🦎' },
   // ── 3-1 보스 ──
   'a3-boss': { name: '다람쥐 정복자', subtitle: 'SQUIRREL TAMER', colors: ['#3f2d12', '#d97706'], accent: '#fde68a', emoji: '🐿️' },
   'p3-boss': { name: '거북 탐험가', subtitle: 'TURTLE EXPLORER', colors: ['#14532d', '#16a34a'], accent: '#dcfce7', emoji: '🐢' },

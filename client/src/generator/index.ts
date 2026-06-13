@@ -1,5 +1,28 @@
 /** 생성기 공개 API — 스킬 레지스트리와 문제 생성 진입점 */
 
+import { unitNum9Skills } from './units/g1Num9';
+import { unitShape1Skills } from './units/g1Shape';
+import { unitAddSub1Skills } from './units/g1AddSub';
+import { unitCompare1Skills } from './units/g1Compare';
+import { unitNum50Skills } from './units/g1Num50';
+import { unitNum100Skills } from './units/g1Num100';
+import { unitAS12aSkills } from './units/g1AS2a';
+import { unitShape12Skills } from './units/g1Shape2';
+import { unitAS12bSkills } from './units/g1AS2b';
+import { unitClock1Skills } from './units/g1Clock';
+import { unitAS12cSkills } from './units/g1AS2c';
+import { unitNum3dSkills } from './units/g2Num3d';
+import { unitFigure2Skills } from './units/g2Figure';
+import { unitAddSub2Skills } from './units/g2AddSub';
+import { unitLength2Skills } from './units/g2Length';
+import { unitClassifySkills } from './units/g2Classify';
+import { unitMulIntroSkills } from './units/g2MulIntro';
+import { unitNum4dSkills } from './units/g2Num4d';
+import { unitGuguSkills } from './units/g2Gugu';
+import { unitLength22Skills } from './units/g2Length2';
+import { unitTime2Skills } from './units/g2Time';
+import { unitTableGraphSkills } from './units/g2TableGraph';
+import { unitRule2Skills } from './units/g2Rule';
 import { unitAdd3Skills } from './units/g3Add';
 import { unitPlane3Skills } from './units/g3Plane';
 import { unitDiv3Skills } from './units/g3Div';
@@ -55,8 +78,35 @@ import { challengeG6S2Skills } from './units/challengeG6S2';
 import type { Problem, SkillDef, UnitDef } from './types';
 import { randomSeed } from './rng';
 
-/** 2022 개정교육과정 단원 순서 (3-1 → 4-1 → 4-2 → 5-1 → 5-2 → 6-1 → 6-2) */
+/** 2022 개정교육과정 단원 순서 (1-1 → 1-2 → 2-1 → 3-1 → 4-1 → 4-2 → 5-1 → 5-2 → 6-1 → 6-2) */
 export const SKILLS: SkillDef[] = [
+  // ── 1-1 ──
+  ...unitNum9Skills,
+  ...unitShape1Skills,
+  ...unitAddSub1Skills,
+  ...unitCompare1Skills,
+  ...unitNum50Skills,
+  // ── 1-2 ──
+  ...unitNum100Skills,
+  ...unitAS12aSkills,
+  ...unitShape12Skills,
+  ...unitAS12bSkills,
+  ...unitClock1Skills,
+  ...unitAS12cSkills,
+  // ── 2-1 ──
+  ...unitNum3dSkills,
+  ...unitFigure2Skills,
+  ...unitAddSub2Skills,
+  ...unitLength2Skills,
+  ...unitClassifySkills,
+  ...unitMulIntroSkills,
+  // ── 2-2 ──
+  ...unitNum4dSkills,
+  ...unitGuguSkills,
+  ...unitLength22Skills,
+  ...unitTime2Skills,
+  ...unitTableGraphSkills,
+  ...unitRule2Skills,
   // ── 3-1 (전반) ──
   ...unitAdd3Skills,
   ...unitPlane3Skills,
@@ -122,6 +172,29 @@ export const SKILLS: SkillDef[] = [
 const skillMap = new Map(SKILLS.map((s) => [s.id, s]));
 
 export const UNITS: UnitDef[] = [
+  { id: 'unitNum9', title: '1-1 9까지의 수', skillIds: unitNum9Skills.map((s) => s.id) },
+  { id: 'unitShape1', title: '1-1 여러 가지 모양', skillIds: unitShape1Skills.map((s) => s.id) },
+  { id: 'unitAddSub1', title: '1-1 덧셈과 뺄셈', skillIds: unitAddSub1Skills.map((s) => s.id) },
+  { id: 'unitCompare1', title: '1-1 비교하기', skillIds: unitCompare1Skills.map((s) => s.id) },
+  { id: 'unitNum50', title: '1-1 50까지의 수', skillIds: unitNum50Skills.map((s) => s.id) },
+  { id: 'unitNum100', title: '1-2 100까지의 수', skillIds: unitNum100Skills.map((s) => s.id) },
+  { id: 'unitAS12a', title: '1-2 덧셈과 뺄셈(1)', skillIds: unitAS12aSkills.map((s) => s.id) },
+  { id: 'unitShape12', title: '1-2 여러 가지 모양', skillIds: unitShape12Skills.map((s) => s.id) },
+  { id: 'unitAS12b', title: '1-2 덧셈과 뺄셈(2)', skillIds: unitAS12bSkills.map((s) => s.id) },
+  { id: 'unitClock1', title: '1-2 시계 보기와 규칙 찾기', skillIds: unitClock1Skills.map((s) => s.id) },
+  { id: 'unitAS12c', title: '1-2 덧셈과 뺄셈(3)', skillIds: unitAS12cSkills.map((s) => s.id) },
+  { id: 'unitNum3d', title: '2-1 세 자리 수', skillIds: unitNum3dSkills.map((s) => s.id) },
+  { id: 'unitFigure2', title: '2-1 여러 가지 도형', skillIds: unitFigure2Skills.map((s) => s.id) },
+  { id: 'unitAddSub2', title: '2-1 덧셈과 뺄셈', skillIds: unitAddSub2Skills.map((s) => s.id) },
+  { id: 'unitLength2', title: '2-1 길이 재기', skillIds: unitLength2Skills.map((s) => s.id) },
+  { id: 'unitClassify', title: '2-1 분류하기', skillIds: unitClassifySkills.map((s) => s.id) },
+  { id: 'unitMulIntro', title: '2-1 곱셈', skillIds: unitMulIntroSkills.map((s) => s.id) },
+  { id: 'unitNum4d', title: '2-2 네 자리 수', skillIds: unitNum4dSkills.map((s) => s.id) },
+  { id: 'unitGugu', title: '2-2 곱셈구구', skillIds: unitGuguSkills.map((s) => s.id) },
+  { id: 'unitLength22', title: '2-2 길이 재기', skillIds: unitLength22Skills.map((s) => s.id) },
+  { id: 'unitTime2', title: '2-2 시각과 시간', skillIds: unitTime2Skills.map((s) => s.id) },
+  { id: 'unitTableGraph', title: '2-2 표와 그래프', skillIds: unitTableGraphSkills.map((s) => s.id) },
+  { id: 'unitRule2', title: '2-2 규칙 찾기', skillIds: unitRule2Skills.map((s) => s.id) },
   { id: 'unitAdd3', title: '3-1 덧셈과 뺄셈', skillIds: unitAdd3Skills.map((s) => s.id) },
   { id: 'unitPlane3', title: '3-1 평면도형', skillIds: unitPlane3Skills.map((s) => s.id) },
   { id: 'unitDiv3', title: '3-1 나눗셈', skillIds: unitDiv3Skills.map((s) => s.id) },

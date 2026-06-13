@@ -79,8 +79,9 @@ npm run build -w client               # PWA 빌드
 
 ## 8. 자주 쓰는 사실
 
-- 테스트 수 기준선: 905개(2026-06-13). 줄어들면 뭔가 깨진 것.
-- 학기: g3s1~g6s2 (g3는 본 문서 작성 시점 진행 중). 스테이지 접두사 전체 목록은 stages.ts grep이 정답.
+- 테스트 수 기준선: 1430개(2026-06-13, 1~6학년 전 학년 완성). 줄어들면 뭔가 깨진 것.
+- 학기: g1s1~g6s2 전 12학기 완성(스테이지 312개·보스 71종). 1·2학년 청사진 docs/g1g2-design.md, 보스 명세 ASSET_SPEC_G12.md. 스테이지 접두사 전체 목록은 stages.ts grep이 정답.
+- 1·2학년 특이: 이모지를 시각 자료로 사용(세기·모양·반복 패턴), fill-blanks 답 0 금지(0의 곱/합은 choice·식 빈칸), 복수 빈칸 blankAnswers 배열([시,분]·[m,cm]).
 - 문제 형식: choice / fraction-input / decimal-input / comparison / fill-blanks / matching.
 - 난이도 램프: 레슨 앞1/3 d1→d2→d3, 기초유지 게이트(정답률<50% 시 상승 중지), 오답 retrieval 25%, 보스 후반 30%는 심화 50% 혼합.
 - 드래곤: game/dragon.ts — GP 5단계(0/50/120/300/600), 속성 4종(해/달/별/숲), 성체 분기 보물카드 10장, 레어 엔딩 15장.
