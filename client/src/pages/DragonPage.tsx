@@ -11,6 +11,8 @@ import {
   FRUITS,
   MOOD_INFO,
   RARE_ENDING_CARDS,
+  ROOM_TIERS,
+  roomTier,
   adultTitle,
   currentFullness,
   dragonMood,
@@ -19,6 +21,7 @@ import {
   type Affinity,
 } from '../game/dragon';
 import { dragonArt } from '../game/dragonArt';
+import { DragonRoom } from '../components/DragonRoom';
 import { todayStr } from '../game/missions';
 import { sfx } from '../game/sounds';
 
@@ -340,6 +343,13 @@ export default function DragonPage() {
   const maxAff = Math.max(1, ...Object.values(dragon.affinities));
   const affinityOrder: Affinity[] = ['sun', 'moon', 'star', 'forest'];
 
+  // 방(집) 단계 — 보유 아이템(집 재료) 수로 결정
+  const itemCount = dragon.items.length;
+  const tier = roomTier(itemCount);
+  const roomInfo = ROOM_TIERS[tier];
+  const nextRoom = ROOM_TIERS[tier + 1];
+  const itemsToNext = nextRoom ? nextRoom.need - itemCount : 0;
+
   return (
     <div className="max-w-xl mx-auto px-5 pb-16">
       {/* 하트 파티클 */}
@@ -370,15 +380,18 @@ export default function DragonPage() {
       </div>
 
       {/* ── 드래곤 무대 ── */}
-      <div className="rounded-3xl bg-night-900 border border-night-700 p-6 flex flex-col items-center gap-4"
+      <div className="relative rounded-3xl bg-night-900 border border-night-700 overflow-hidden flex flex-col items-center gap-4 pt-6 pb-5 px-6"
         style={{
           background: 'radial-gradient(ellipse at 50% 30%, #2b2768 0%, #1e1b4b 60%)',
         }}
       >
+        {/* 방 배경 (집 단계별) — 드래곤 뒤에 깔린다 */}
+        <DragonRoom tier={tier} className="absolute inset-x-0 bottom-0 w-full h-[70%] pointer-events-none" />
+
         {/* 성체 칭호 */}
         {dragon.adult && (
           <motion.div
-            className="text-sm font-bold px-4 py-1 rounded-full"
+            className="relative z-10 text-sm font-bold px-4 py-1 rounded-full"
             animate={{ opacity: [0.8, 1, 0.8] }}
             transition={{ repeat: Infinity, duration: 2.4 }}
             style={{
@@ -391,9 +404,10 @@ export default function DragonPage() {
           </motion.div>
         )}
 
-        {/* 드래곤 */}
+        {/* 드래곤 (방 위에) */}
         <motion.div
           ref={dragonRef}
+          className="relative z-10"
           animate={dragonPop ? { scale: 1.25 } : { scale: 1 }}
           transition={{ duration: 0.25, type: 'spring' }}
         >
@@ -401,8 +415,18 @@ export default function DragonPage() {
         </motion.div>
 
         {/* 말풍선 */}
-        <div className="bg-night-800 rounded-full px-5 py-2 text-sm text-center max-w-xs border border-night-700">
+        <div className="relative z-10 bg-night-800/90 rounded-full px-5 py-2 text-sm text-center max-w-xs border border-night-700">
           {moodInfo.emoji} {moodInfo.line}
+        </div>
+
+        {/* 방 이름 + 다음 단계 진행 */}
+        <div className="relative z-10 text-center">
+          <div className="text-xs text-coin">🏠 {roomInfo.name}</div>
+          <div className="text-[0.65rem] opacity-60 mt-0.5">
+            {nextRoom
+              ? `아이템 ${itemsToNext}개 더 모으면 「${nextRoom.name}」으로 업그레이드!`
+              : '최고 단계의 궁전이에요! 👑'}
+          </div>
         </div>
       </div>
 

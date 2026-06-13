@@ -204,6 +204,26 @@ export function adultTitle(adult: { affinity: Affinity; form: 'human' | 'dragon'
 /** 레어 엔딩 조건: 성체 + 보물 카드 15종 이상 (카드는 희귀 이벤트에서만 나옴) */
 export const RARE_ENDING_CARDS = 15;
 
+/**
+ * 드래곤 방(집) 단계 — 육성 아이템(집 재료)을 모을수록 외양간→궁전으로 업그레이드.
+ * 아이들이 시각적으로 성장의 보람을 느끼도록. need = 보유 아이템 수 임계값.
+ */
+export const ROOM_TIERS = [
+  { tier: 0, name: '지푸라기 둥지', need: 0, hint: '알이 태어난 따뜻한 외양간' },
+  { tier: 1, name: '아늑한 나무 둥지', need: 2, hint: '통나무로 포근하게' },
+  { tier: 2, name: '포근한 오두막', need: 4, hint: '지붕과 창문이 생겼어요' },
+  { tier: 3, name: '튼튼한 벽돌집', need: 6, hint: '굴뚝에서 연기가 나요' },
+  { tier: 4, name: '드래곤의 성', need: 9, hint: '깃발 휘날리는 성채' },
+  { tier: 5, name: '찬란한 궁전', need: 12, hint: '황금 돔의 궁전!' },
+] as const;
+
+/** 보유 아이템(집 재료) 수 → 방 단계 */
+export function roomTier(itemCount: number): number {
+  let t = 0;
+  for (const r of ROOM_TIERS) if (itemCount >= r.need) t = r.tier;
+  return t;
+}
+
 /** 현재 드래곤 모습 이모지 — 홈/프로필 아바타용 (알 → 성체로 아바타도 자란다) */
 export function dragonEmoji(d: DragonState): string {
   if (d.adult) return d.adult.form === 'dragon' ? '🐉' : '🧙';
