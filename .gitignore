@@ -15,3 +15,6 @@ dev-dist/
 
 # 참고문제 원본 (저작권 자료 — 커밋 금지)
 참고문제/
+
+# Codex 에셋 작업 스크래치(alpha·key 소스, 100MB+) — 최종물만 client/public/assets에 커밋
+assets/_work/
