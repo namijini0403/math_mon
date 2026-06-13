@@ -76,6 +76,22 @@ function FruitIcon({ id, emoji }: { id: string; emoji: string }) {
   return <span className="text-3xl leading-none">{emoji}</span>;
 }
 
+/** 육성 아이템 아이콘 — Codex PNG(assets/dragon/items/{id}.png) 우선, 없으면 이모지 폴백 */
+function ItemIcon({ id, emoji }: { id: string; emoji: string }) {
+  const [ok, setOk] = useState(true);
+  if (ok) {
+    return (
+      <img
+        src={`assets/dragon/items/${id}.png`}
+        alt=""
+        className="w-7 h-7 object-contain"
+        onError={() => setOk(false)}
+      />
+    );
+  }
+  return <span className="text-2xl leading-none">{emoji}</span>;
+}
+
 // ── 드래곤 무대 ─────────────────────────────────────────────────────────────
 
 function DragonStage({ dragon, fullness, mood }: {
@@ -782,7 +798,7 @@ export default function DragonPage() {
                 title={owned ? item.desc : item.hint}
                 aria-label={owned ? `${item.name}: ${item.desc}` : `잠김 — ${item.hint}`}
               >
-                <span className="text-2xl leading-none">{item.emoji}</span>
+                <ItemIcon id={item.id} emoji={item.emoji} />
                 <span className="text-[9px] text-center leading-tight opacity-80">
                   {owned ? item.name : item.hint}
                 </span>
