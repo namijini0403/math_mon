@@ -35,10 +35,18 @@ describe('decideEvolution — 티어 결정', () => {
     expect(r.id).toBe('moon-human');
   });
 
-  it('한 학기 봉인(6) + 뚜렷한 으뜸 → rare(각성)', () => {
+  it('한 학기 봉인(6) + 뚜렷한 으뜸 → rare(각성) 드래곤형', () => {
     const r = decideEvolution({ affinities: aff(20, 10, 8, 6), sealedCount: 6, rewardCardCount: 0 });
     expect(r.tier).toBe('rare');
-    expect(r.id).toBe('rare-sun');
+    expect(r.id).toBe('rare-sun-dragon');
+    expect(r.form).toBe('dragon');
+  });
+
+  it('rare도 카드 10+면 인간형 세트', () => {
+    const r = decideEvolution({ affinities: aff(20, 10, 8, 6), sealedCount: 6, rewardCardCount: 12 });
+    expect(r.tier).toBe('rare');
+    expect(r.id).toBe('rare-sun-human');
+    expect(r.form).toBe('human');
   });
 
   it('봉인 6이어도 으뜸이 안 뚜렷하면 common', () => {
@@ -49,13 +57,13 @@ describe('decideEvolution — 티어 결정', () => {
   it('두 학기 봉인(12) + 균형 분포 → 슈퍼레어 무지개', () => {
     const r = decideEvolution({ affinities: aff(15, 14, 13, 12), sealedCount: 12, rewardCardCount: 0 });
     expect(r.tier).toBe('superrare');
-    expect(r.id).toBe('super-rainbow');
+    expect(r.id).toBe('super-rainbow-dragon');
   });
 
   it('두 학기 봉인(12) + 극단 편향 → 슈퍼레어 흑요석', () => {
     const r = decideEvolution({ affinities: aff(40, 10, 8, 6), sealedCount: 12, rewardCardCount: 0 });
     expect(r.tier).toBe('superrare');
-    expect(r.id).toBe('super-obsidian');
+    expect(r.id).toBe('super-obsidian-dragon');
   });
 
   it('봉인 11이면 아직 슈퍼레어 아님(레어로)', () => {

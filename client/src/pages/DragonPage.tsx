@@ -304,15 +304,21 @@ function EvolutionModal({ fromStage, toStage, onClose }: {
 
 // ── 엔딩 오버레이 ────────────────────────────────────────────────────────────
 
-function EndingOverlay({ affinity, form, nickname, title, onClose }: {
+function EndingOverlay({ affinity, form, nickname, title, evolution, onClose }: {
   affinity: Affinity;
   form: 'human' | 'dragon';
   nickname: string;
   title: string;
+  evolution?: { id: string; tier: 'common' | 'rare' | 'superrare' };
   onClose: () => void;
 }) {
   const [imgError, setImgError] = useState(false);
   const info = AFFINITY_INFO[affinity];
+  // 레어/슈퍼레어는 카드급 화려 일러스트(evolution-card), 그 외 기존 엔딩 일러스트
+  const artSrc =
+    evolution && evolution.tier !== 'common'
+      ? `assets/dragon/evolution-card/${evolution.id}.png`
+      : `assets/dragon/ending/${affinity}-${form}.png`;
 
   return (
     <motion.div
@@ -355,7 +361,7 @@ function EndingOverlay({ affinity, form, nickname, title, onClose }: {
         >
           {!imgError ? (
             <img
-              src={`assets/dragon/ending/${affinity}-${form}.png`}
+              src={artSrc}
               alt={title}
               className="w-56 h-56 object-contain rounded-3xl"
               style={{ filter: `drop-shadow(0 0 32px ${info.color}cc)` }}
@@ -858,6 +864,7 @@ export default function DragonPage() {
             form={dragon.adult.form}
             nickname={nickname ?? '모험가'}
             title={endingTitle}
+            evolution={dragon.adult.evolution}
             onClose={() => setShowEnding(false)}
           />
         )}

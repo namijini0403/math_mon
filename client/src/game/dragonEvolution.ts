@@ -55,25 +55,29 @@ export interface EvolutionResult {
   emoji: string;
   /** 색·테마용 대표 속성 */
   affinity: Affinity;
-  /** common만 형태 구분(인간형/드래곤형) */
-  form?: AdultForm;
+  /** 형태(인간형/드래곤형) — 모든 티어가 드래곤·인간 한 세트를 가진다 */
+  form: AdultForm;
 }
 
 export function tierRank(t: EvolutionTier): number {
   return t === 'superrare' ? 2 : t === 'rare' ? 1 : 0;
 }
 
-// ── 레어(각성) 로스터 — 으뜸 속성별 1종 ──────────────────────────────────────
-const RARE: Record<Affinity, { id: string; name: string; emoji: string }> = {
-  sun: { id: 'rare-sun', name: '작열하는 태양 패왕룡', emoji: '☀️🐲' },
-  moon: { id: 'rare-moon', name: '몽환의 월령 마도룡', emoji: '🌙🐲' },
-  star: { id: 'rare-star', name: '천공의 성좌룡', emoji: '⭐🐲' },
-  forest: { id: 'rare-forest', name: '세계수의 정령룡', emoji: '🌿🐲' },
+// ── 레어(각성) 로스터 — 속성별 드래곤형·인간형 한 세트 ───────────────────────
+const RARE_NAMES: Record<Affinity, { dragon: string; human: string; emoji: string }> = {
+  sun: { dragon: '작열하는 태양 패왕룡', human: '불꽃의 태양 성기사', emoji: '☀️' },
+  moon: { dragon: '몽환의 월령 마도룡', human: '심연을 보는 월광 현자', emoji: '🌙' },
+  star: { dragon: '천공의 성좌룡', human: '운명을 읽는 별 점성왕', emoji: '⭐' },
+  forest: { dragon: '세계수의 정령룡', human: '생명의 숲 정령왕', emoji: '🌿' },
 };
 
-// ── 슈퍼레어 로스터 — 2종(균형형/편향형) ─────────────────────────────────────
-const SUPER_RAINBOW = { id: 'super-rainbow', name: '무지개 창세룡', emoji: '🌈🐉' };
-const SUPER_OBSIDIAN = { id: 'super-obsidian', name: '흑요석 폭풍룡', emoji: '🌑🐉' };
+// ── 슈퍼레어 로스터 — 2종(균형형/편향형) × 드래곤·인간 ───────────────────────
+const SUPER_NAMES = {
+  rainbow: { dragon: '무지개 창세룡', human: '세계를 잇는 무지개 현왕', emoji: '🌈' },
+  obsidian: { dragon: '흑요석 폭풍룡', human: '폭풍을 다스리는 흑요석 군주', emoji: '🌑' },
+} as const;
+
+const formEmoji = (form: AdultForm) => (form === 'human' ? '🧙' : '🐉');
 
 /** 으뜸 속성 + 형태 → common 캐릭터 id (기존 mini/adult-{affinity}-{form}.png) */
 export function commonId(affinity: Affinity, form: AdultForm): string {
@@ -102,16 +106,21 @@ export function decideEvolution(input: {
   const balance = topV > 0 ? minV / topV : 0;
   const form: AdultForm = rewardCardCount >= 10 ? 'human' : 'dragon';
 
-  // 슈퍼레어 — 두 학기+ 분량 봉인 + 특수 분포
+  // 슈퍼레어 — 두 학기+ 분량 봉인 + 특수 분포 (드래곤·인간 한 세트)
   if (sealedCount >= SEAL_SUPERRARE_BOSSES && topV > 0) {
-    if (balance >= BALANCE_SUPER)
-      return { ...SUPER_RAINBOW, tier: 'superrare', affinity: topA };
-    if (dominance >= DOMINANCE_SUPER)
-      return { ...SUPER_OBSIDIAN, tier: 'superrare', affinity: topA };
+    if (balance >= BALANCE_SUPER) {
+      const n = SUPER_NAMES.rainbow;
+      return { id: `super-rainbow-${form}`, name: n[form], tier: 'superrare', emoji: n.emoji + formEmoji(form), affinity: topA, form };
+    }
+    if (dominance >= DOMINANCE_SUPER) {
+      const n = SUPER_NAMES.obsidian;
+      return { id: `super-obsidian-${form}`, name: n[form], tier: 'superrare', emoji: n.emoji + formEmoji(form), affinity: topA, form };
+    }
   }
-  // 레어(각성) — 한 학기+ 봉인 + 뚜렷한 으뜸 속성
+  // 레어(각성) — 한 학기+ 봉인 + 뚜렷한 으뜸 속성 (드래곤·인간 한 세트)
   if (sealedCount >= SEAL_RARE_BOSSES && dominance >= DOMINANCE_RARE) {
-    return { ...RARE[topA], tier: 'rare', affinity: topA };
+    const n = RARE_NAMES[topA];
+    return { id: `rare-${topA}-${form}`, name: n[form], tier: 'rare', emoji: n.emoji + formEmoji(form), affinity: topA, form };
   }
   // common — 으뜸 속성 × 형태
   const info = AFFINITY_INFO[topA];
@@ -119,7 +128,7 @@ export function decideEvolution(input: {
     id: commonId(topA, form),
     name: form === 'human' ? info.adultHuman : info.adultDragon,
     tier: 'common',
-    emoji: info.emoji + (form === 'human' ? '🧙' : '🐉'),
+    emoji: info.emoji + formEmoji(form),
     affinity: topA,
     form,
   };

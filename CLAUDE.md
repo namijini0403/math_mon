@@ -79,11 +79,12 @@ npm run build -w client               # PWA 빌드
 
 ## 8. 자주 쓰는 사실
 
-- 테스트 수 기준선: 1455개(2026-06-13: 1430 + steps 8 + gradeAccess 7 + dragonEvolution 10). 줄어들면 뭔가 깨진 것.
+- 테스트 수 기준선: 1456개(2026-06-13: 1430 + steps 8 + gradeAccess 7 + dragonEvolution 11). 줄어들면 뭔가 깨진 것.
 - 학기: g1s1~g6s2 전 12학기 완성(스테이지 312개·보스 71종). 1·2학년 청사진 docs/g1g2-design.md, 보스 명세 ASSET_SPEC_G12.md. 스테이지 접두사 전체 목록은 stages.ts grep이 정답.
 - 1·2학년 특이: 이모지를 시각 자료로 사용(세기·모양·반복 패턴), fill-blanks 답 0 금지(0의 곱/합은 choice·식 빈칸), 복수 빈칸 blankAnswers 배열([시,분]·[m,cm]).
 - 문제 형식: choice / fraction-input / decimal-input / comparison / fill-blanks / matching.
 - 난이도 램프: 레슨 앞1/3 d1→d2→d3, 기초유지 게이트(정답률<50% 시 상승 중지), 오답 retrieval 25%.
 - 보스전: 문장제 위주(단순계산 ≈25%/문장제 ≈75%), 스테이지 전체 제한시간 10분(문제별 타이머 아님), 시간 초과 또는 오답 3개 시 패배. 심화 강제 혼합 없음.
 - 드래곤: game/dragon.ts — GP 5단계(0/50/120/300/600)로 몸 성장. 속성 4종(해/달/별/숲).
-- 드래곤 진화(game/dragonEvolution.ts): 보스를 '봉인'하면 보스 고유 속성·세기가 귀속 → 누적 분포+봉인수로 최종 캐릭터 결정. common 8(속성×형태) → rare 4(각성, ~6보스+뚜렷한 으뜸) → superrare 2(무지개=균형/흑요석=편향, ~12보스). 더 높은 티어 도달 시 성장(갱신). 보스 텍스트는 '봉인'(비폭력). 레어 엔딩 카드 15장은 별개 연출.
+- 드래곤 진화(game/dragonEvolution.ts): 보스를 '봉인'하면 보스 고유 속성·세기가 귀속 → 누적 분포+봉인수로 최종 캐릭터 결정. 모든 티어가 드래곤·인간 한 세트(form). common 8(속성4×form2) → rare 8(각성, 속성4×form2, ~6보스+뚜렷한 으뜸) → superrare 4(무지개=균형/흑요석=편향, 각 form2, ~12보스). 더 높은 티어 도달 시 성장(갱신). 보스 텍스트는 '봉인'(비폭력). 레어 엔딩 카드 15장은 별개 연출.
+- 진화 에셋(ASSET_SPEC_DRAGON 1-D): rare/super 각 캐릭터는 미니미(dragon/rare·super/{id}.png, 512²)+카드급 화려(dragon/evolution-card/{id}.png, 1280×1810, 엔딩 오버레이용) 2종. id=rare-{속성}-{form}/super-{rainbow|obsidian}-{form}. 부재 시 이모지/기존 엔딩 폴백.
