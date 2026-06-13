@@ -124,9 +124,9 @@ const num9Compare: SkillDef = {
       left: [{ kind: 'decimal', v: a }],
       right: [{ kind: 'decimal', v: b }],
       answer,
-      // 1학년은 부등호 기호 대신 '더 크다/작다' 말로 설명한다 (docs/curriculum/g1.md).
+      // 부등호는 '클릭 선택'(ComparisonView)으로만 입력. 풀이는 말로 짚어 주고 기호도 함께 보여준다.
       explanation: [
-        txt(`수를 순서대로 늘어놓으면 뒤에 오는 수가 더 커요. ${a}은(는) ${b}보다 ${a < b ? '작아요' : '커요'}.`),
+        txt(`수를 순서대로 늘어놓으면 뒤에 오는 수가 더 커요. ${a}은(는) ${b}보다 ${a < b ? '작아요' : '커요'}. 그래서 ${a} ${answer} ${b} 예요.`),
       ],
     };
   },

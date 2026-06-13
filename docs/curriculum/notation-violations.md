@@ -19,4 +19,4 @@
 - [ ] `ch62-circle-biggest`, `ch62-compound-area`, `ch62-cylinder-net`, `ch62-quarter-cut`, `ch62-rotate-cross-diff` (6-2 심화): 원 넓이를 `r² × 3.14` → `r × r × 3.14`(초등 원의 넓이 = 반지름 × 반지름 × 원주율).
 
 > 참고: 정식(비심화) 6학년 원의 넓이 단원(unitCircle)도 도달 시 같은 `r × r × 원주율` 표기 확인.
-> 부등호(<,>) 보수 처리는 표기 가드가 아니라 단원 audit 시 말로 전환(docs/curriculum/g1.md 참조).
+> 부등호(<,>)는 앱 결정상 사용 OK(입력은 클릭 선택만) — 가드 대상 아님(docs/curriculum/g1.md 참조).
