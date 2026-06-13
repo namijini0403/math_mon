@@ -12,6 +12,16 @@ import { signToken, scryptHash, scryptVerify, tokenRemainingSeconds, verifyToken
 
 const app = new Hono();
 
+// ── 기본 보안 헤더 (비파괴적 — SECURITY-PLAN.md M4) ──────────────────────────
+// CSP는 PWA 인라인 스타일/워커 영향 검토 후 점진 적용 예정(3단계).
+app.use('*', async (c, next) => {
+  await next();
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-Frame-Options', 'DENY');
+  c.header('Referrer-Policy', 'no-referrer');
+  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+});
+
 // ── 레거시 SHA-256 PIN 해시 (폴백용) ─────────────────────────────────────────
 function pinHash(pin: string, classCode: string, nickname: string): string {
   return createHash('sha256').update(`${pin}:${classCode}:${nickname}`).digest('hex');

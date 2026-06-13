@@ -2,6 +2,7 @@
 
 > 코드 작업은 전부 끝났거나 제(Claude)가 할 일이고, 아래는 **행정·계정·구매처럼 선생님만 할 수 있는 일**입니다.
 > 순서대로 진행하면 됩니다. 상세 근거는 [analytics-design.md](analytics-design.md) 참조.
+> 보안 감사·보완 계획은 [SECURITY-PLAN.md](SECURITY-PLAN.md) (코드 보완은 제가, 동의·법적 절차는 아래 ①).
 
 ## ① 법적·행정 (수집 시작 전 필수 — 이게 안 되면 ANALYTICS_DB_URL을 넣어도 안 됩니다)
 
