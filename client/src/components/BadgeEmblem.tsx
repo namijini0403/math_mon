@@ -23,6 +23,13 @@ export interface BadgeVisual {
   ring?: boolean;
 }
 
+/** sRGB 상대 명도(0~1) — 글리프 대비 판정용 */
+function relLum(hex: string): number {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
 /** [deep, dark, base, light] */
 const PALETTES: Record<EmblemPalette, [string, string, string, string]> = {
   bronze: ['#3a2410', '#7c4a21', '#cd7f32', '#f0b27a'],
@@ -234,6 +241,10 @@ export function BadgeEmblem({
 }) {
   const [deep, dark, base, light] = PALETTES[visual.palette];
   const gradId = `bg-${id}`;
+  // 밝은 플레이트(은·동·금·하늘·호박 계열)는 light 글리프가 묻힘 → deep로 음각.
+  const lowContrast = relLum(light) - relLum(base) < 0.3;
+  const glyphColor = lowContrast ? deep : light;
+  const glyphAccent = lowContrast ? light : deep; // 내부 음영은 글리프와 반대 톤
   return (
     <svg
       viewBox="0 0 100 112"
@@ -253,7 +264,7 @@ export function BadgeEmblem({
       <Plate shape={visual.shape} gradId={gradId} rim={light} />
       {/* 상단 광택 */}
       <ellipse cx="40" cy="30" rx="20" ry="10" fill="#ffffff" opacity="0.18" />
-      <Glyph glyph={visual.glyph} color={light} dark={deep} />
+      <Glyph glyph={visual.glyph} color={glyphColor} dark={glyphAccent} />
     </svg>
   );
 }
