@@ -38,7 +38,7 @@ const num50Compose: SkillDef = {
         prompt: `10개씩 묶음이 ${bundles}개, 낱개가 ${singles}개이면 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`10 × ${bundles} + ${singles} = ${ans}`)],
+        explanation: [txt(`10개씩 ${bundles}묶음은 ${bundles * 10}개예요. 낱개 ${singles}개와 합치면 ${ans}개예요.`)],
       };
     } else {
       // 수 → 낱개 개수 물어보기
@@ -59,7 +59,7 @@ const num50Compose: SkillDef = {
         prompt: `${total}은 10개씩 묶음 ${bundles}개와 낱개 몇 개인가요?`,
         expr,
         blankAnswers: [singles],
-        explanation: [txt(`${total} = 10 × ${bundles} + ${singles}. 낱개는 ${singles}개예요.`)],
+        explanation: [txt(`${total}은 10개씩 ${bundles}묶음(${bundles * 10}개)과 낱개로 이루어져요. 그래서 낱개는 ${singles}개예요.`)],
       };
     }
   },
@@ -113,6 +113,7 @@ const num50Order: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
     const expr: MathExpr = [{ kind: 'blank', slot: 0 }];
 
     if (pat === 0) {
@@ -120,16 +121,19 @@ const num50Order: SkillDef = {
       const n = rng.int(10, 49);
       answer = n + 1;
       promptStr = `${n}보다 1 큰 수는 얼마인가요?`;
+      explanation = [txt(`${n} 다음 수를 세면 ${answer}이에요. 그래서 ${n}보다 1 큰 수는 ${answer}이에요.`)];
     } else if (pat === 1) {
       // 1 작은 수
       const n = rng.int(11, 50);
       answer = n - 1;
       promptStr = `${n}보다 1 작은 수는 얼마인가요?`;
+      explanation = [txt(`${n} 바로 앞의 수는 ${answer}예요. 그래서 ${n}보다 1 작은 수는 ${answer}예요.`)];
     } else {
       // 사이 수: a, ?, a+2
       const a = rng.int(10, 48);
       answer = a + 1;
       promptStr = `${a}과 ${a + 2} 사이에 있는 수는 얼마인가요?`;
+      explanation = [txt(`${a}, ${answer}, ${a + 2}을 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
     }
 
     return {
@@ -140,7 +144,7 @@ const num50Order: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}`)],
+      explanation,
     };
   },
 };
@@ -174,8 +178,9 @@ const num50Compare: SkillDef = {
       left: [{ kind: 'decimal', v: a }],
       right: [{ kind: 'decimal', v: b }],
       answer,
+      // 부등호는 클릭 선택(ComparisonView). 풀이는 어느 수가 큰지 말로 짚고 기호도 함께.
       explanation: [
-        txt(`${a}와 ${b}를 비교하면: ${a} ${answer} ${b}이에요.`),
+        txt(`${a}와 ${b} 중에서 ${Math.max(a, b)}이 더 커요. 그래서 ${a} ${answer} ${b}예요.`),
       ],
     };
   },
@@ -199,6 +204,7 @@ const num50Word: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 묶음+낱개 → 합
@@ -206,6 +212,7 @@ const num50Word: SkillDef = {
       const singles = rng.int(1, 9);
       answer = bundles * 10 + singles;
       promptStr = `${item}이 10개씩 ${bundles}묶음과 낱개 ${singles}개 있어요. 모두 몇 개인가요?`;
+      explanation = [txt(`10개씩 ${bundles}묶음은 ${bundles * 10}개예요. 낱개 ${singles}개와 합치면 ${answer}개예요.`)];
     } else {
       // 두 묶음 합산
       let a = 13, b = 25;
@@ -221,6 +228,7 @@ const num50Word: SkillDef = {
       answer = a + b;
       const item2 = rng.pick(BUNDLE_ITEMS.filter(i => i !== item));
       promptStr = `${item}이 ${a}개, ${item2}이 ${b}개 있어요. 모두 몇 개인가요?`;
+      explanation = [txt(`${a}개와 ${b}개를 더하면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
     }
 
     const expr: MathExpr = [
@@ -237,7 +245,7 @@ const num50Word: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}개`)],
+      explanation,
     };
   },
 };

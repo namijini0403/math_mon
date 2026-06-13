@@ -107,7 +107,7 @@ const as1Add: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} + ${b} = ${ans}`)],
+      explanation: [txt(`${a}부터 ${b}만큼 이어 세면 ${ans}이에요. ${a} + ${b} = ${ans}.`)],
     };
   },
 };
@@ -143,7 +143,7 @@ const as1Sub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} - ${b} = ${ans}`)],
+      explanation: [txt(`${a}에서 ${b}만큼 덜어 내면 ${ans}이에요. ${a} - ${b} = ${ans}.`)],
     };
   },
 };
@@ -206,6 +206,7 @@ const as1Missing: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
     const expr: MathExpr = [txt('□ = '), { kind: 'blank', slot: 0 }];
 
     if (pat === 0) {
@@ -218,6 +219,7 @@ const as1Missing: SkillDef = {
       }
       answer = c - b;
       promptStr = `□ + ${b} = ${c}일 때, □에 알맞은 수를 구하세요.`;
+      explanation = [txt(`${c}에서 ${b}만큼 덜어 내면 □를 알 수 있어요. □ = ${c} - ${b} = ${answer}.`)];
     } else {
       // a - □ = c → □ = a - c (□ ≥ 1, c ≥ 1)
       let a = 7, c = 3;
@@ -228,6 +230,7 @@ const as1Missing: SkillDef = {
       }
       answer = a - c;
       promptStr = `${a} - □ = ${c}일 때, □에 알맞은 수를 구하세요.`;
+      explanation = [txt(`${a}에서 얼마를 빼야 ${c}가 될까요? □ = ${a} - ${c} = ${answer}.`)];
     }
 
     return {
@@ -238,7 +241,7 @@ const as1Missing: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`□ = ${answer}`)],
+      explanation,
     };
   },
 };
@@ -259,7 +262,8 @@ const as1Word: SkillDef = {
 
     let promptStr: string;
     let answer: number;
-    let unit = '개';
+    let explanation: MathExpr;
+    const unit = '개';
 
     if (pat === 0) {
       // 덧셈
@@ -271,6 +275,7 @@ const as1Word: SkillDef = {
       }
       answer = a + b;
       promptStr = `${item}가 ${a}개 있어요. ${b}개를 더 사면 모두 몇 개인가요?`;
+      explanation = [txt(`${a}개에 ${b}개를 더하면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
     } else {
       // 뺄셈
       let a = 5, b = 2;
@@ -281,6 +286,7 @@ const as1Word: SkillDef = {
       }
       answer = a - b;
       promptStr = `${item}가 ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
+      explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} - ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
     }
 
     const expr: MathExpr = [
@@ -297,7 +303,7 @@ const as1Word: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}${unit}`)],
+      explanation,
     };
   },
 };

@@ -14,6 +14,13 @@ const txc = (text: string): ChoiceValue => ({ kind: 'text', text });
 const SHAPES = ['공 모양 ⚽', '상자 모양 📦', '둥근기둥 모양 🥫'] as const;
 type ShapeType = typeof SHAPES[number];
 
+// 모양별 특징 (1학년 눈높이 — '왜 그 모양인지' 풀이에 사용)
+const SHAPE_TRAIT: Record<ShapeType, string> = {
+  '공 모양 ⚽': '어느 쪽에서 봐도 둥글어서 잘 굴러가요',
+  '상자 모양 📦': '평평한 면이 있어서 잘 쌓을 수 있어요',
+  '둥근기둥 모양 🥫': '위와 아래는 평평하고 옆은 둥글어요',
+};
+
 // 물건 풀 (모양별 분류)
 const BALL_ITEMS = ['축구공', '농구공', '지구본', '오렌지', '수박', '야구공', '탁구공', '볼링공', '사탕', '구슬'];
 const BOX_ITEMS = ['선물 상자', '과자 상자', '책', '지우개', '주사위', '벽돌', '휴지 상자', '냉장고', '세탁기', '텔레비전'];
@@ -61,7 +68,7 @@ const shape1Classify: SkillDef = {
       prompt: `${item}은(는) 어떤 모양인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${item}은(는) ${correct}이에요.`)],
+      explanation: [txt(`${item}은(는) ${SHAPE_TRAIT[correct]}. 그래서 ${correct}이에요.`)],
     };
   },
 };
@@ -117,7 +124,9 @@ const shape1Same: SkillDef = {
       prompt: `${referenceItem}과 같은 모양의 물건을 고르세요.`,
       choices,
       answerIndex,
-      explanation: [txt(`${referenceItem}과 ${correctItem}은(는) 같은 모양이에요.`)],
+      explanation: [
+        txt(`${referenceItem}과 ${correctItem}은(는) 둘 다 ${SHAPES[which]}이라 같은 모양이에요.`),
+      ],
     };
   },
 };
@@ -161,7 +170,7 @@ const shape1Count: SkillDef = {
       prompt: `${display}\n${shapeNames[ask]}은(는) 몇 개인가요?`,
       expr,
       blankAnswers: [counts[ask]],
-      explanation: [txt(`${shapeNames[ask]}이(가) ${counts[ask]}개 있어요.`)],
+      explanation: [txt(`${shapeNames[ask]}만 하나씩 골라 세어 보면 ${counts[ask]}개예요.`)],
     };
   },
 };
@@ -181,6 +190,7 @@ const shape1Word: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 공 모양 개수
@@ -189,6 +199,7 @@ const shape1Word: SkillDef = {
       const cyls = rng.int(1, 5);
       answer = balls;
       promptStr = `바구니에 ⚽ ${balls}개, 📦 ${boxes}개, 🥫 ${cyls}개가 있어요. 공 모양은 몇 개인가요?`;
+      explanation = [txt(`공 모양 ⚽만 골라 세면 ${balls}개예요.`)];
     } else if (pat === 1) {
       // 상자 모양 개수
       const balls = rng.int(1, 5);
@@ -196,6 +207,7 @@ const shape1Word: SkillDef = {
       const cyls = rng.int(1, 5);
       answer = boxes;
       promptStr = `선반에 ⚽ ${balls}개, 📦 ${boxes}개, 🥫 ${cyls}개가 있어요. 상자 모양은 몇 개인가요?`;
+      explanation = [txt(`상자 모양 📦만 골라 세면 ${boxes}개예요.`)];
     } else {
       // 모양 합계
       const a = rng.int(1, 4);
@@ -204,6 +216,7 @@ const shape1Word: SkillDef = {
       const which1 = rng.int(0, 2);
       const which2 = (which1 + 1) % 3;
       promptStr = `${SHAPE_EMOJIS[which1]} ${a}개와 ${SHAPE_EMOJIS[which2]} ${b}개가 있어요. 모두 몇 개인가요?`;
+      explanation = [txt(`${a}개와 ${b}개를 모으면 ${a} + ${b} = ${answer}개예요.`)];
     }
 
     const expr: MathExpr = [
@@ -220,7 +233,7 @@ const shape1Word: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}개`)],
+      explanation,
     };
   },
 };

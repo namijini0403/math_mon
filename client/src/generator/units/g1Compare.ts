@@ -129,6 +129,7 @@ const comp1Vocab: SkillDef = {
 
     let promptStr: string;
     let answer: string;
+    let explanation: MathExpr;
     let wrong1: string, wrong2: string, wrong3: string;
 
     if (pat === 0) {
@@ -142,6 +143,7 @@ const comp1Vocab: SkillDef = {
       wrong2 = '같아요';
       wrong3 = '모르겠어요';
       promptStr = `가에는 ${item}가 ${a}개, 나에는 ${b}개 있어요. 가는 나보다 ${item}가 어때요?`;
+      explanation = [txt(`가는 ${a}개, 나는 ${b}개예요. 그래서 가는 나보다 ${answer}`)];
     } else if (pat === 1) {
       const a = rng.int(1, 9);
       let b = rng.int(1, 9);
@@ -152,6 +154,7 @@ const comp1Vocab: SkillDef = {
       wrong2 = '같아요';
       wrong3 = '모르겠어요';
       promptStr = `가 끈은 ${a}cm, 나 끈은 ${b}cm예요. 가 끈은 나 끈보다 어때요?`;
+      explanation = [txt(`가 끈은 ${a}cm, 나 끈은 ${b}cm예요. 그래서 가 끈은 나 끈보다 ${answer}`)];
     } else {
       const a = rng.int(1, 9);
       let b = rng.int(1, 9);
@@ -162,6 +165,7 @@ const comp1Vocab: SkillDef = {
       wrong2 = '같아요';
       wrong3 = '모르겠어요';
       promptStr = `가 가방은 ${a}kg, 나 가방은 ${b}kg이에요. 가 가방은 나 가방보다 어때요?`;
+      explanation = [txt(`가 가방은 ${a}kg, 나 가방은 ${b}kg이에요. 그래서 가 가방은 나 가방보다 ${answer}`)];
     }
 
     const answerVal = txc(answer);
@@ -176,7 +180,7 @@ const comp1Vocab: SkillDef = {
       prompt: promptStr,
       choices,
       answerIndex,
-      explanation: [txt(`답: ${answer}`)],
+      explanation,
     };
   },
 };
@@ -197,6 +201,7 @@ const comp1Word: SkillDef = {
 
     let promptStr: string;
     let answer: number;
+    let explanation: MathExpr;
 
     if (pat === 0) {
       // 더 많은 쪽 개수
@@ -209,6 +214,7 @@ const comp1Word: SkillDef = {
       answer = Math.max(a, b);
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
       promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. 더 많은 것은 몇 개인가요?`;
+      explanation = [txt(`${a}개와 ${b}개를 비교하면 ${answer}개가 더 많아요.`)];
     } else if (pat === 1) {
       // 더 적은 쪽 개수
       let a = 3, b = 5;
@@ -220,6 +226,7 @@ const comp1Word: SkillDef = {
       answer = Math.min(a, b);
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
       promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. 더 적은 것은 몇 개인가요?`;
+      explanation = [txt(`${a}개와 ${b}개를 비교하면 ${answer}개가 더 적어요.`)];
     } else {
       // 차이
       let a = 3, b = 5;
@@ -231,6 +238,7 @@ const comp1Word: SkillDef = {
       answer = b - a;
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
       promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. ${item2}는 ${item}보다 몇 개 더 많은가요?`;
+      explanation = [txt(`${b}개에서 ${a}개를 덜어 내어 비교하면 ${b} - ${a} = ${answer}개 더 많아요.`)];
     }
 
     const expr: MathExpr = [
@@ -247,7 +255,7 @@ const comp1Word: SkillDef = {
       prompt: promptStr,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`답: ${answer}개`)],
+      explanation,
     };
   },
 };

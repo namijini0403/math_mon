@@ -16,7 +16,12 @@ import { semesterOfUnit } from './gradeAccess';
  * 미등록 단원의 알려진 위반은 docs/curriculum/notation-violations.md에 추적.
  */
 export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
-  'unitNum9', // 1-1 ①
+  // 1-1
+  'unitNum9', // ① 9까지의 수
+  'unitShape1', // ② 여러 가지 모양
+  'unitAddSub1', // ③ 덧셈과 뺄셈
+  'unitCompare1', // ④ 비교하기
+  'unitNum50', // ⑤ 50까지의 수
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {

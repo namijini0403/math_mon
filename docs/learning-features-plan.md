@@ -98,7 +98,7 @@
 
 ## 권장 실행 순서 (단계)
 1. ✅ **Phase A 완료(2026-06-14)**: wrongLog 모델(game/wrongLog.ts, 10테스트) + 「흐려진 별의 회랑」(CorridorPage) + 「수련의 첨탑」(TowerPage) + 단원평가 「약점 봉인 모드」(ExamPage ?focus=weak). recordAnswer에 seed 추가, 공통 ProblemBody 추출, 허브 진입점. tsc·vitest 1472·build·Playwright 검수 통과.
-2. 🔄 **Phase B (기능4 풀이) 진행 중**: 인프라 완료(2026-06-14) — SolutionReveal(정답에도 💡풀이 보기, 5화면) + curriculumGuard(학년별 금지표기 스캔, AUDITED_UNITS 게이트) + docs/curriculum/g{N}.md 누적기준 + notation-violations.md 추적. **단원 audit 순차 진행: unitNum9(1-1①) 완료.** 다음 = 1-1② 여러가지 모양(unitShape1)… 1학년부터 차례로. 각 단원: 풀이를 학년 단계풀이로 정비 → 표기위반0 확인 → AUDITED_UNITS 추가. 교육과정 의심 시 검색.
+2. 🔄 **Phase B (기능4 풀이) 진행 중**: 인프라 완료(2026-06-14) — SolutionReveal(정답에도 💡풀이 보기, 5화면) + curriculumGuard(학년별 금지표기 스캔, AUDITED_UNITS 게이트) + docs/curriculum/g{N}.md 누적기준 + notation-violations.md 추적. **단원 audit 순차 진행: 1-1 전체 5단원 완료(unitNum9·Shape1·AddSub1·Compare1·Num50).** 다음 = 1-2(100까지의 수 등)… 1학년부터 차례로. 각 단원: 풀이를 학년 단계풀이로 정비 → 표기위반0 확인 → AUDITED_UNITS 추가. 교육과정 의심 시 검색.
 3. **Phase C (기능2 힌트)**: hintTokens + 힌트 단계(풀이 공유) + 보스 힌트 연출.
 4. **Phase D (기능3+5 교사·단원평가)**: 서버 assignments/results + 교사 작성·배포·레포트 + 학생 수신/응시 + 누적 추이 + 인쇄. (가장 큼, 서버 중심)
 
