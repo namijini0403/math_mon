@@ -1,8 +1,12 @@
 /**
  * DragonRoom — 드래곤이 사는 방 배경(코드 렌더 SVG). 집 재료를 모을수록 6단계로 업그레이드.
  *   0 지푸라기 둥지 → 1 나무 둥지 → 2 포근한 오두막 → 3 튼튼한 벽돌집 → 4 드래곤의 성 → 5 찬란한 궁전
- * 드래곤(DragonStage)은 이 배경 위(앞)에 겹쳐 그린다. 이미지 에셋 불필요.
+ * 드래곤(DragonStage)은 이 배경 위(앞)에 겹쳐 그린다.
+ * Codex 페인터리 방 배경(assets/dragon/room/tierN.png)이 있으면 우선 사용하고,
+ * 없으면 아래 코드 렌더 SVG로 폴백한다(파일명만 맞으면 자동 업그레이드).
  */
+
+import { useState } from 'react';
 
 const VB_W = 320;
 const VB_H = 210;
@@ -188,7 +192,24 @@ function Tier5() {
 const TIERS = [Tier0, Tier1, Tier2, Tier3, Tier4, Tier5];
 
 export function DragonRoom({ tier, className }: { tier: number; className?: string }) {
-  const Scene = TIERS[Math.max(0, Math.min(5, tier))];
+  const t = Math.max(0, Math.min(5, tier));
+  const Scene = TIERS[t];
+  const [rasterOk, setRasterOk] = useState(true);
+  const rasterSrc = `assets/dragon/room/tier${t}.png`;
+
+  // Codex 페인터리 배경이 있으면 우선 사용
+  if (rasterOk) {
+    return (
+      <img
+        src={rasterSrc}
+        alt=""
+        aria-hidden="true"
+        className={`${className ?? ''} object-cover object-bottom`}
+        onError={() => setRasterOk(false)}
+      />
+    );
+  }
+  // 폴백: 코드 렌더 SVG 방
   return (
     <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className={className} preserveAspectRatio="xMidYMax meet" aria-hidden="true">
       <Scene />

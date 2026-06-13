@@ -18,9 +18,12 @@ import {
   currentFullness,
   stageForGp,
   topAffinity,
+  earnedDecor,
   type Affinity,
   type DragonItemDef,
+  type DragonItemStats,
   type DragonState,
+  type RoomDecorDef,
 } from './dragon';
 import { pushProgress } from '../api';
 import { track } from '../analytics';
@@ -112,6 +115,10 @@ interface GameState {
   addPracticeAnswer: (mode: 'basic' | 'word' | 'challenge') => 'basic' | 'word' | 'challenge' | null;
   /** 드래곤 아이템 조건 재평가 — 새로 얻은 아이템 반환 (아이템당 +20 GP) */
   evaluateDragonItems: () => DragonItemDef[];
+  /** 방 장식 배치/해제 토글 */
+  togglePlacedDecor: (decorId: string) => void;
+  /** 현재 해금된 방 장식 목록 */
+  earnedDecorList: () => RoomDecorDef[];
   /** 보물 카드 1장 뽑기. 중복이면 ×n 카운트 + 보너스 XP */
   drawTreasureCard: () => { drawn: RewardCardDef; duplicate: boolean };
   /** 심화 스테이지 클리어 기록 */
@@ -462,6 +469,34 @@ export const useGame = create<GameState>()(
           get().dragonGain({ gp: GP_REWARDS.item * earned.length });
         }
         return earned;
+      },
+
+      togglePlacedDecor: (decorId) =>
+        set((s) => {
+          const placed = s.dragon.placedDecor ?? [];
+          const next = placed.includes(decorId)
+            ? placed.filter((id) => id !== decorId)
+            : [...placed, decorId];
+          return { dragon: { ...s.dragon, placedDecor: next } };
+        }),
+
+      earnedDecorList: () => {
+        const s = get();
+        const stats: DragonItemStats = {
+          lessonsCompleted: s.records.lessonsCompleted,
+          bossesCleared: Object.keys(s.stages).filter(
+            (id) => id.endsWith('-boss') && (s.stages[id]?.stars ?? 0) > 0,
+          ).length,
+          basicSets: s.practice.basicSets,
+          wordSets: s.practice.wordSets,
+          challengeSets: s.practice.challengeSets,
+          examCount: s.examCount,
+          challengeCleared: s.records.challengeCleared,
+          attendanceDays: s.attendance.totalDays,
+          feedCount: s.dragon.feedCount,
+          rewardCardCount: s.rewardCards.length,
+        };
+        return earnedDecor(stats);
       },
 
       evaluateBadges: () => {

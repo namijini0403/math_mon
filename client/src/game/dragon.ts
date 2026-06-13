@@ -144,6 +144,8 @@ export interface DragonState {
   feedCount: number;
   /** 성체 확정 정보 (성체 도달 시 1회 결정) */
   adult?: { affinity: Affinity; form: 'human' | 'dragon' };
+  /** 방에 배치한 장식 id 목록 */
+  placedDecor?: string[];
 }
 
 export function emptyDragon(): DragonState {
@@ -155,7 +157,57 @@ export function emptyDragon(): DragonState {
     lastFed: '',
     fullnessAtFed: 70,
     feedCount: 0,
+    placedDecor: [],
   };
+}
+
+// ── 방 꾸미기: 배치 장식 ─────────────────────────────────────────────
+// 미션·활동으로 해금하고, 방의 정해진 슬롯에 배치한다.
+// Codex PNG(assets/dragon/decor/{id}.png) 우선, 없으면 이모지 폴백.
+
+export type RoomSlot = 'floorLeft' | 'floorRight' | 'floorCenter' | 'wallLeft' | 'wallRight';
+
+/** 방 박스(상대 좌표) 내 슬롯 위치 — left/bottom %, 크기(px) */
+export const ROOM_SLOTS: Record<RoomSlot, { left: string; bottom: string; size: number }> = {
+  floorLeft: { left: '8%', bottom: '6%', size: 52 },
+  floorRight: { left: '72%', bottom: '6%', size: 52 },
+  floorCenter: { left: '42%', bottom: '2%', size: 48 },
+  wallLeft: { left: '9%', bottom: '44%', size: 44 },
+  wallRight: { left: '75%', bottom: '44%', size: 44 },
+};
+
+export interface RoomDecorDef {
+  id: string;
+  name: string;
+  /** 이미지 부재 시 폴백 이모지 */
+  emoji: string;
+  /** 기본 배치 슬롯 */
+  slot: RoomSlot;
+  /** 해금 조건 설명 */
+  hint: string;
+  earned: (s: DragonItemStats) => boolean;
+}
+
+export const ROOM_DECOR: RoomDecorDef[] = [
+  { id: 'rug', name: '별무늬 양탄자', emoji: '🟣', slot: 'floorCenter', hint: '첫 보스를 물리치면', earned: (s) => s.bossesCleared >= 1 },
+  { id: 'torch', name: '벽 횃불', emoji: '🔥', slot: 'wallLeft', hint: '레슨 10개를 완료하면', earned: (s) => s.lessonsCompleted >= 10 },
+  { id: 'chest', name: '보물 상자', emoji: '🧰', slot: 'floorLeft', hint: '보물 카드 3장을 모으면', earned: (s) => s.rewardCardCount >= 3 },
+  { id: 'plant', name: '빛나는 화분', emoji: '🪴', slot: 'floorRight', hint: '10일 출석하면', earned: (s) => s.attendanceDays >= 10 },
+  { id: 'banner', name: '드래곤 깃발', emoji: '🚩', slot: 'wallRight', hint: '보스 6마리를 물리치면', earned: (s) => s.bossesCleared >= 6 },
+  { id: 'lantern', name: '별빛 등불', emoji: '🏮', slot: 'wallRight', hint: '7일 연속 접속하면', earned: (s) => s.attendanceDays >= 7 },
+  { id: 'bookshelf', name: '마법 책장', emoji: '📚', slot: 'floorLeft', hint: '문장제 연습 3세트를 마치면', earned: (s) => s.wordSets >= 3 },
+  { id: 'cushion', name: '포근한 방석', emoji: '🛋️', slot: 'floorCenter', hint: '먹이를 10번 주면', earned: (s) => s.feedCount >= 10 },
+  { id: 'crystal', name: '수정 장식', emoji: '🔮', slot: 'wallLeft', hint: '심화 탐험을 1회 클리어하면', earned: (s) => s.challengeCleared >= 1 },
+  { id: 'trophy', name: '명예의 트로피', emoji: '🏆', slot: 'floorRight', hint: '단원평가에 5번 도전하면', earned: (s) => s.examCount >= 5 },
+];
+
+/** 해금된 장식 목록 */
+export function earnedDecor(stats: DragonItemStats): RoomDecorDef[] {
+  return ROOM_DECOR.filter((d) => d.earned(stats));
+}
+
+export function getDecor(id: string): RoomDecorDef | undefined {
+  return ROOM_DECOR.find((d) => d.id === id);
 }
 
 /** 현재 배부름 (하루 25씩 감소) */

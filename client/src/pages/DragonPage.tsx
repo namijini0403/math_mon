@@ -12,13 +12,17 @@ import {
   MOOD_INFO,
   RARE_ENDING_CARDS,
   ROOM_TIERS,
+  ROOM_SLOTS,
+  ROOM_DECOR,
   roomTier,
+  getDecor,
   adultTitle,
   currentFullness,
   dragonMood,
   stageForGp,
   topAffinity,
   type Affinity,
+  type RoomDecorDef,
 } from '../game/dragon';
 import { dragonArt } from '../game/dragonArt';
 import { DragonRoom } from '../components/DragonRoom';
@@ -26,6 +30,24 @@ import { todayStr } from '../game/missions';
 import { sfx } from '../game/sounds';
 
 const SEEN_STAGE_KEY = 'mathmon-dragon-seen-stage';
+
+/** 장식 아이콘 — Codex PNG 우선, 없으면 이모지 폴백 */
+function DecorIcon({ decor, size }: { decor: RoomDecorDef; size: number }) {
+  const [ok, setOk] = useState(true);
+  if (ok) {
+    return (
+      <img
+        src={`assets/dragon/decor/${decor.id}.png`}
+        alt={decor.name}
+        width={size}
+        height={size}
+        className="object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
+        onError={() => setOk(false)}
+      />
+    );
+  }
+  return <span style={{ fontSize: size * 0.8 }} className="leading-none drop-shadow">{decor.emoji}</span>;
+}
 
 // ── 드래곤 무대 ─────────────────────────────────────────────────────────────
 
@@ -258,7 +280,7 @@ function EndingOverlay({ affinity, form, nickname, title, onClose }: {
 // ── 메인 페이지 ──────────────────────────────────────────────────────────────
 
 export default function DragonPage() {
-  const { dragon, streak, rewardCards, nickname, feedDragon } = useGame();
+  const { dragon, streak, rewardCards, nickname, feedDragon, togglePlacedDecor, earnedDecorList } = useGame();
   const today = todayStr();
   const stage = stageForGp(dragon.gp);
   const fullness = currentFullness(dragon, today);
@@ -350,6 +372,9 @@ export default function DragonPage() {
   const nextRoom = ROOM_TIERS[tier + 1];
   const itemsToNext = nextRoom ? nextRoom.need - itemCount : 0;
 
+  // 해금된 장식 id 집합 (방 꾸미기)
+  const earnedIds = new Set(earnedDecorList().map((d) => d.id));
+
   return (
     <div className="max-w-xl mx-auto px-5 pb-16">
       {/* 하트 파티클 */}
@@ -387,6 +412,22 @@ export default function DragonPage() {
       >
         {/* 방 배경 (집 단계별) — 드래곤 뒤에 깔린다 */}
         <DragonRoom tier={tier} className="absolute inset-x-0 bottom-0 w-full h-[70%] pointer-events-none" />
+
+        {/* 배치한 장식 — 슬롯 위치에 (드래곤보다 뒤, 배경보다 앞) */}
+        {(dragon.placedDecor ?? []).map((id) => {
+          const d = getDecor(id);
+          if (!d) return null;
+          const slot = ROOM_SLOTS[d.slot];
+          return (
+            <div
+              key={id}
+              className="absolute z-[5] pointer-events-none flex items-end justify-center"
+              style={{ left: slot.left, bottom: slot.bottom, width: slot.size, height: slot.size }}
+            >
+              <DecorIcon decor={d} size={slot.size} />
+            </div>
+          );
+        })}
 
         {/* 성체 칭호 */}
         {dragon.adult && (
@@ -427,6 +468,49 @@ export default function DragonPage() {
               ? `아이템 ${itemsToNext}개 더 모으면 「${nextRoom.name}」으로 업그레이드!`
               : '최고 단계의 궁전이에요! 👑'}
           </div>
+        </div>
+      </div>
+
+      {/* ── 방 꾸미기 ── */}
+      <div className="mt-4 rounded-3xl bg-night-900 border border-night-700 p-4">
+        <div className="text-sm opacity-70 mb-3">🎨 방 꾸미기 <span className="text-[0.65rem] opacity-60">— 미션으로 얻은 장식을 방에 배치해요</span></div>
+        <div className="grid grid-cols-5 gap-2">
+          {ROOM_DECOR.map((d) => {
+            const unlocked = earnedIds.has(d.id);
+            const placed = (dragon.placedDecor ?? []).includes(d.id);
+            return (
+              <button
+                key={d.id}
+                disabled={!unlocked}
+                onClick={() => togglePlacedDecor(d.id)}
+                aria-label={unlocked ? `${d.name} ${placed ? '치우기' : '배치'}` : `${d.name} (잠김)`}
+                className={`relative flex flex-col items-center justify-center rounded-2xl border-2 p-2 gap-1 aspect-square transition-all ${
+                  placed
+                    ? 'border-coin bg-coin/15'
+                    : unlocked
+                      ? 'border-night-700 bg-night-800 hover:bg-night-700'
+                      : 'border-night-800 bg-night-900 opacity-40'
+                }`}
+              >
+                {unlocked ? (
+                  <DecorIcon decor={d} size={34} />
+                ) : (
+                  <span className="text-xl">🔒</span>
+                )}
+                <span className="text-[8px] leading-tight text-center line-clamp-1 opacity-80">
+                  {unlocked ? d.name : '???'}
+                </span>
+                {placed && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-coin text-night-950 text-[9px] font-bold flex items-center justify-center">
+                    ✓
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <div className="text-[0.65rem] opacity-50 mt-2">
+          잠긴 장식은 미션을 달성하면 열려요. 장식을 누르면 방에 놓거나 치울 수 있어요.
         </div>
       </div>
 
