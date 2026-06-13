@@ -79,7 +79,8 @@ npm run build -w client               # PWA 빌드
 
 ## 8. 자주 쓰는 사실
 
-- 테스트 수 기준선: 1462개(2026-06-13: 1430 + steps 8 + gradeAccess 7 + dragonEvolution 11 + dragonItems 6). 줄어들면 뭔가 깨진 것.
+- 테스트 수 기준선: 1472개(2026-06-14: 1462 + wrongLog 10). 줄어들면 뭔가 깨진 것.
+- 학습강화(Phase A, 2026-06-14): 틀린 문제 다시보기 store.wrongLog(단원별 (skillId,seed), game/wrongLog.ts 순수 reducer). recordAnswer(skillId,correct,seed?)에 seed 주면 오답=pushWrong·정답=clearWrong. 「흐려진 별의 회랑」=CorridorPage(/corridor[/:unitId], 저장 seed로 문제 그대로 재현·맞히면 별 점등). 「수련의 첨탑」=TowerPage(/tower/:skillId, 단일스킬 무한). 단원평가 「약점 봉인 모드」=ExamPage ?focus=weak(skillStats.w 가중). 공통 문제뷰=components/problem/ProblemBody.tsx(회랑·첨탑만 사용, 기존 3페이지는 회귀방지로 미변경). 진입점=PracticeHubPage. 나머지 Phase B~D는 docs/learning-features-plan.md.
 - 학기: g1s1~g6s2 전 12학기 완성(스테이지 312개·보스 71종). 1·2학년 청사진 docs/g1g2-design.md, 보스 명세 ASSET_SPEC_G12.md. 스테이지 접두사 전체 목록은 stages.ts grep이 정답.
 - 1·2학년 특이: 이모지를 시각 자료로 사용(세기·모양·반복 패턴), fill-blanks 답 0 금지(0의 곱/합은 choice·식 빈칸), 복수 빈칸 blankAnswers 배열([시,분]·[m,cm]).
 - 문제 형식: choice / fraction-input / decimal-input / comparison / fill-blanks / matching.

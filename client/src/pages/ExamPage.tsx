@@ -5,7 +5,7 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SKILLS, generateProblem, randomSeed } from '../generator';
 import type { Problem, SkillDef } from '../generator/types';
@@ -28,8 +28,30 @@ import { track } from '../analytics';
 
 const TOTAL = 10;
 
-/** 시험 문제 선택 — 앞 3문제 기초, 중간 보통, 마지막 3문제 도전(심화 혼합) */
-function pickExamProblem(unitId: string, index: number): Problem {
+type Stats = Record<string, { c: number; w: number }>;
+
+/** 약점 가중 픽 — 정답률이 낮은(틀린 비율 높은) 스킬을 더 자주 뽑는다. */
+function pickWeighted(pool: SkillDef[], stats: Stats): SkillDef {
+  const entries = pool.map((s) => {
+    const st = stats[s.id];
+    // 표본 없으면 보통 가중, 오답이 많을수록 최대 3배까지 가중
+    const w = !st || st.c + st.w === 0 ? 1 : 1 + 2 * (st.w / (st.c + st.w));
+    return { s, w };
+  });
+  const totalW = entries.reduce((a, e) => a + e.w, 0);
+  let r = Math.random() * totalW;
+  for (const e of entries) {
+    r -= e.w;
+    if (r <= 0) return e.s;
+  }
+  return entries[entries.length - 1].s;
+}
+
+/**
+ * 시험 문제 선택 — 앞 3문제 기초, 중간 보통, 마지막 3문제 도전(심화 혼합).
+ * weak=true(약점 봉인 모드)면 같은 난이도 풀 안에서 '내가 틀린 유형'을 가중해 뽑는다.
+ */
+function pickExamProblem(unitId: string, index: number, weak: boolean, stats: Stats): Problem {
   const unitSkills = SKILLS.filter((s) => s.unitId === unitId);
   const target: 1 | 2 | 3 = index < 3 ? 1 : index < 7 ? 2 : 3;
   let pool: SkillDef[];
@@ -41,7 +63,7 @@ function pickExamProblem(unitId: string, index: number): Problem {
     pool = unitSkills.filter((s) => !s.challenge && s.difficulty === target);
     if (pool.length === 0) pool = unitSkills.filter((s) => !s.challenge);
   }
-  const skill = pool[Math.floor(Math.random() * pool.length)];
+  const skill = weak ? pickWeighted(pool, stats) : pool[Math.floor(Math.random() * pool.length)];
   return generateProblem(skill.id, randomSeed());
 }
 
@@ -54,6 +76,8 @@ function gradeOf(score: number): { title: string; emoji: string; line: string } 
 
 export default function ExamPage() {
   const { showAnswers, recordAnswer, addXp, syncNow, classCode } = useGame();
+  const [searchParams] = useSearchParams();
+  const weak = searchParams.get('focus') === 'weak';
   const [unitId, setUnitId] = useState<string | null>(null);
   // 복습/선행 단원 시험은 보상(XP·메달·미션카드) 미지급
   const rewarded = unitId ? accessZone(parseGradeSemester(classCode), unitId) === 'current' : true;
@@ -80,10 +104,10 @@ export default function ExamPage() {
     setUnitId(uid);
     setIndex(0);
     setScore(0);
-    setProblem(pickExamProblem(uid, 0));
+    setProblem(pickExamProblem(uid, 0, weak, useGame.getState().skillStats));
     servedAtRef.current = Date.now();
     setAnswer(null);
-    void track('exam.start', { unit_id: uid });
+    void track('exam.start', { unit_id: uid, policy_tag: weak ? 'weak' : 'normal' });
     setPhase('answering');
   };
 
@@ -98,7 +122,7 @@ export default function ExamPage() {
     if (!a || !problem) return;
     const elapsed_ms = Date.now() - servedAtRef.current;
     const ok = checkAnswer(problem, a);
-    recordAnswer(problem.skillId, ok);
+    recordAnswer(problem.skillId, ok, problem.seed);
     void track('exam.answer', {
       unit_id: unitId ?? undefined,
       skill_id: problem.skillId,
@@ -139,7 +163,7 @@ export default function ExamPage() {
       return;
     }
     setIndex((i) => i + 1);
-    setProblem(pickExamProblem(unitId, index + 1));
+    setProblem(pickExamProblem(unitId, index + 1, weak, useGame.getState().skillStats));
     servedAtRef.current = Date.now();
     setAnswer(null);
     setPhase('answering');
@@ -152,8 +176,12 @@ export default function ExamPage() {
         <div className="flex items-center gap-3 py-4">
           <Link to="/" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">←</Link>
           <div>
-            <h1 className="text-xl">🏟️ 명예의 시험장</h1>
-            <p className="text-xs opacity-60">단원을 골라 10문제 시험에 도전! (보스전 수준 · {semester.label})</p>
+            <h1 className="text-xl">{weak ? '🌑 약점 봉인 모드' : '🏟️ 명예의 시험장'}</h1>
+            <p className="text-xs opacity-60">
+              {weak
+                ? `내가 자주 틀린 유형을 집중 출제해요 (보스전 수준 · ${semester.label})`
+                : `단원을 골라 10문제 시험에 도전! (보스전 수준 · ${semester.label})`}
+            </p>
           </div>
         </div>
         <div className="flex flex-col gap-2.5 mt-2">
@@ -220,7 +248,9 @@ export default function ExamPage() {
       <div className="flex items-center gap-3 p-4">
         <Link to="/" className="text-2xl opacity-60 hover:opacity-100" aria-label="나가기">✕</Link>
         <div className="flex-1">
-          <div className="text-sm leading-tight">🏟️ {unitId ? UNIT_TITLES[unitId] : ''} 시험</div>
+          <div className="text-sm leading-tight">
+            {weak ? '🌑' : '🏟️'} {unitId ? UNIT_TITLES[unitId] : ''} {weak ? '약점 봉인 모드' : '시험'}
+          </div>
           <div className="h-3 mt-1 rounded-full bg-night-800 overflow-hidden border border-night-700">
             <motion.div
               className="h-full bg-gradient-to-r from-coin to-amber-500"

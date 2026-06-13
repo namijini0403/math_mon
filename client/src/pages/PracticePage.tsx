@@ -121,7 +121,7 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
     if (!a) return;
     const elapsed_ms = Date.now() - servedAtRef.current;
     const ok = checkAnswer(problem, a);
-    recordAnswer(problem.skillId, ok);
+    recordAnswer(problem.skillId, ok, problem.seed);
     void track('practice.answer', {
       skill_id: problem.skillId,
       problem_id: problem.id,

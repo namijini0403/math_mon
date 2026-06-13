@@ -9,6 +9,8 @@ import { bossSeal, decideEvolution, tierRank } from './dragonEvolution';
 import { dailyRewardXp, newlyEarned, type BadgeDef, type BadgeStats } from './badges';
 import { drawRewardCard, DUPLICATE_XP, type RewardCardDef } from './rewardCards';
 import { newlyCompletedHidden, type HiddenMissionDef } from './hiddenMissions';
+import { clearWrong, pushWrong, type WrongLog } from './wrongLog';
+import { getSkill } from '../generator';
 import {
   AFFINITY_SOURCES,
   DRAGON_ITEMS,
@@ -58,6 +60,8 @@ interface GameState {
   daily: DailyCounters;
   /** 최근 틀린 스킬 큐 — retrieval 재출제용 (최대 8개) */
   recentWrong: string[];
+  /** 단원별 틀린 문제 (skillId,seed) — 「흐려진 별의 회랑」 다시보기용 */
+  wrongLog: WrongLog;
   /** 출석: 마지막 보상 수령일 + 누적 출석일 */
   attendance: { lastClaim: string; totalDays: number };
   /** 획득한 배지 id */
@@ -98,7 +102,7 @@ interface GameState {
   steps: StepState;
 
   setProfile: (p: { nickname: string; classCode?: string; studentId?: string }) => void;
-  recordAnswer: (skillId: string, correct: boolean) => void;
+  recordAnswer: (skillId: string, correct: boolean, seed?: number) => void;
   /** XP 추가 + 레벨업 카드 발급. 새로 얻은 카드 목록 반환 */
   addXp: (amount: number) => EarnedCard[];
   /** 보스 격파 카드 발급 */
@@ -181,6 +185,7 @@ export const useGame = create<GameState>()(
       streak: { last: '', count: 0 },
       daily: emptyDaily(),
       recentWrong: [],
+      wrongLog: {},
       attendance: { lastClaim: '', totalDays: 0 },
       badges: [],
       rewardCards: [],
@@ -203,7 +208,7 @@ export const useGame = create<GameState>()(
       setProfile: ({ nickname, classCode, studentId }) =>
         set({ nickname, classCode: classCode ?? null, studentId: studentId ?? null }),
 
-      recordAnswer: (skillId, correct) =>
+      recordAnswer: (skillId, correct, seed) =>
         set((s) => {
           const stat = s.skillStats[skillId] ?? { c: 0, w: 0 };
           const daily = freshDaily(s.daily);
@@ -215,6 +220,22 @@ export const useGame = create<GameState>()(
           } else if (!recentWrong.includes(skillId)) {
             recentWrong = [skillId, ...recentWrong].slice(0, 8);
           }
+          // 틀린 문제 다시보기(회랑): seed가 주어졌을 때만 단원별 (skillId,seed) 기록.
+          // 오답 = 흐려진 별 추가, 정답 = 그 문제 별 점등(목록에서 제거).
+          let wrongLog = s.wrongLog;
+          if (seed !== undefined) {
+            let unitId: string | null = null;
+            try {
+              unitId = getSkill(skillId).unitId;
+            } catch {
+              unitId = null;
+            }
+            if (unitId) {
+              wrongLog = correct
+                ? clearWrong(wrongLog, unitId, skillId, seed)
+                : pushWrong(wrongLog, unitId, skillId, seed, Date.now());
+            }
+          }
           return {
             skillStats: {
               ...s.skillStats,
@@ -222,6 +243,7 @@ export const useGame = create<GameState>()(
             },
             daily: { ...daily, solved: daily.solved + (correct ? 1 : 0) },
             recentWrong,
+            wrongLog,
           };
         }),
 
@@ -620,6 +642,7 @@ export const useGame = create<GameState>()(
           streak: { last: '', count: 0 },
           daily: emptyDaily(),
           recentWrong: [],
+          wrongLog: {},
           attendance: { lastClaim: '', totalDays: 0 },
           badges: [],
           rewardCards: [],

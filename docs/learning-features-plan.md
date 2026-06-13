@@ -97,7 +97,7 @@
 ---
 
 ## 권장 실행 순서 (단계)
-1. **Phase A (기반+기능1)**: wrongLog 모델 + 「흐려진 별의 회랑」 + 「수련의 첨탑」 + 시험 약점 모드. (클라, 재현성 테스트)
+1. ✅ **Phase A 완료(2026-06-14)**: wrongLog 모델(game/wrongLog.ts, 10테스트) + 「흐려진 별의 회랑」(CorridorPage) + 「수련의 첨탑」(TowerPage) + 단원평가 「약점 봉인 모드」(ExamPage ?focus=weak). recordAnswer에 seed 추가, 공통 ProblemBody 추출, 허브 진입점. tsc·vitest 1472·build·Playwright 검수 통과.
 2. **Phase B (기능4 풀이)**: explanation→단계 풀이 뷰 + 학년 가드 스캔 테스트. **교육과정 검색 동반.** (단원/포맷 단위로 점진)
 3. **Phase C (기능2 힌트)**: hintTokens + 힌트 단계(풀이 공유) + 보스 힌트 연출.
 4. **Phase D (기능3+5 교사·단원평가)**: 서버 assignments/results + 교사 작성·배포·레포트 + 학생 수신/응시 + 누적 추이 + 인쇄. (가장 큼, 서버 중심)

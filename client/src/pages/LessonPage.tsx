@@ -125,7 +125,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
   }, [isBoss]);
 
   const miss = (timeout: boolean) => {
-    recordAnswer(problem.skillId, false);
+    recordAnswer(problem.skillId, false, problem.seed);
     setLastCorrect(false);
     setTimedOut(timeout);
     if (isChallenge) {
@@ -165,7 +165,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
       correct: true,
       elapsed_ms,
     });
-    recordAnswer(problem.skillId, true);
+    recordAnswer(problem.skillId, true, problem.seed);
     setLastCorrect(true);
     setTimedOut(false);
     setDone((d) => d + 1);

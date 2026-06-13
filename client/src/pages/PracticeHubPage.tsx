@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SEMESTERS, STAGES, UNIT_TITLES } from '../game/stages';
 import { useGame } from '../game/store';
+import { wrongCountFor } from '../game/wrongLog';
 
 /** 한 단원에 '별 받은 스테이지(심화 제외)'가 1개 이상이면 클리어로 간주 */
 function isUnitCleared(unitId: string, stages: Record<string, { stars: number }>): boolean {
@@ -27,8 +28,9 @@ const MODES = [
 ] as const;
 
 export default function PracticeHubPage() {
-  const { stages } = useGame();
+  const { stages, wrongLog } = useGame();
   const navigate = useNavigate();
+  const totalWrong = Object.values(wrongLog).reduce((a, arr) => a + arr.length, 0);
 
   // 학기 선택 — localStorage 초기값
   const [semesterId, setSemesterId] = useState<string>(
@@ -67,8 +69,23 @@ export default function PracticeHubPage() {
         </div>
       </div>
 
+      {/* ── 흐려진 별의 회랑 (틀린 문제 다시보기) ── */}
+      <Link
+        to="/corridor"
+        className="btn-3d rounded-3xl bg-gradient-to-r from-indigo-900 to-night-900 border-2 border-indigo-500/60 border-b-indigo-700 px-5 py-4 flex items-center gap-4 hover:from-indigo-800 mt-1"
+      >
+        <span className="text-3xl">🌌</span>
+        <div className="flex-1">
+          <div className="text-base">흐려진 별의 회랑</div>
+          <div className="text-xs opacity-70">
+            {totalWrong > 0 ? `틀렸던 문제 ${totalWrong}개를 다시 풀어 별빛을 되살려요` : '틀린 문제가 모이면 여기서 다시 풀 수 있어요'}
+          </div>
+        </div>
+        {totalWrong > 0 && <span className="text-coin text-sm">🌫️ {totalWrong}</span>}
+      </Link>
+
       {/* ── 학기 선택 탭 ── */}
-      <div className="grid grid-cols-4 gap-1.5 mt-1">
+      <div className="grid grid-cols-4 gap-1.5 mt-4">
         {SEMESTERS.map((s) => (
           <button
             key={s.id}
@@ -133,6 +150,32 @@ export default function PracticeHubPage() {
                       <div className="text-[0.65rem] opacity-50">10문제 · 보스전 수준</div>
                     </div>
                   </button>
+                  {/* 약점 봉인 모드 (내가 틀린 유형 중심) */}
+                  <button
+                    onClick={() => navigate(`/exam/${uid}?focus=weak`)}
+                    className="btn-3d rounded-2xl bg-night-900 border-2 border-indigo-500/40 border-b-indigo-500/40 px-5 py-3 text-left hover:bg-night-800 flex items-center gap-3"
+                  >
+                    <span className="text-2xl">🌑</span>
+                    <div>
+                      <div className="text-sm">약점 봉인 모드</div>
+                      <div className="text-[0.65rem] opacity-50">내가 자주 틀린 유형 중심 10문제</div>
+                    </div>
+                  </button>
+                  {/* 이 단원 흐려진 별 (있을 때만) */}
+                  {wrongCountFor(wrongLog, uid) > 0 && (
+                    <button
+                      onClick={() => navigate(`/corridor/${uid}`)}
+                      className="btn-3d rounded-2xl bg-night-900 border-2 border-indigo-400/40 border-b-indigo-400/40 px-5 py-3 text-left hover:bg-night-800 flex items-center gap-3"
+                    >
+                      <span className="text-2xl">🌫️</span>
+                      <div>
+                        <div className="text-sm">흐려진 별 다시 풀기</div>
+                        <div className="text-[0.65rem] opacity-50">
+                          이 단원에서 틀린 문제 {wrongCountFor(wrongLog, uid)}개
+                        </div>
+                      </div>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
