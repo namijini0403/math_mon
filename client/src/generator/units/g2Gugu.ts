@@ -216,7 +216,7 @@ const guguMissing: SkillDef = {
         prompt: '□에 알맞은 수를 쓰세요.',
         expr,
         blankAnswers: [n],
-        explanation: [txt(`□ × ${dan} = ${result} → □ = ${result} ÷ ${dan} = ${n}`)],
+        explanation: [txt(`${dan}단을 외워 보면 ${dan} × ${n} = ${result}이에요. 곱셈은 순서를 바꿔도 결과가 같으니 □ × ${dan} = ${result}에서 □ = ${n}이에요.`)],
       };
     } else {
       // dan × □ = result  (answer: n)
@@ -233,7 +233,7 @@ const guguMissing: SkillDef = {
         prompt: '□에 알맞은 수를 쓰세요.',
         expr,
         blankAnswers: [n],
-        explanation: [txt(`${dan} × □ = ${result} → □ = ${result} ÷ ${dan} = ${n}`)],
+        explanation: [txt(`${dan}단을 외워 보면 ${dan} × ${n} = ${result}이에요. 그래서 ${dan} × □ = ${result}에서 □ = ${n}이에요.`)],
       };
     }
   },
@@ -331,7 +331,7 @@ const guguWord: SkillDef = {
         prompt: `${emoji} ${item}이 ${dan}개씩 ${n}봉지 있어요. ${item}은 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${dan} × ${n} = ${ans}개`)],
+        explanation: [txt(`한 봉지에 ${dan}개씩 ${n}봉지니까 ${dan}단 구구로 ${dan} × ${n} = ${ans}개예요.`)],
       };
     } else {
       // 배열 형태
@@ -347,7 +347,7 @@ const guguWord: SkillDef = {
         prompt: `${emoji} ${item}을 ${rows}줄로 놓았더니 한 줄에 ${cols}개씩 있어요. ${item}은 모두 몇 개인가요?`,
         expr,
         blankAnswers: [total],
-        explanation: [txt(`${rows} × ${cols} = ${total}개`)],
+        explanation: [txt(`한 줄에 ${cols}개씩 ${rows}줄이니까 ${rows} × ${cols} = ${total}개예요.`)],
       };
     }
   },

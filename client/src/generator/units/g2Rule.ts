@@ -171,7 +171,7 @@ const rule2Shape: SkillDef = {
       prompt: `모양의 규칙을 찾아 ${nthPos}번째에 올 모양을 고르세요.\n${shownStr} …`,
       choices,
       answerIndex,
-      explanation: [txt(`패턴이 ${pattern.join('')}(${period}개)씩 반복돼요. ${nthPos} ÷ ${period} = 몫 ${Math.floor((nthPos - 1) / period)}, 나머지 ${(nthPos - 1) % period}+1=${(nthPos - 1) % period + 1}번째 → ${answer}`)],
+      explanation: [txt(`${pattern.join('')}이 ${period}개씩 반복돼요. ${nthPos}번째는 반복되는 ${period}개 중 ${(nthPos - 1) % period + 1}번째와 같아서 ${answer}예요.`)],
     };
   },
 };
@@ -205,9 +205,9 @@ const rule2Stack: SkillDef = {
       ruleDesc = `${d}씩 늘어나는 규칙`;
       context = '탑을 쌓을 때 층마다 쌓는 블록 수예요.';
     } else {
-      // 제곱형: 1, 4, 9, 16, 25 (간단히 패턴 제시)
+      // 정사각형 수: 1, 4, 9, 16, 25 (한 변 1~5인 정사각형 블록 수)
       seq = [1, 4, 9, 16, 25];
-      ruleDesc = '정사각형 모양의 블록 수 (1²=1, 2²=4, 3²=9, ...)';
+      ruleDesc = '정사각형 모양으로 놓는 규칙(1×1, 2×2, 3×3, 4×4, 5×5)';
       context = '정사각형 모양으로 블록을 놓는 개수예요.';
     }
 
@@ -288,7 +288,7 @@ const rule2Word: SkillDef = {
         prompt: `${chosen.name}이 ${shown} … 순서로 반복돼요.\n${nthPos}번째에 오는 것은 ${chosen.emojis[0]}이 '1번째', ${chosen.emojis[1]}이 '2번째'처럼 패턴에서 몇 번째 ${chosen.name}인가요?`,
         expr,
         blankAnswers: [posInPattern],
-        explanation: [txt(`패턴이 ${period}개씩 반복돼요. ${nthPos} ÷ ${period} = 몫 ${Math.floor((nthPos - 1) / period)}, 나머지 ${(nthPos - 1) % period} → 패턴에서 ${posInPattern}번째(${answer})`)],
+        explanation: [txt(`패턴이 ${period}개씩 반복돼요. 처음부터 ${period}개씩 끊어 세면 ${nthPos}번째는 반복되는 ${period}개 중 ${posInPattern}번째(${answer})와 같아요.`)],
       };
     }
   },

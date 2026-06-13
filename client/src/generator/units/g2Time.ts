@@ -43,7 +43,7 @@ const time2Read: SkillDef = {
       prompt: `짧은바늘이 ${hour}, 긴바늘이 ${longHandPos}을 가리켜요. 몇 시 몇 분인가요?`,
       expr,
       blankAnswers: [hour, minute],
-      explanation: [txt(`짧은바늘 ${hour} → ${hour}시, 긴바늘 ${longHandPos} → ${longHandPos}×5=${minute}분 → ${hour}시 ${minute}분`)],
+      explanation: [txt(`짧은바늘이 ${hour}을 가리키면 ${hour}시예요. 긴바늘이 ${longHandPos}을 가리키면 5분씩 ${longHandPos}칸이라 ${minute}분이에요. 그래서 ${hour}시 ${minute}분이에요.`)],
     };
   },
 };
@@ -72,7 +72,7 @@ const time2Conv: SkillDef = {
       prompt = `${h}시간은 몇 분인가요?`;
       expr = [txt(`${h}시간 = `), { kind: 'blank', slot: 0 }, txt('분')];
       blankAnswers = [mins];
-      expl = `1시간 = 60분이므로 ${h}시간 = ${h} × 60 = ${mins}분`;
+      expl = `1시간은 60분이에요. ${h}시간은 60분씩 ${h}묶음이니 ${mins}분이에요.`;
     } else if (pat === 1) {
       // n분 = ? 시간 (60의 배수만)
       const h = rng.int(1, 5);
@@ -80,7 +80,7 @@ const time2Conv: SkillDef = {
       prompt = `${mins}분은 몇 시간인가요?`;
       expr = [txt(`${mins}분 = `), { kind: 'blank', slot: 0 }, txt('시간')];
       blankAnswers = [h];
-      expl = `60분 = 1시간이므로 ${mins}분 = ${mins} ÷ 60 = ${h}시간`;
+      expl = `60분이 1시간이에요. ${mins}분은 60분씩 ${h}묶음이니 ${h}시간이에요.`;
     } else if (pat === 2) {
       // 1시간 n분 = ? 분
       const h = rng.int(1, 3);
@@ -89,7 +89,7 @@ const time2Conv: SkillDef = {
       prompt = `${h}시간 ${extraMin}분은 모두 몇 분인가요?`;
       expr = [txt(`${h}시간 ${extraMin}분 = `), { kind: 'blank', slot: 0 }, txt('분')];
       blankAnswers = [total];
-      expl = `${h}시간 = ${h * 60}분이므로 ${h * 60} + ${extraMin} = ${total}분`;
+      expl = `${h}시간은 60분씩 ${h}묶음이라 ${h * 60}분이에요. 거기에 ${extraMin}분을 더하면 ${h * 60} + ${extraMin} = ${total}분이에요.`;
     } else {
       // ? 분 = n시간 ? 분 (역: 총 분 → 시, 분)
       const h = rng.int(1, 3);
@@ -101,7 +101,7 @@ const time2Conv: SkillDef = {
         { kind: 'blank', slot: 1 }, txt('분'),
       ];
       blankAnswers = [h, extraMin];
-      expl = `${total} ÷ 60 = ${h}시간, 나머지 ${extraMin}분 → ${h}시간 ${extraMin}분`;
+      expl = `60분이 1시간이에요. ${total}분을 60분씩 묶으면 ${h}묶음(=${h}시간)이 되고 ${extraMin}분이 남아요 → ${h}시간 ${extraMin}분이에요.`;
     }
 
     return {
@@ -212,7 +212,7 @@ const time2Units: SkillDef = {
       prompt = `${d}일은 몇 시간인가요?`;
       expr = [{ kind: 'blank', slot: 0 }, txt('시간')];
       blankAnswers = [ans];
-      expl = `1일 = 24시간이므로 ${d}일 = ${d} × 24 = ${ans}시간`;
+      expl = `하루는 24시간이에요. ${d}일은 24시간씩 ${d}묶음이니 ${ans}시간이에요.`;
     } else if (pat === 1) {
       // n주일 = ? 일
       const w = rng.int(1, 4);
@@ -220,7 +220,7 @@ const time2Units: SkillDef = {
       prompt = `${w}주일은 몇 일인가요?`;
       expr = [{ kind: 'blank', slot: 0 }, txt('일')];
       blankAnswers = [ans];
-      expl = `1주일 = 7일이므로 ${w}주일 = ${w} × 7 = ${ans}일`;
+      expl = `1주일은 7일이에요. ${w}주일은 7일씩 ${w}묶음이니 ${ans}일이에요.`;
     } else if (pat === 2) {
       // 1년 = ? 개월
       prompt = `1년은 몇 개월인가요?`;
@@ -240,7 +240,7 @@ const time2Units: SkillDef = {
       prompt = `${months}개월은 약 몇 주일인가요? (한 달은 4주로 계산하세요.)`;
       expr = [{ kind: 'blank', slot: 0 }, txt('주일')];
       blankAnswers = [approxWeeks];
-      expl = `1개월 ≈ 4주이므로 ${months}개월 ≈ ${months} × 4 = ${approxWeeks}주일`;
+      expl = `한 달은 약 4주예요. ${months}개월은 4주씩 ${months}묶음이니 약 ${approxWeeks}주일이에요.`;
     } else {
       // ? 시간 = n일
       const h = rng.pick([24, 48, 72] as const);
@@ -248,7 +248,7 @@ const time2Units: SkillDef = {
       prompt = `${h}시간은 며칠인가요?`;
       expr = [{ kind: 'blank', slot: 0 }, txt('일')];
       blankAnswers = [days];
-      expl = `24시간 = 1일이므로 ${h}시간 = ${h} ÷ 24 = ${days}일`;
+      expl = `24시간이 하루예요. ${h}시간을 24시간씩 묶으면 ${days}묶음이니 ${days}일이에요.`;
     }
 
     return {
@@ -323,7 +323,7 @@ const time2Word: SkillDef = {
       if (extra > 0) {
         expr = [{ kind: 'blank', slot: 0 }, txt('분')];
         blankAnswers = [totalMin];
-        expl = `${h}시간 ${extra}분 = ${h}×60 + ${extra} = ${totalMin}분`;
+        expl = `${h}시간은 60분씩 ${h}묶음이라 ${h * 60}분이에요. 거기에 ${extra}분을 더하면 ${h * 60} + ${extra} = ${totalMin}분이에요.`;
         return {
           id: `${this.id}:${seed}`,
           skillId: this.id,
@@ -337,7 +337,7 @@ const time2Word: SkillDef = {
       } else {
         expr = [{ kind: 'blank', slot: 0 }, txt('분')];
         blankAnswers = [h * 60];
-        expl = `${h}시간 = ${h}×60 = ${h * 60}분`;
+        expl = `${h}시간은 60분씩 ${h}묶음이니 ${h * 60}분이에요.`;
         return {
           id: `${this.id}:${seed}`,
           skillId: this.id,

@@ -167,7 +167,7 @@ const tbg2Total: SkillDef = {
       prompt: `표를 보고 합계를 구하세요.\n[${data.topic.title}] ${tableText}\n\n합계: □${data.topic.unit}`,
       expr,
       blankAnswers: [data.total],
-      explanation: [txt(`${data.values.join(' + ')} = ${data.total}${data.topic.unit}`)],
+      explanation: [txt(`각 항목의 수를 모두 더해요. ${data.values.join(' + ')} = ${data.total}${data.topic.unit}예요.`)],
     };
   },
 };
@@ -249,12 +249,12 @@ const tbg2Word: SkillDef = {
         prompt: `표를 보고 답하세요.\n[${data.topic.title}] ${tableText}\n\n${bigItem}은 ${smallItem}보다 몇 ${data.topic.unit} 더 많은가요?`,
         expr,
         blankAnswers: [diff],
-        explanation: [txt(`${Math.max(vA, vB)} − ${Math.min(vA, vB)} = ${diff}${data.topic.unit}`)],
+        explanation: [txt(`더 많은 ${Math.max(vA, vB)}${data.topic.unit}에서 더 적은 ${Math.min(vA, vB)}${data.topic.unit}를 빼요. ${Math.max(vA, vB)} − ${Math.min(vA, vB)} = ${diff}${data.topic.unit}예요.`)],
       };
     } else {
       // 합계 문장제
       const expr: MathExpr = [txt('답: '), { kind: 'blank', slot: 0 }, txt(data.topic.unit)];
-      const names = ['우리 반', '1학년 전체', '우리 학교'];
+      const names = ['우리 반', '2학년 전체', '우리 학교'];
       const name = rng.pick(names);
       return {
         id: `${this.id}:${seed}`,
@@ -264,7 +264,7 @@ const tbg2Word: SkillDef = {
         prompt: `표를 보고 답하세요.\n[${data.topic.title}] ${tableText}\n\n${name} 학생은 모두 몇 ${data.topic.unit}인가요?`,
         expr,
         blankAnswers: [data.total],
-        explanation: [txt(`${data.values.join(' + ')} = ${data.total}${data.topic.unit}`)],
+        explanation: [txt(`각 항목의 수를 모두 더해요. ${data.values.join(' + ')} = ${data.total}${data.topic.unit}예요.`)],
       };
     }
   },

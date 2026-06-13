@@ -35,7 +35,7 @@ const len22Conv: SkillDef = {
       prompt = `${m} m는 몇 cm인가요?`;
       expr = [txt(`${m} m = `), { kind: 'blank', slot: 0 }, txt(' cm')];
       blankAnswers = [ans];
-      expl = `1 m = 100 cm이므로 ${m} m = ${m} × 100 = ${ans} cm`;
+      expl = `1 m는 100 cm예요. ${m} m는 100 cm씩 ${m}묶음이니 ${ans} cm예요.`;
     } else if (pat === 1) {
       // ? cm = n m (100의 배수)
       const m = rng.int(1, 9);
@@ -43,7 +43,7 @@ const len22Conv: SkillDef = {
       prompt = `${cm} cm는 몇 m인가요?`;
       expr = [txt(`${cm} cm = `), { kind: 'blank', slot: 0 }, txt(' m')];
       blankAnswers = [m];
-      expl = `100 cm = 1 m이므로 ${cm} cm = ${m} m`;
+      expl = `100 cm가 1 m예요. ${cm} cm는 100 cm씩 ${m}묶음이니 ${m} m예요.`;
     } else if (pat === 2) {
       // n m m cm = ? cm
       const m = rng.int(1, 9);
@@ -52,7 +52,7 @@ const len22Conv: SkillDef = {
       prompt = `${m} m ${cm} cm는 모두 몇 cm인가요?`;
       expr = [txt(`${m} m ${cm} cm = `), { kind: 'blank', slot: 0 }, txt(' cm')];
       blankAnswers = [ans];
-      expl = `${m} m = ${m * 100} cm이므로 ${m * 100} + ${cm} = ${ans} cm`;
+      expl = `${m} m는 100 cm씩 ${m}묶음이라 ${m * 100} cm예요. 거기에 ${cm} cm를 더하면 ${m * 100} + ${cm} = ${ans} cm예요.`;
     } else {
       // ? m ? cm = n cm (n을 m, cm로 변환)
       const m = rng.int(1, 8);
@@ -64,7 +64,7 @@ const len22Conv: SkillDef = {
         { kind: 'blank', slot: 1 }, txt(' cm'),
       ];
       blankAnswers = [m, cm];
-      expl = `${total} ÷ 100 = ${m}m, 나머지 ${cm}cm → ${m} m ${cm} cm`;
+      expl = `100 cm가 1 m예요. ${total} cm를 100 cm씩 묶으면 ${m}묶음(=${m} m)이 되고 ${cm} cm가 남아요 → ${m} m ${cm} cm예요.`;
     }
 
     return {
@@ -270,7 +270,7 @@ const len22Word: SkillDef = {
         prompt: `${name1}이의 리본은 ${m1} m ${cm1} cm, ${name2}이의 리본은 ${m2} m ${cm2} cm예요. 두 리본의 길이의 합은 얼마인가요?`,
         expr,
         blankAnswers: [ansM, ansCm],
-        explanation: [txt(`${m1} m ${cm1} cm + ${m2} m ${cm2} cm = ${ansM} m ${ansCm} cm`)],
+        explanation: [txt(`m끼리, cm끼리 더해요. ${m1} m ${cm1} cm + ${m2} m ${cm2} cm = ${ansM} m ${ansCm} cm예요.${cm1 + cm2 >= 100 ? ` (cm가 ${cm1 + cm2}이라 100 cm를 1 m로 받아올렸어요.)` : ''}`)],
       };
     } else {
       // 두 길이의 차 (ansM >= 1, ansCm >= 1 보장)
@@ -304,7 +304,7 @@ const len22Word: SkillDef = {
         prompt: `${name1}이의 줄넘기는 ${m1} m ${cm1} cm, ${name2}이의 줄넘기는 ${m2} m ${cm2} cm예요. 두 줄넘기의 길이의 차는 얼마인가요?`,
         expr,
         blankAnswers: [ansM, ansCm],
-        explanation: [txt(`${m1} m ${cm1} cm − ${m2} m ${cm2} cm = ${ansM} m ${ansCm} cm`)],
+        explanation: [txt(`m끼리, cm끼리 빼요. ${m1} m ${cm1} cm − ${m2} m ${cm2} cm = ${ansM} m ${ansCm} cm예요.${cm1 < cm2 ? ` (cm가 모자라 1 m를 100 cm로 받아내렸어요.)` : ''}`)],
       };
     }
   },

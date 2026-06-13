@@ -36,6 +36,13 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unitLength2', // ④ 길이 재기
   'unitClassify', // ⑤ 분류하기
   'unitMulIntro', // ⑥ 곱셈
+  // 2-2
+  'unitNum4d', // ① 네 자리 수
+  'unitGugu', // ② 곱셈구구
+  'unitLength22', // ③ 길이 재기
+  'unitTime2', // ④ 시각과 시간
+  'unitTableGraph', // ⑤ 표와 그래프
+  'unitRule2', // ⑥ 규칙 찾기
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {
