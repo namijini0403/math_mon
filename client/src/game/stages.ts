@@ -24,6 +24,290 @@ export interface StageDef {
 }
 
 export const STAGES: StageDef[] = [
+  // ════════ 3학년 1학기 (전반) ════════
+  // ── 3-1-1: 덧셈과 뺄셈 ──
+  {
+    id: 'a3-1', unitId: 'unitAdd3', title: '덧셈 마을', type: 'lesson', emoji: '➕',
+    skillIds: ['add3-add'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'a3-2', unitId: 'unitAdd3', title: '뺄셈 요새', type: 'lesson', emoji: '➖',
+    skillIds: ['add3-sub'], reviewSkillIds: ['add3-add'], problemCount: 8,
+  },
+  {
+    id: 'a3-3', unitId: 'unitAdd3', title: '어림셈 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['add3-round', 'add3-missing'], reviewSkillIds: ['add3-sub'], problemCount: 8,
+  },
+  {
+    id: 'a3-4', unitId: 'unitAdd3', title: '이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['add3-word'], reviewSkillIds: ['add3-round', 'add3-missing'], problemCount: 8,
+  },
+  {
+    id: 'a3-boss', unitId: 'unitAdd3', title: '받아올림 다람쥐', type: 'boss', emoji: '🐿️',
+    skillIds: ['add3-add', 'add3-sub', 'add3-round', 'add3-missing', 'add3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '받아올림 다람쥐', emoji: '🐿️', hp: 10, image: 'assets/boss/squirrel3.png', taunt: '받아올림이 몇 번인지 셀 수 있겠어?' },
+  },
+  // ── 3-1-2: 평면도형 ──
+  {
+    id: 'p3-1', unitId: 'unitPlane3', title: '선의 나라', type: 'lesson', emoji: '📏',
+    skillIds: ['plane3-line'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'p3-2', unitId: 'unitPlane3', title: '각의 정원', type: 'lesson', emoji: '📐',
+    skillIds: ['plane3-angle'], reviewSkillIds: ['plane3-line'], problemCount: 8,
+  },
+  {
+    id: 'p3-3', unitId: 'unitPlane3', title: '직각 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['plane3-right-tri', 'plane3-perimeter'], reviewSkillIds: ['plane3-angle'], problemCount: 8,
+  },
+  {
+    id: 'p3-4', unitId: 'unitPlane3', title: '도형 이야기 마을', type: 'lesson', emoji: '🏘️',
+    skillIds: ['plane3-word'], reviewSkillIds: ['plane3-right-tri', 'plane3-perimeter'], problemCount: 8,
+  },
+  {
+    id: 'p3-boss', unitId: 'unitPlane3', title: '직각 거북', type: 'boss', emoji: '🐢',
+    skillIds: ['plane3-line', 'plane3-angle', 'plane3-right-tri', 'plane3-perimeter', 'plane3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '직각 거북', emoji: '🐢', hp: 10, image: 'assets/boss/turtle.png', taunt: '내 등딱지의 각도를 맞혀 봐!' },
+  },
+  // ── 3-1-3: 나눗셈 ──
+  {
+    id: 'd31-1', unitId: 'unitDiv3', title: '나누기 광장', type: 'lesson', emoji: '➗',
+    skillIds: ['div3-equal'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'd31-2', unitId: 'unitDiv3', title: '곱셈↔나눗셈 다리', type: 'lesson', emoji: '🌉',
+    skillIds: ['div3-rel'], reviewSkillIds: ['div3-equal'], problemCount: 8,
+  },
+  {
+    id: 'd31-3', unitId: 'unitDiv3', title: '구구단 숲', type: 'lesson', emoji: '🌲',
+    skillIds: ['div3-times', 'div3-word'], reviewSkillIds: ['div3-rel'], problemCount: 8,
+  },
+  {
+    id: 'd31-boss', unitId: 'unitDiv3', title: '나눔 비버', type: 'boss', emoji: '🦫',
+    skillIds: ['div3-equal', 'div3-rel', 'div3-times', 'div3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '나눔 비버', emoji: '🦫', hp: 10, image: 'assets/boss/beaver.png', taunt: '내 댐의 나무를 똑같이 나눠 봐!' },
+  },
+
+  // ── 3-1-4: 곱셈 ──
+  {
+    id: 'm31-1', unitId: 'unitMul31', title: '곱셈 마을', type: 'lesson', emoji: '✖️',
+    skillIds: ['mul31-no-carry'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'm31-2', unitId: 'unitMul31', title: '올림 요새', type: 'lesson', emoji: '🏰',
+    skillIds: ['mul31-carry', 'mul31-tens'], reviewSkillIds: ['mul31-no-carry'], problemCount: 8,
+  },
+  {
+    id: 'm31-3', unitId: 'unitMul31', title: '어림 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['mul31-estimate'], reviewSkillIds: ['mul31-carry'], problemCount: 8,
+  },
+  {
+    id: 'm31-4', unitId: 'unitMul31', title: '곱셈 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['mul31-word'], reviewSkillIds: ['mul31-estimate', 'mul31-tens'], problemCount: 8,
+  },
+  {
+    id: 'm31-boss', unitId: 'unitMul31', title: '곱셈 꿀벌', type: 'boss', emoji: '🐝',
+    skillIds: ['mul31-no-carry', 'mul31-carry', 'mul31-tens', 'mul31-estimate', 'mul31-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '곱셈 꿀벌', emoji: '🐝', hp: 10, image: 'assets/boss/bee.png', taunt: '내 벌집의 칸이 몇 개인지 곱셈으로 구해 봐!' },
+  },
+
+  // ── 3-1-5: 길이와 시간 ──
+  {
+    id: 't3-1', unitId: 'unitTime3', title: '길이 단위 마을', type: 'lesson', emoji: '📏',
+    skillIds: ['time3-len'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 't3-2', unitId: 'unitTime3', title: '시간 변환 광장', type: 'lesson', emoji: '⏱️',
+    skillIds: ['time3-minsec'], reviewSkillIds: ['time3-len'], problemCount: 8,
+  },
+  {
+    id: 't3-3', unitId: 'unitTime3', title: '시간 덧셈 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['time3-add', 'time3-sub'], reviewSkillIds: ['time3-minsec'], problemCount: 8,
+  },
+  {
+    id: 't3-4', unitId: 'unitTime3', title: '시간 이야기 숲', type: 'lesson', emoji: '🌲',
+    skillIds: ['time3-word'], reviewSkillIds: ['time3-add', 'time3-sub'], problemCount: 8,
+  },
+  {
+    id: 't3-boss', unitId: 'unitTime3', title: '시계 토끼', type: 'boss', emoji: '🐇',
+    skillIds: ['time3-len', 'time3-minsec', 'time3-add', 'time3-sub', 'time3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '시계 토끼', emoji: '🐇', hp: 10, image: 'assets/boss/clockrabbit.png', taunt: '시간은 기다려 주지 않아! 얼른 풀어 봐!' },
+  },
+
+  // ── 3-1-6: 분수와 소수 ──
+  {
+    id: 'f31-1', unitId: 'unitFrac3', title: '분수 개념 마을', type: 'lesson', emoji: '🍕',
+    skillIds: ['frac3-part'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'f31-2', unitId: 'unitFrac3', title: '단위분수 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['frac3-unit-cmp', 'frac3-same-denom-cmp'], reviewSkillIds: ['frac3-part'], problemCount: 8,
+  },
+  {
+    id: 'f31-3', unitId: 'unitFrac3', title: '소수 다리', type: 'lesson', emoji: '🌉',
+    skillIds: ['frac3-dec-rel', 'frac3-dec-cmp'], reviewSkillIds: ['frac3-unit-cmp'], problemCount: 8,
+  },
+  {
+    id: 'f31-4', unitId: 'unitFrac3', title: '분수·소수 이야기 광장', type: 'lesson', emoji: '🌟',
+    skillIds: ['frac3-word'], reviewSkillIds: ['frac3-dec-rel', 'frac3-same-denom-cmp'], problemCount: 8,
+  },
+  {
+    id: 'f31-boss', unitId: 'unitFrac3', title: '분수 케이크 요정', type: 'boss', emoji: '🧁',
+    skillIds: ['frac3-part', 'frac3-unit-cmp', 'frac3-same-denom-cmp', 'frac3-dec-rel', 'frac3-dec-cmp', 'frac3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '분수 케이크 요정', emoji: '🧁', hp: 10, image: 'assets/boss/cupcake.png', taunt: '케이크를 공평하게 나눌 수 있겠어?' },
+  },
+
+  // ════════ 3학년 2학기 (전반) ════════
+  // ── 3-2-1: 곱셈 ──
+  {
+    id: 'm32-1', unitId: 'unitMul32', title: '세 자리 곱셈 광장', type: 'lesson', emoji: '✖️',
+    skillIds: ['mul32-3by1'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'm32-2', unitId: 'unitMul32', title: '몇십 곱하기 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['mul32-tens-tens'], reviewSkillIds: ['mul32-3by1'], problemCount: 8,
+  },
+  {
+    id: 'm32-3', unitId: 'unitMul32', title: '두 자리 곱셈 요새', type: 'lesson', emoji: '🏰',
+    skillIds: ['mul32-2by2'], reviewSkillIds: ['mul32-tens-tens'], problemCount: 8,
+  },
+  {
+    id: 'm32-4', unitId: 'unitMul32', title: '곱셈 이야기 마을', type: 'lesson', emoji: '🏘️',
+    skillIds: ['mul32-word'], reviewSkillIds: ['mul32-2by2'], problemCount: 8,
+  },
+  {
+    id: 'm32-boss', unitId: 'unitMul32', title: '곱셈 코끼리', type: 'boss', emoji: '🐘',
+    skillIds: ['mul32-3by1', 'mul32-tens-tens', 'mul32-2by2', 'mul32-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '곱셈 코끼리', emoji: '🐘', hp: 10, image: 'assets/boss/elephant.png', taunt: '내 코로 계산하면 세 자리 곱셈도 한 번에 끝이야!' },
+  },
+
+  // ── 3-2-2: 나눗셈 ──
+  {
+    id: 'd32-1', unitId: 'unitDiv32', title: '몇십 나눗셈 광장', type: 'lesson', emoji: '➗',
+    skillIds: ['div32-tens'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'd32-2', unitId: 'unitDiv32', title: '나머지 없는 나눗셈 들판', type: 'lesson', emoji: '🌾',
+    skillIds: ['div32-no-rem'], reviewSkillIds: ['div32-tens'], problemCount: 8,
+  },
+  {
+    id: 'd32-3', unitId: 'unitDiv32', title: '나머지 있는 나눗셈 협곡', type: 'lesson', emoji: '🏔️',
+    skillIds: ['div32-rem'], reviewSkillIds: ['div32-no-rem'], problemCount: 8,
+  },
+  {
+    id: 'd32-4', unitId: 'unitDiv32', title: '검산식 이야기 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['div32-verify', 'div32-word'], reviewSkillIds: ['div32-rem'], problemCount: 8,
+  },
+  {
+    id: 'd32-boss', unitId: 'unitDiv32', title: '나머지 햄스터', type: 'boss', emoji: '🐹',
+    skillIds: ['div32-tens', 'div32-no-rem', 'div32-rem', 'div32-verify', 'div32-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '나머지 햄스터', emoji: '🐹', hp: 10, image: 'assets/boss/hamster.png', taunt: '나머지를 빼먹으면 안 돼! 내가 꼭 찾아낸다!' },
+  },
+
+  // ── 3-2-3: 원 ──
+  {
+    id: 'c31-1', unitId: 'unitCircle3', title: '반지름 다리', type: 'lesson', emoji: '⭕',
+    skillIds: ['circ3-rel'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'c31-2', unitId: 'unitCircle3', title: '원의 성질 정원', type: 'lesson', emoji: '🌷',
+    skillIds: ['circ3-prop'], reviewSkillIds: ['circ3-rel'], problemCount: 8,
+  },
+  {
+    id: 'c31-3', unitId: 'unitCircle3', title: '원 이어붙이기 미로', type: 'lesson', emoji: '🌀',
+    skillIds: ['circ3-line', 'circ3-mixed-line'], reviewSkillIds: ['circ3-prop'], problemCount: 8,
+  },
+  {
+    id: 'c31-4', unitId: 'unitCircle3', title: '원 이야기 마을', type: 'lesson', emoji: '🏘️',
+    skillIds: ['circ3-word'], reviewSkillIds: ['circ3-line', 'circ3-mixed-line'], problemCount: 8,
+  },
+  {
+    id: 'c31-boss', unitId: 'unitCircle3', title: '동그라미 물범', type: 'boss', emoji: '🦭',
+    skillIds: ['circ3-rel', 'circ3-prop', 'circ3-line', 'circ3-mixed-line', 'circ3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '동그라미 물범', emoji: '🦭', hp: 10, image: 'assets/boss/seal.png', taunt: '내 코끝에서 원을 몇 개나 굴릴 수 있을까?' },
+  },
+
+  // ── 3-2-4: 분수 ──
+  {
+    id: 'f32-1', unitId: 'unitFrac32', title: '분수 묶음 마을', type: 'lesson', emoji: '🍕',
+    skillIds: ['frac32-of-whole'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'f32-2', unitId: 'unitFrac32', title: '분수 분류 광장', type: 'lesson', emoji: '📐',
+    skillIds: ['frac32-classify'], reviewSkillIds: ['frac32-of-whole'], problemCount: 8,
+  },
+  {
+    id: 'f32-3', unitId: 'unitFrac32', title: '변환의 다리', type: 'lesson', emoji: '🌉',
+    skillIds: ['frac32-convert', 'frac32-cmp'], reviewSkillIds: ['frac32-classify'], problemCount: 8,
+  },
+  {
+    id: 'f32-4', unitId: 'unitFrac32', title: '분수 이야기 탑', type: 'lesson', emoji: '🗼',
+    skillIds: ['frac32-word'], reviewSkillIds: ['frac32-convert', 'frac32-cmp'], problemCount: 8,
+  },
+  {
+    id: 'f32-boss', unitId: 'unitFrac32', title: '가분수 캥거루', type: 'boss', emoji: '🦘',
+    skillIds: ['frac32-of-whole', 'frac32-classify', 'frac32-convert', 'frac32-cmp', 'frac32-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '가분수 캥거루', emoji: '🦘', hp: 10, image: 'assets/boss/kangaroo.png', taunt: '내 주머니 속에 가분수가 몇 개인지 맞혀 봐!' },
+  },
+
+  // ── 3-2-5: 들이와 무게 ──
+  {
+    id: 'ms3-1', unitId: 'unitMeasure3', title: '들이 단위 광장', type: 'lesson', emoji: '💧',
+    skillIds: ['meas3-liquid-conv'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'ms3-2', unitId: 'unitMeasure3', title: '무게 단위 들판', type: 'lesson', emoji: '⚖️',
+    skillIds: ['meas3-weight-conv', 'meas3-unit-pick'], reviewSkillIds: ['meas3-liquid-conv'], problemCount: 8,
+  },
+  {
+    id: 'ms3-3', unitId: 'unitMeasure3', title: '들이 계산 요새', type: 'lesson', emoji: '🏰',
+    skillIds: ['meas3-liquid-add', 'meas3-liquid-sub'], reviewSkillIds: ['meas3-weight-conv'], problemCount: 8,
+  },
+  {
+    id: 'ms3-4', unitId: 'unitMeasure3', title: '무게·이야기 마을', type: 'lesson', emoji: '🏘️',
+    skillIds: ['meas3-weight-add', 'meas3-word'], reviewSkillIds: ['meas3-liquid-add', 'meas3-liquid-sub'], problemCount: 8,
+  },
+  {
+    id: 'ms3-boss', unitId: 'unitMeasure3', title: '저울 곰', type: 'boss', emoji: '🐻',
+    skillIds: ['meas3-liquid-conv', 'meas3-weight-conv', 'meas3-liquid-add', 'meas3-liquid-sub', 'meas3-weight-add', 'meas3-unit-pick', 'meas3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '저울 곰', emoji: '🐻', hp: 10, image: 'assets/boss/bear3.png', taunt: '내 꿀단지의 무게를 정확하게 재 봐!' },
+  },
+
+  // ── 3-2-6: 자료의 정리 ──
+  {
+    id: 'dt3-1', unitId: 'unitData3', title: '표 읽기 마을', type: 'lesson', emoji: '📊',
+    skillIds: ['data3-table-sum'], reviewSkillIds: [], problemCount: 8,
+  },
+  {
+    id: 'dt3-2', unitId: 'unitData3', title: '차이 계산 광장', type: 'lesson', emoji: '📋',
+    skillIds: ['data3-table-diff', 'data3-most-least'], reviewSkillIds: ['data3-table-sum'], problemCount: 8,
+  },
+  {
+    id: 'dt3-3', unitId: 'unitData3', title: '그림그래프 정원', type: 'lesson', emoji: '🌷',
+    skillIds: ['data3-picto-read', 'data3-picto-inv'], reviewSkillIds: ['data3-table-diff'], problemCount: 8,
+  },
+  {
+    id: 'dt3-4', unitId: 'unitData3', title: '자료 이야기 숲', type: 'lesson', emoji: '🌲',
+    skillIds: ['data3-word'], reviewSkillIds: ['data3-picto-read', 'data3-picto-inv', 'data3-most-least'], problemCount: 8,
+  },
+  {
+    id: 'dt3-boss', unitId: 'unitData3', title: '그래프 앵무', type: 'boss', emoji: '🦜',
+    skillIds: ['data3-table-sum', 'data3-table-diff', 'data3-picto-read', 'data3-picto-inv', 'data3-most-least', 'data3-word'],
+    reviewSkillIds: [], problemCount: 10,
+    boss: { name: '그래프 앵무', emoji: '🦜', hp: 10, image: 'assets/boss/parrot.png', taunt: '내 그래프를 제대로 읽을 수 있겠어? 폴리 원해!' },
+  },
+
   // ════════ 4학년 1학기 ════════
   // ── 4-1-1: 큰 수 ──
   {
@@ -711,6 +995,14 @@ export interface SemesterDef {
 
 export const SEMESTERS: SemesterDef[] = [
   {
+    id: 'g3s1', label: '3학년 1학기', emoji: '🐣',
+    units: ['unitAdd3', 'unitPlane3', 'unitDiv3', 'unitMul31', 'unitTime3', 'unitFrac3'],
+  },
+  {
+    id: 'g3s2', label: '3학년 2학기', emoji: '🍄',
+    units: ['unitMul32', 'unitDiv32', 'unitCircle3', 'unitFrac32', 'unitMeasure3', 'unitData3'],
+  },
+  {
     id: 'g4s1', label: '4학년 1학기', emoji: '🌼',
     units: ['unitBigNum', 'unitAngle', 'unitMulDiv', 'unitMove', 'unitBarGraph', 'unitFindRule'],
   },
@@ -737,6 +1029,18 @@ export const SEMESTERS: SemesterDef[] = [
 ];
 
 export const UNIT_TITLES: Record<string, string> = {
+  unitAdd3: '1. 덧셈과 뺄셈',
+  unitPlane3: '2. 평면도형',
+  unitDiv3: '3. 나눗셈',
+  unitMul31: '4. 곱셈',
+  unitTime3: '5. 길이와 시간',
+  unitFrac3: '6. 분수와 소수',
+  unitMul32: '1. 곱셈',
+  unitDiv32: '2. 나눗셈',
+  unitCircle3: '3. 원',
+  unitFrac32: '4. 분수',
+  unitMeasure3: '5. 들이와 무게',
+  unitData3: '6. 자료의 정리',
   unitBigNum: '1. 큰 수',
   unitAngle: '2. 각도',
   unitFracAS4: '1. 분수의 덧셈과 뺄셈',

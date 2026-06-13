@@ -62,6 +62,20 @@ export interface BossCardDef {
 }
 
 export const BOSS_CARDS: Record<string, BossCardDef> = {
+  // ── 3-1 보스 ──
+  'a3-boss': { name: '다람쥐 정복자', subtitle: 'SQUIRREL TAMER', colors: ['#3f2d12', '#d97706'], accent: '#fde68a', emoji: '🐿️' },
+  'p3-boss': { name: '거북 탐험가', subtitle: 'TURTLE EXPLORER', colors: ['#14532d', '#16a34a'], accent: '#dcfce7', emoji: '🐢' },
+  'd31-boss': { name: '비버의 동반자', subtitle: 'BEAVER COMPANION', colors: ['#1e3a5f', '#0369a1'], accent: '#bae6fd', emoji: '🦫' },
+  'm31-boss': { name: '꿀벌 기사단', subtitle: 'BEE KNIGHT', colors: ['#713f12', '#f59e0b'], accent: '#fef9c3', emoji: '🐝' },
+  't3-boss': { name: '시계 토끼의 친구', subtitle: 'CLOCK RABBIT FRIEND', colors: ['#1e3a5f', '#7c3aed'], accent: '#ede9fe', emoji: '🐇' },
+  'f31-boss': { name: '케이크 요정의 선택', subtitle: 'CUPCAKE FAIRY CHOSEN', colors: ['#4a044e', '#ec4899'], accent: '#fce7f3', emoji: '🧁' },
+  // ── 3-2 보스 ──
+  'm32-boss': { name: '코끼리 정복자', subtitle: 'ELEPHANT CONQUEROR', colors: ['#1c1917', '#6d28d9'], accent: '#ddd6fe', emoji: '🐘' },
+  'd32-boss': { name: '햄스터의 동반자', subtitle: 'HAMSTER COMPANION', colors: ['#422006', '#f97316'], accent: '#ffedd5', emoji: '🐹' },
+  'c31-boss': { name: '물범의 친구', subtitle: 'SEAL FRIEND', colors: ['#0c4a6e', '#22d3ee'], accent: '#cffafe', emoji: '🦭' },
+  'f32-boss': { name: '캥거루 정복자', subtitle: 'KANGAROO TAMER', colors: ['#713f12', '#d97706'], accent: '#fef9c3', emoji: '🦘' },
+  'ms3-boss': { name: '저울 곰의 친구', subtitle: 'BEAR BALANCE FRIEND', colors: ['#1c1917', '#78716c'], accent: '#e7e5e4', emoji: '🐻' },
+  'dt3-boss': { name: '그래프 앵무의 동반자', subtitle: 'PARROT GRAPH COMPANION', colors: ['#14532d', '#16a34a'], accent: '#d1fae5', emoji: '🦜' },
   // ── 4-1 보스 ──
   'bn-boss': { name: '콜로서스 격파자', subtitle: 'COLOSSUS BREAKER', colors: ['#1c1917', '#a16207'], accent: '#fef9c3', emoji: '🏛️' },
   // ── 4-2 보스 (전반) ──

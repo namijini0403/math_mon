@@ -12,6 +12,7 @@ import {
   dragonMood,
   stageForGp,
 } from '../game/dragon';
+import { dragonMiniArt } from '../game/dragonArt';
 import { todayStr } from '../game/missions';
 
 export default function DragonWidget() {
@@ -26,14 +27,14 @@ export default function DragonWidget() {
 
   // 미니 이미지
   const [imgError, setImgError] = useState(false);
-  const imgSrc = dragon.adult
-    ? `assets/dragon/mini/adult-${dragon.adult.affinity}-${dragon.adult.form}.png`
-    : `assets/dragon/mini/stage${stage}.png`;
-
+  const miniArt = dragonMiniArt(dragon, fullness);
+  const imgSrc = miniArt.src;
   const stagesArr = DRAGON_STAGES as readonly { stage: number; name: string; emoji: string; minGp: number }[];
-  const fallbackEmoji = dragon.adult
-    ? AFFINITY_INFO[dragon.adult.affinity].emoji
-    : stagesArr[stage]?.emoji ?? '🥚';
+  const fallbackEmoji = miniArt.fallbackEmoji || (
+    dragon.adult
+      ? AFFINITY_INFO[dragon.adult.affinity].emoji
+      : stagesArr[stage]?.emoji ?? '🥚'
+  );
 
   return (
     <Link to="/dragon" aria-label="드래곤 방 가기">
@@ -55,7 +56,7 @@ export default function DragonWidget() {
 
         {/* 미니 드래곤 */}
         <div className="relative shrink-0">
-          {!imgError ? (
+          {!imgError && imgSrc ? (
             <img
               src={imgSrc}
               alt="드래곤"

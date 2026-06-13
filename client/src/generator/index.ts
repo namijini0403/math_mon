@@ -1,5 +1,17 @@
 /** 생성기 공개 API — 스킬 레지스트리와 문제 생성 진입점 */
 
+import { unitAdd3Skills } from './units/g3Add';
+import { unitPlane3Skills } from './units/g3Plane';
+import { unitDiv3Skills } from './units/g3Div';
+import { unitMul31Skills } from './units/g3Mul';
+import { unitTime3Skills } from './units/g3Time';
+import { unitFrac3Skills } from './units/g3Frac';
+import { unitMul32Skills } from './units/g3Mul2';
+import { unitDiv32Skills } from './units/g3Div2';
+import { unitCircle3Skills } from './units/g3Circle';
+import { unitFrac32Skills } from './units/g3Frac2';
+import { unitMeasure3Skills } from './units/g3Measure';
+import { unitData3Skills } from './units/g3Data';
 import { unitBigNumSkills } from './units/g4BigNum';
 import { unitAngleSkills } from './units/g4Angle';
 import { unitMulDivSkills } from './units/g4MulDiv';
@@ -43,8 +55,23 @@ import { challengeG6S2Skills } from './units/challengeG6S2';
 import type { Problem, SkillDef, UnitDef } from './types';
 import { randomSeed } from './rng';
 
-/** 2022 개정교육과정 단원 순서 (4-1 → 4-2 → 5-1 → 5-2 → 6-1 → 6-2) */
+/** 2022 개정교육과정 단원 순서 (3-1 → 4-1 → 4-2 → 5-1 → 5-2 → 6-1 → 6-2) */
 export const SKILLS: SkillDef[] = [
+  // ── 3-1 (전반) ──
+  ...unitAdd3Skills,
+  ...unitPlane3Skills,
+  ...unitDiv3Skills,
+  // ── 3-1 (후반) ──
+  ...unitMul31Skills,
+  ...unitTime3Skills,
+  ...unitFrac3Skills,
+  // ── 3-2 ──
+  ...unitMul32Skills,
+  ...unitDiv32Skills,
+  ...unitCircle3Skills,
+  ...unitFrac32Skills,
+  ...unitMeasure3Skills,
+  ...unitData3Skills,
   // ── 4-1 ──
   ...unitBigNumSkills,
   ...unitAngleSkills,
@@ -95,6 +122,18 @@ export const SKILLS: SkillDef[] = [
 const skillMap = new Map(SKILLS.map((s) => [s.id, s]));
 
 export const UNITS: UnitDef[] = [
+  { id: 'unitAdd3', title: '3-1 덧셈과 뺄셈', skillIds: unitAdd3Skills.map((s) => s.id) },
+  { id: 'unitPlane3', title: '3-1 평면도형', skillIds: unitPlane3Skills.map((s) => s.id) },
+  { id: 'unitDiv3', title: '3-1 나눗셈', skillIds: unitDiv3Skills.map((s) => s.id) },
+  { id: 'unitMul31', title: '3-1 곱셈', skillIds: unitMul31Skills.map((s) => s.id) },
+  { id: 'unitTime3', title: '3-1 길이와 시간', skillIds: unitTime3Skills.map((s) => s.id) },
+  { id: 'unitFrac3', title: '3-1 분수와 소수', skillIds: unitFrac3Skills.map((s) => s.id) },
+  { id: 'unitMul32', title: '3-2 곱셈', skillIds: unitMul32Skills.map((s) => s.id) },
+  { id: 'unitDiv32', title: '3-2 나눗셈', skillIds: unitDiv32Skills.map((s) => s.id) },
+  { id: 'unitCircle3', title: '3-2 원', skillIds: unitCircle3Skills.map((s) => s.id) },
+  { id: 'unitFrac32', title: '3-2 분수', skillIds: unitFrac32Skills.map((s) => s.id) },
+  { id: 'unitMeasure3', title: '3-2 들이와 무게', skillIds: unitMeasure3Skills.map((s) => s.id) },
+  { id: 'unitData3', title: '3-2 자료의 정리', skillIds: unitData3Skills.map((s) => s.id) },
   { id: 'unitBigNum', title: '4-1 큰 수', skillIds: unitBigNumSkills.map((s) => s.id) },
   { id: 'unitAngle', title: '4-1 각도', skillIds: unitAngleSkills.map((s) => s.id) },
   { id: 'unitMulDiv', title: '4-1 곱셈과 나눗셈', skillIds: unitMulDivSkills.map((s) => s.id) },

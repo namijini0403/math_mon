@@ -18,6 +18,7 @@ import {
   topAffinity,
   type Affinity,
 } from '../game/dragon';
+import { dragonArt } from '../game/dragonArt';
 import { todayStr } from '../game/missions';
 import { sfx } from '../game/sounds';
 
@@ -25,21 +26,16 @@ const SEEN_STAGE_KEY = 'mathmon-dragon-seen-stage';
 
 // ── 드래곤 무대 ─────────────────────────────────────────────────────────────
 
-function DragonStage({ stage, adult, mood }: {
-  stage: number;
-  adult?: { affinity: Affinity; form: 'human' | 'dragon' };
+function DragonStage({ dragon, fullness, mood }: {
+  dragon: import('../game/dragon').DragonState;
+  fullness: number;
   mood: 'happy' | 'normal' | 'hungry' | 'sad';
 }) {
   const [imgError, setImgError] = useState(false);
 
-  const imgSrc = adult
-    ? `assets/dragon/mini/adult-${adult.affinity}-${adult.form}.png`
-    : `assets/dragon/mini/stage${stage}.png`;
-
-  const stagesLookup = DRAGON_STAGES as readonly { stage: number; name: string; emoji: string; minGp: number }[];
-  const fallbackEmoji = adult
-    ? AFFINITY_INFO[adult.affinity].emoji + (adult.form === 'human' ? '🧑' : '🐉')
-    : stagesLookup[stage]?.emoji ?? '🥚';
+  const art = dragonArt(dragon, fullness);
+  const imgSrc = art.src;
+  const fallbackEmoji = art.fallbackEmoji;
 
   // 무드별 애니메이션
   const moodAnimate: Record<string, TargetAndTransition> = {
@@ -62,11 +58,11 @@ function DragonStage({ stage, adult, mood }: {
         transition={moodTransition[mood]}
         className="relative"
       >
-        {!imgError ? (
+        {!imgError && imgSrc ? (
           <img
             src={imgSrc}
             alt="드래곤"
-            className="w-40 h-40 object-contain drop-shadow-[0_0_24px_rgba(167,139,250,0.6)]"
+            className="w-56 h-56 object-contain drop-shadow-[0_0_24px_rgba(167,139,250,0.6)]"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -401,7 +397,7 @@ export default function DragonPage() {
           animate={dragonPop ? { scale: 1.25 } : { scale: 1 }}
           transition={{ duration: 0.25, type: 'spring' }}
         >
-          <DragonStage stage={stage} adult={dragon.adult} mood={mood} />
+          <DragonStage dragon={dragon} fullness={fullness} mood={mood} />
         </motion.div>
 
         {/* 말풍선 */}
