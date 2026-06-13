@@ -131,7 +131,7 @@ export function TreasureReveal({
                 animate={{ opacity: 1, y: 0 }}
                 className="text-[10px] opacity-50 mt-0.5"
               >
-                🎴 보관함에 저장됐어요
+                📦 보관함에 저장됐어요
               </motion.div>
             )}
           </motion.div>

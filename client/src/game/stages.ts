@@ -1259,10 +1259,10 @@ export const STAGES: StageDef[] = [
     skillIds: ['cub-edge-missing', 'cub-word'], reviewSkillIds: ['cub-edge-sum'], problemCount: 8,
   },
   {
-    id: 'scb-boss', unitId: 'unitCuboid', title: '큐브 제왕', type: 'boss', emoji: '🎲',
+    id: 'scb-boss', unitId: 'unitCuboid', title: '큐브 제왕', type: 'boss', emoji: '🧊',
     skillIds: ['cub-count', 'cub-face-pair', 'cub-edge-sum', 'cub-cube-edge', 'cub-edge-missing', 'cub-word'],
     reviewSkillIds: [], problemCount: 10,
-    boss: { name: '큐브 제왕', emoji: '🎲', hp: 10, image: 'assets/boss/cube.png', taunt: '내 성의 모서리를 다 셀 수 있겠나!' },
+    boss: { name: '큐브 제왕', emoji: '🧊', hp: 10, image: 'assets/boss/cube.png', taunt: '내 성의 모서리를 다 셀 수 있겠나!' },
   },
   // ── 2-6단원: 평균과 가능성 ──
   {

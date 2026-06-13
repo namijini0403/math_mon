@@ -5,11 +5,11 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DailyRewardModal from '../components/DailyRewardModal';
 import DragonWidget from '../components/DragonWidget';
+import { DragonAvatar } from '../components/DragonAvatar';
 import { SEMESTERS, STAGES, UNIT_TITLES, type StageDef } from '../game/stages';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
 import { DAILY_MISSIONS, todayStr } from '../game/missions';
-import { dragonEmoji } from '../game/dragon';
 import { sfx } from '../game/sounds';
 
 function StageNode({ stage, index, unlocked, stars }: { stage: StageDef; index: number; unlocked: boolean; stars: number }) {
@@ -110,7 +110,7 @@ function MissionPanel() {
 }
 
 export default function UnitMapPage() {
-  const { nickname, xp, stages, streak, dragon } = useGame();
+  const { nickname, xp, stages, streak } = useGame();
   const { level, into, need } = levelFromXp(xp);
   const streakActive = streak.last === todayStr();
   // 학기 탭 (마지막 선택 기억)
@@ -152,9 +152,7 @@ export default function UnitMapPage() {
       {/* ── 헤더 ── */}
       <div className="sticky top-0 z-10 bg-night-950/90 backdrop-blur py-3 flex items-center gap-3">
         <Link to="/profile" className="flex items-center gap-2" aria-label="프로필">
-          <div className="w-11 h-11 rounded-full bg-gradient-to-b from-violet-500 to-violet-700 flex items-center justify-center text-xl">
-            {dragonEmoji(dragon)}
-          </div>
+          <DragonAvatar sizeClass="w-11 h-11" textClass="text-xl" />
           <div>
             <div className="text-sm leading-tight">{nickname}</div>
             <div className="text-xs text-coin leading-tight">Lv.{level}</div>
@@ -217,13 +215,13 @@ export default function UnitMapPage() {
         </Link>
       </div>
 
-      {/* ── 보물 카드 갤러리 ── */}
+      {/* ── 보물창고 (배지·메달·보물 카드) ── */}
       <Link
         to="/cards"
         className="mt-3 btn-3d rounded-3xl bg-night-900 border-2 border-night-700 border-b-night-700 p-3 text-center hover:bg-night-800 flex items-center justify-center gap-2"
       >
-        <span className="text-2xl">🎴</span>
-        <span className="text-sm">나의 보물 카드 도감</span>
+        <span className="text-2xl">💎</span>
+        <span className="text-sm">나의 보물창고</span>
       </Link>
 
       {/* ── 학기 선택 탭 ── */}

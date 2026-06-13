@@ -124,6 +124,8 @@ interface GameState {
   toggleShowAnswers: () => void;
   /** [교사용] 모든 스테이지 잠금 해제 (체험·시연용) */
   devUnlockAll: (stageIds: string[]) => void;
+  /** [교사용] 드래곤만 알로 초기화 (성장 미리보기 후 되돌리기) */
+  resetDragon: () => void;
   resetAll: () => void;
 }
 
@@ -487,6 +489,8 @@ export const useGame = create<GameState>()(
         void track('mission.claim', { policy_tag: String(missionId) });
         return get().addXp(XP_MISSION_REWARD);
       },
+
+      resetDragon: () => set({ dragon: emptyDragon() }),
 
       resetAll: () =>
         set({

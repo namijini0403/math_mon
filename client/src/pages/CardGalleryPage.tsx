@@ -1,9 +1,12 @@
-/** 보물 카드 도감 — 캡처용 컬렉션 페이지. 획득 카드는 컬러+중복 ×n, 미획득은 실루엣 🔒 */
+/** 보물창고 — 배지 + 인증 메달 + 보물 카드를 한곳에 모아 보는 컬렉션 페이지.
+ *  보물 카드는 컬러+중복 ×n, 미획득은 실루엣. 카드를 누르면 크게 보고 이미지로 저장. */
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useGame } from '../game/store';
+import { BADGES, type BadgeDef } from '../game/badges';
+import { MedalView } from '../components/MedalView';
 import {
   RARITY_COLOR,
   RARITY_LABEL,
@@ -15,6 +18,13 @@ import { downloadTreasurePng } from '../card/renderTreasurePng';
 import { sfx } from '../game/sounds';
 
 const RARITY_ORDER: RewardRarity[] = ['legendary', 'rare', 'common'];
+
+/** 배지 희귀도별 테두리 + glow */
+function badgeStyle(rarity: 1 | 2 | 3): string {
+  if (rarity === 3) return 'border-coin shadow-[0_0_10px_2px_rgba(251,191,36,0.55)]';
+  if (rarity === 2) return 'border-[#c0c0c0] shadow-[0_0_8px_1px_rgba(192,192,192,0.45)]';
+  return 'border-[#cd7f32] shadow-[0_0_6px_1px_rgba(205,127,50,0.35)]';
+}
 
 function CardCell({
   card,
@@ -69,13 +79,14 @@ function CardCell({
 }
 
 export default function CardGalleryPage() {
-  const { nickname, rewardCards, rewardCardCounts } = useGame();
+  const { nickname, badges, cards, rewardCards, rewardCardCounts } = useGame();
   const [zoom, setZoom] = useState<RewardCardDef | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState<BadgeDef | null>(null);
 
   const countOf = (id: string) =>
     rewardCardCounts[id] ?? (rewardCards.includes(id) ? 1 : 0);
-  const ownedTotal = REWARD_CARDS.filter((c) => countOf(c.id) > 0).length;
+  const ownedCardTotal = REWARD_CARDS.filter((c) => countOf(c.id) > 0).length;
 
   async function savePng(card: RewardCardDef) {
     if (saving) return;
@@ -96,33 +107,123 @@ export default function CardGalleryPage() {
           ←
         </Link>
         <div className="flex-1">
-          <div className="text-lg font-bold">🎴 {nickname}의 보물 카드 도감</div>
+          <div className="text-lg font-bold">💎 {nickname}의 보물창고</div>
           <div className="text-xs opacity-60">
-            {ownedTotal}/{REWARD_CARDS.length}장 수집 — 카드를 누르면 크게 보고 저장할 수 있어요
+            배지 {badges.length}/{BADGES.length} · 메달 {cards.length}개 · 카드 {ownedCardTotal}/
+            {REWARD_CARDS.length}장
           </div>
         </div>
       </div>
 
-      {/* ── 등급별 섹션 ── */}
+      {/* ── 배지 ── */}
+      <h2 className="mt-5 mb-2.5 text-base flex items-center gap-2">
+        🏅 배지 <span className="text-xs opacity-50">({badges.length}/{BADGES.length})</span>
+      </h2>
+      <div className="rounded-3xl bg-night-900 border border-night-700 p-4">
+        <div className="grid grid-cols-4 gap-3">
+          {BADGES.map((b) => {
+            const owned = badges.includes(b.id);
+            return (
+              <motion.button
+                key={b.id}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setSelectedBadge(selectedBadge?.id === b.id ? null : b)}
+                aria-label={owned ? `${b.name}: ${b.desc}` : '잠긴 배지'}
+                className={`flex flex-col items-center rounded-2xl border-2 p-2 gap-1 transition-all ${
+                  owned ? badgeStyle(b.rarity) : 'border-night-700 opacity-30 grayscale'
+                } ${selectedBadge?.id === b.id ? 'ring-2 ring-white/40' : ''}`}
+              >
+                <span className="text-2xl leading-none">{owned ? b.emoji : '🔒'}</span>
+                <span className="text-[9px] leading-tight text-center line-clamp-2 opacity-80">
+                  {owned ? b.name : '???'}
+                </span>
+              </motion.button>
+            );
+          })}
+        </div>
+
+        <AnimatePresence>
+          {selectedBadge && (
+            <motion.div
+              key={selectedBadge.id}
+              initial={{ opacity: 0, y: -8, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: 'auto' }}
+              exit={{ opacity: 0, y: -8, height: 0 }}
+              transition={{ duration: 0.22 }}
+              className="overflow-hidden"
+            >
+              <div
+                className={`mt-4 rounded-2xl border-2 p-4 flex items-center gap-3 ${
+                  badges.includes(selectedBadge.id)
+                    ? badgeStyle(selectedBadge.rarity)
+                    : 'border-night-700 opacity-50'
+                } bg-night-800`}
+              >
+                <span className="text-4xl">
+                  {badges.includes(selectedBadge.id) ? selectedBadge.emoji : '🔒'}
+                </span>
+                <div className="flex-1">
+                  <div className="font-bold text-sm">
+                    {badges.includes(selectedBadge.id) ? selectedBadge.name : '???'}
+                  </div>
+                  <div className="text-xs opacity-70 mt-0.5">
+                    {badges.includes(selectedBadge.id)
+                      ? selectedBadge.desc
+                      : '아직 획득하지 못한 배지예요. 계속 도전해 보세요!'}
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedBadge(null)}
+                  className="opacity-40 text-xl px-1"
+                  aria-label="닫기"
+                >
+                  ×
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* ── 인증 메달 ── */}
+      <h2 className="mt-7 mb-2.5 text-base">
+        🏵️ 인증 메달 <span className="text-xs opacity-50">({cards.length}개)</span>
+      </h2>
+      {cards.length === 0 ? (
+        <div className="rounded-3xl bg-night-900 border border-dashed border-night-700 p-8 text-center opacity-60 text-sm">
+          레벨 2가 되거나 보스를 물리치면 메달을 받아요!
+        </div>
+      ) : (
+        <div className="rounded-3xl bg-night-900 border border-night-700 p-4 grid grid-cols-4 gap-4">
+          {cards.map((c, i) => (
+            <MedalView key={i} card={c} />
+          ))}
+        </div>
+      )}
+
+      {/* ── 보물 카드 ── */}
+      <h2 className="mt-7 mb-2.5 text-base">
+        🗝️ 보물 카드{' '}
+        <span className="text-xs opacity-50">
+          ({ownedCardTotal}/{REWARD_CARDS.length}) · 누르면 크게 보고 저장
+        </span>
+      </h2>
       {RARITY_ORDER.map((rarity) => {
-        const cards = REWARD_CARDS.filter((c) => c.rarity === rarity);
-        const owned = cards.filter((c) => countOf(c.id) > 0).length;
+        const cs = REWARD_CARDS.filter((c) => c.rarity === rarity);
+        const owned = cs.filter((c) => countOf(c.id) > 0).length;
         return (
-          <section key={rarity} className="mt-5">
+          <section key={rarity} className="mt-3">
             <div className="flex items-center gap-2 mb-2.5">
               <span className="text-sm font-bold" style={{ color: RARITY_COLOR[rarity] }}>
                 {RARITY_LABEL[rarity]}
               </span>
               <span className="text-xs opacity-50">
-                {owned}/{cards.length}
+                {owned}/{cs.length}
               </span>
-              <div
-                className="flex-1 h-px opacity-30"
-                style={{ background: RARITY_COLOR[rarity] }}
-              />
+              <div className="flex-1 h-px opacity-30" style={{ background: RARITY_COLOR[rarity] }} />
             </div>
             <div className="grid grid-cols-3 gap-3">
-              {cards.map((card) => (
+              {cs.map((card) => (
                 <CardCell key={card.id} card={card} count={countOf(card.id)} onOpen={setZoom} />
               ))}
             </div>
@@ -130,7 +231,7 @@ export default function CardGalleryPage() {
         );
       })}
 
-      {/* ── 클로즈업 모달 ── */}
+      {/* ── 카드 클로즈업 모달 ── */}
       <AnimatePresence>
         {zoom && (
           <motion.div
