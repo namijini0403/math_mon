@@ -80,6 +80,14 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unit1', // ④ 약분과 통분
   'unit2', // ⑤ 분수의 덧셈과 뺄셈
   'unitPoly', // ⑥ 다각형의 둘레와 넓이
+  // 5-2 (수의 범위와 어림·분수의 곱셈·합동과 대칭·소수의 곱셈·직육면체·평균과 가능성)
+  // 단원 순서 = 2022 개정 그대로. 분수곱은 5-1 약분/통분 뒤, 소수곱은 분수곱 뒤(1/10 표현 사용).
+  'unitRange', // ① 수의 범위와 어림하기
+  'unitFracMul', // ② 분수의 곱셈
+  'unitSym', // ③ 합동과 대칭
+  'unitDecMul', // ④ 소수의 곱셈
+  'unitCuboid', // ⑤ 직육면체
+  'unitAvg', // ⑥ 평균과 가능성
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {
