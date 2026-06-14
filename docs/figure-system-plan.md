@@ -67,7 +67,7 @@ return { ...앞과 동일..., figure: { kind: 'staircase', squares: n, side: a }
 
 ## 5. 단계별 적용 순서
 
-1. **1단계(골격)**: types.ts figure 필드 + FigureView + ProblemBody 배선 + **staircase·painted-cube** 2종(가장 단순한 격자 도형) + 스냅샷 테스트.
+1. **✅ 1단계(골격) 완료(커밋 3db3e8d)**: types.ts `figure?:FigureSpec` 필드 + FigureView + **5개 표시부 배선**(ProblemBody·Lesson·Exam·FinalExam·Practice) + **staircase·painted-cube** 2종 + figure.test.ts(렌더 스모크 + 스펙↔답 교차검증) + Playwright 실화면 검수(계단 답60·정육면체 답24 일치). 연결: ch51-stairs, ch52-paintcut.
 2. **2단계(심화 그림 의존)**: congruent-triangles·paper-fold·line-symmetry·point-symmetry·overlap — TEACHER-VERIFY ②의 '그림 의존' 항목 해소.
 3. **3단계(정규 단원)**: cuboid 겨냥도(unitCuboid), unitSym 합동/대칭 기본형. 그 다음 6학년 도형(각기둥·각뿔 전개도는 난도 높음 — 별도 검토).
 4. **확장**: bar-graph·number-line 등으로 자료/범위 단원까지(현재는 텍스트 서술).
