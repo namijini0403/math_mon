@@ -277,78 +277,106 @@ function HeartParticle({ x, y, delay }: { x: number; y: number; delay: number })
 
 // ── 진화 모달 ────────────────────────────────────────────────────────────────
 
-function EvolutionModal({ fromStage, toStage, onClose }: {
-  fromStage: number;
-  toStage: number;
+function EvolutionModal({ artSrc, fallbackEmoji, auraColor, toName, onClose }: {
+  artSrc: string;
+  fallbackEmoji: string;
+  auraColor: string;
+  toName: string;
   onClose: () => void;
 }) {
+  const [imgError, setImgError] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+
   useEffect(() => {
     sfx.levelUp();
   }, []);
 
-  const stageList = DRAGON_STAGES as readonly { stage: number; name: string; emoji: string; minGp: number }[];
-  const fromInfo = stageList[fromStage];
-  const toInfo = stageList[toStage];
+  // 닫기 = 드래곤이 작아지며 방으로 내려가는 연출 후 종료
+  const leave = () => {
+    if (leaving) return;
+    setLeaving(true);
+    setTimeout(onClose, 750);
+  };
 
   return (
     <motion.div
       className="fixed inset-0 z-50 bg-night-950/95 backdrop-blur flex flex-col items-center justify-center gap-6 p-8"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: leaving ? 0 : 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: leaving ? 0.7 : 0.3 }}
+      onClick={leave}
     >
-      {/* 빛나는 배경 */}
+      {/* 빛나는 배경 (속성색) */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
-        animate={{ opacity: [0.3, 0.7, 0.3] }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-        style={{
-          background: 'radial-gradient(circle at 50% 40%, rgba(167,139,250,0.35) 0%, transparent 70%)',
-        }}
+        animate={{ opacity: leaving ? 0 : [0.3, 0.7, 0.3] }}
+        transition={leaving ? { duration: 0.5 } : { repeat: Infinity, duration: 1.5 }}
+        style={{ background: `radial-gradient(circle at 50% 42%, ${auraColor}55 0%, transparent 70%)` }}
       />
 
+      {!leaving && (
+        <motion.div
+          className="text-2xl font-bold text-center drop-shadow-[0_0_8px_rgba(167,139,250,0.8)]"
+          initial={{ y: -12, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
+          ✨ 드래곤이 성장했어요!
+        </motion.div>
+      )}
+
+      {/* 실제 드래곤 아트 — 크게 짜자잔! 등장 → 닫으면 방으로 축소·하강 */}
       <motion.div
-        className="text-5xl"
-        animate={{ rotate: [0, 360] }}
-        transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
+        className="relative z-10"
+        initial={{ scale: 0, rotate: -12, opacity: 0 }}
+        animate={leaving ? { scale: 0.32, y: 360, opacity: 0 } : { scale: 1, rotate: 0, opacity: 1 }}
+        transition={
+          leaving
+            ? { duration: 0.75, ease: 'easeIn' }
+            : { type: 'spring', stiffness: 160, damping: 13, delay: 0.1 }
+        }
       >
-        ✨
+        {/* 등장 순간 흰 플래시 */}
+        {!leaving && (
+          <motion.div
+            aria-hidden
+            className="absolute inset-0 rounded-full bg-white pointer-events-none"
+            initial={{ opacity: 0.85, scale: 0.5 }}
+            animate={{ opacity: 0, scale: 1.6 }}
+            transition={{ duration: 0.6 }}
+          />
+        )}
+        {!imgError && artSrc ? (
+          <img
+            src={artSrc}
+            alt="성장한 드래곤"
+            className="w-64 h-64 object-contain"
+            style={{ filter: `drop-shadow(0 0 28px ${auraColor}aa)` }}
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <span className="text-[7rem] select-none" style={{ filter: `drop-shadow(0 0 20px ${auraColor}aa)` }}>
+            {fallbackEmoji}
+          </span>
+        )}
       </motion.div>
 
-      <div className="text-3xl text-center font-bold drop-shadow-[0_0_8px_rgba(167,139,250,0.8)]">
-        드래곤이 성장했어요!
-      </div>
-
-      <div className="flex items-center gap-6">
-        <div className="flex flex-col items-center gap-2 opacity-50">
-          <span className="text-5xl">{fromInfo?.emoji ?? '🥚'}</span>
-          <span className="text-sm text-center">{fromInfo?.name ?? ''}</span>
-        </div>
+      {!leaving && (
         <motion.div
-          animate={{ x: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 0.6 }}
-          className="text-3xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="flex flex-col items-center gap-4"
         >
-          →
+          {toName && <div className="text-lg text-coin font-bold">{toName}</div>}
+          <button
+            onClick={(e) => { e.stopPropagation(); leave(); }}
+            className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-10 py-3 text-xl text-night-950"
+          >
+            방으로 데려가기 🏠
+          </button>
         </motion.div>
-        <motion.div
-          className="flex flex-col items-center gap-2"
-          animate={{ scale: [1, 1.15, 1] }}
-          transition={{ repeat: Infinity, duration: 1.2 }}
-        >
-          <span className="text-6xl drop-shadow-[0_0_12px_rgba(251,191,36,0.7)]">
-            {toInfo?.emoji ?? '✨'}
-          </span>
-          <span className="text-sm text-center text-coin">{toInfo?.name ?? ''}</span>
-        </motion.div>
-      </div>
-
-      <button
-        onClick={onClose}
-        className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-10 py-3 text-xl text-night-950 mt-4"
-      >
-        확인!
-      </button>
+      )}
     </motion.div>
   );
 }
@@ -365,6 +393,7 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, humanEnding
   onClose: () => void;
 }) {
   const [imgError, setImgError] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const info = AFFINITY_INFO[affinity];
   // 레어/슈퍼레어는 카드급 화려 일러스트(evolution-card), 그 외 기존 엔딩 일러스트
   const artSrc =
@@ -374,12 +403,20 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, humanEnding
         ? frontAscendHumanEndingSrc(humanEndingVariant)
       : `assets/dragon/ending/${affinity}-${form}.png`;
 
+  // 닫기 = 성체가 작아지며 방으로 안착하는 연출 후 종료
+  const leave = () => {
+    if (leaving) return;
+    setLeaving(true);
+    setTimeout(onClose, 750);
+  };
+
   return (
     <motion.div
       className="fixed inset-0 z-50 bg-night-950/95 backdrop-blur flex flex-col items-center justify-center gap-5 p-8"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      animate={{ opacity: leaving ? 0 : 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: leaving ? 0.7 : 0.3 }}
     >
       <div className="text-3xl font-bold text-coin text-center drop-shadow-[0_0_8px_rgba(251,191,36,0.7)]">
         🌟 전설의 엔딩!
@@ -409,8 +446,8 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, humanEnding
         />
         <motion.div
           initial={{ scale: 0, rotate: -16, opacity: 0 }}
-          animate={{ scale: 1, rotate: 0, opacity: 1 }}
-          transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.15 }}
+          animate={leaving ? { scale: 0.3, y: 380, opacity: 0 } : { scale: 1, rotate: 0, opacity: 1 }}
+          transition={leaving ? { duration: 0.75, ease: 'easeIn' } : { type: 'spring', stiffness: 180, damping: 12, delay: 0.15 }}
           className="relative z-10"
         >
           {!imgError ? (
@@ -455,12 +492,14 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, humanEnding
         </div>
       </div>
 
-      <button
-        onClick={onClose}
-        className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-8 py-3 text-lg text-night-950"
-      >
-        닫기
-      </button>
+      {!leaving && (
+        <button
+          onClick={leave}
+          className="btn-3d rounded-2xl bg-glow border-glow border-b-lime-600 px-8 py-3 text-lg text-night-950"
+        >
+          방으로 데려가기 🏠
+        </button>
+      )}
     </motion.div>
   );
 }
@@ -490,19 +529,15 @@ export default function DragonPage() {
   const moodInfo = MOOD_INFO[mood];
   const topAff = topAffinity(dragon.affinities);
 
-  // 진화 연출
+  // 성장(레벨업) 연출
   const [showEvolution, setShowEvolution] = useState(false);
-  const [evoFrom, setEvoFrom] = useState(0);
   const seenRef = useRef(false);
 
   useEffect(() => {
     if (seenRef.current) return;
     seenRef.current = true;
     const saved = parseInt(localStorage.getItem(SEEN_STAGE_KEY) ?? '0', 10);
-    if (stage > saved) {
-      setEvoFrom(saved);
-      setShowEvolution(true);
-    }
+    if (stage > saved) setShowEvolution(true);
   }, [stage]);
 
   function handleEvolutionClose() {
@@ -967,15 +1002,26 @@ export default function DragonPage() {
         )}
       </div>
 
-      {/* ── 진화 모달 ── */}
+      {/* ── 성장(레벨업) 모달 — 실제 드래곤 아트가 크게 등장 후 방으로 안착 ── */}
       <AnimatePresence>
-        {showEvolution && (
-          <EvolutionModal
-            fromStage={evoFrom}
-            toStage={stage}
-            onClose={handleEvolutionClose}
-          />
-        )}
+        {showEvolution && (() => {
+          const art = dragonArt(dragon, fullness);
+          const auraColor = dragon.adult
+            ? AFFINITY_INFO[dragon.adult.affinity].color
+            : Object.values(dragon.affinities).some((v) => v > 0)
+              ? AFFINITY_INFO[topAffinity(dragon.affinities)].color
+              : '#a78bfa';
+          const toName = (DRAGON_STAGES as readonly { name: string }[])[stage]?.name ?? '';
+          return (
+            <EvolutionModal
+              artSrc={art.src}
+              fallbackEmoji={art.fallbackEmoji}
+              auraColor={auraColor}
+              toName={toName}
+              onClose={handleEvolutionClose}
+            />
+          );
+        })()}
       </AnimatePresence>
 
       {/* ── 엔딩 오버레이 ── */}
