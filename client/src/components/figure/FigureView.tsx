@@ -60,6 +60,9 @@ export function FigureView({ spec }: { spec: FigureSpec }) {
     case 'congruent-triangle-pair':
       svg = <CongruentTrianglePair />;
       break;
+    case 'number-line':
+      svg = <NumberLine min={spec.min} max={spec.max} lo={spec.lo} hi={spec.hi} />;
+      break;
     default:
       // 미구현 kind 폴백 (타입상 도달 불가지만 방어적으로)
       svg = (
@@ -459,6 +462,71 @@ function CongruentTrianglePair() {
       <text x={t2.ap.x} y={t2.ap.y - 6} textAnchor="middle" fontSize="13" fill={LABEL}>ㄹ</text>
       <text x={t2.bl.x - 4} y={t2.bl.y + 13} textAnchor="middle" fontSize="13" fill={LABEL}>ㅁ</text>
       <text x={t2.br.x + 4} y={t2.br.y + 13} textAnchor="middle" fontSize="13" fill={LABEL}>ㅂ</text>
+    </svg>
+  );
+}
+
+// ── 수직선 위 범위: 이상/이하=● 초과/미만=○, 한쪽만이면 화살표 반직선 ──
+function NumberLine({
+  min, max, lo, hi,
+}: {
+  min: number; max: number;
+  lo?: { v: number; closed: boolean };
+  hi?: { v: number; closed: boolean };
+}) {
+  const range = Math.max(1, max - min);
+  const step = Math.max(13, Math.min(30, Math.floor(230 / range)));
+  const padL = 20, padR = 20, padT = 16;
+  const W = range * step;
+  const axisY = padT + 4;
+  const total = padL + W + padR;
+  const height = axisY + 30;
+  const X = (v: number) => padL + (v - min) * step;
+  const labelEvery = range <= 10 ? 1 : 2;
+
+  // 범위 띠 양 끝
+  const bandStart = lo ? X(lo.v) : padL + 2;
+  const bandEnd = hi ? X(hi.v) : padL + W - 2;
+
+  const ticks = [];
+  for (let v = min; v <= max; v++) {
+    const x = X(v);
+    ticks.push(<line key={`t${v}`} x1={x} y1={axisY - 4} x2={x} y2={axisY + 4} stroke={STROKE} strokeWidth={1.2} />);
+    if ((v - min) % labelEvery === 0 || v === lo?.v || v === hi?.v) {
+      ticks.push(
+        <text key={`l${v}`} x={x} y={axisY + 18} textAnchor="middle" fontSize="10" fill={LABEL}>{v}</text>,
+      );
+    }
+  }
+
+  const circle = (b: { v: number; closed: boolean }, key: string) => (
+    <circle
+      key={key}
+      cx={X(b.v)}
+      cy={axisY}
+      r={4.5}
+      fill={b.closed ? ANG : '#1e1b4b'}
+      stroke={ANG}
+      strokeWidth={2}
+    />
+  );
+
+  return (
+    <svg
+      viewBox={`0 0 ${total} ${height}`}
+      width={Math.min(total, 260)}
+      role="img"
+      aria-label={`수직선 ${min}부터 ${max}까지. ${lo ? `${lo.v} ${lo.closed ? '이상' : '초과'}` : ''}${lo && hi ? ', ' : ''}${hi ? `${hi.v} ${hi.closed ? '이하' : '미만'}` : ''} 범위`}
+    >
+      {/* 축 + 화살표 */}
+      <line x1={padL - 6} y1={axisY} x2={padL + W + 6} y2={axisY} stroke={STROKE} strokeWidth={1.5} />
+      <polygon points={`${padL - 6},${axisY} ${padL - 1},${axisY - 3.5} ${padL - 1},${axisY + 3.5}`} fill={STROKE} />
+      <polygon points={`${padL + W + 6},${axisY} ${padL + W + 1},${axisY - 3.5} ${padL + W + 1},${axisY + 3.5}`} fill={STROKE} />
+      {/* 범위 띠 */}
+      <line x1={bandStart} y1={axisY} x2={bandEnd} y2={axisY} stroke={TARGET} strokeWidth={4} strokeLinecap="round" opacity={0.85} />
+      {ticks}
+      {lo && circle(lo, 'lo')}
+      {hi && circle(hi, 'hi')}
     </svg>
   );
 }

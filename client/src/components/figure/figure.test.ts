@@ -76,6 +76,19 @@ describe('FigureView 렌더 스모크', () => {
     expect(html).toContain('ㄱ');
     expect(html).toContain('ㄹ');
   });
+
+  it('number-line 이상: 닫힌 점(●)과 수직선', () => {
+    const html = renderFigure({ kind: 'number-line', min: 7, max: 13, lo: { v: 10, closed: true } });
+    expect(html).toContain('<svg');
+    expect(html).toContain('수직선');
+    expect(html).toContain('이상');
+  });
+
+  it('number-line 미만: 열린 점(○, 배경색 채움)', () => {
+    const html = renderFigure({ kind: 'number-line', min: 7, max: 13, hi: { v: 10, closed: false } });
+    expect(html).toContain('미만');
+    expect(html.toLowerCase()).toContain('#1e1b4b'); // 열린 점 = 배경색 fill
+  });
 });
 
 describe('그림 연결 스킬의 figure 스펙 일관성', () => {
@@ -192,6 +205,35 @@ describe('그림 연결 스킬의 figure 스펙 일관성', () => {
       expect(skill).toBeDefined();
       const p = skill!.generate(7);
       expect(p.figure!.kind).toBe('congruent-triangle-pair');
+    }
+  });
+
+  it('range-include: 수직선 경계(닫힘/열림)가 이상·이하·초과·미만과 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'range-include');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 120; seed++) {
+      const p = skill!.generate(seed);
+      const f = p.figure as Extract<FigureSpec, { kind: 'number-line' }>;
+      expect(f.kind).toBe('number-line');
+      // 정확히 한쪽 경계만
+      expect(!!f.lo !== !!f.hi).toBe(true);
+      if (p.prompt.includes('이상')) expect(f.lo).toEqual({ v: expect.any(Number), closed: true });
+      else if (p.prompt.includes('초과')) expect(f.lo).toEqual({ v: expect.any(Number), closed: false });
+      else if (p.prompt.includes('이하')) expect(f.hi).toEqual({ v: expect.any(Number), closed: true });
+      else if (p.prompt.includes('미만')) expect(f.hi).toEqual({ v: expect.any(Number), closed: false });
+    }
+  });
+
+  it('range-boundary: 양쪽 경계, closed가 이상/이하와 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'range-boundary');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 120; seed++) {
+      const p = skill!.generate(seed);
+      const f = p.figure as Extract<FigureSpec, { kind: 'number-line' }>;
+      expect(f.lo).toBeDefined();
+      expect(f.hi).toBeDefined();
+      expect(f.lo!.closed).toBe(p.prompt.includes(`${f.lo!.v} 이상`));
+      expect(f.hi!.closed).toBe(p.prompt.includes(`${f.hi!.v} 이하`));
     }
   });
 });

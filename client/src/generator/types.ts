@@ -33,7 +33,15 @@ export type FigureSpec =
   /** 직육면체/정육면체 겨냥도 — 보이는 모서리 실선·숨은 모서리 3개 점선. dims 있으면 가로/세로/높이 라벨 */
   | { kind: 'cuboid'; w: number; h: number; d: number; dims?: { w: string; h: string; d: string } }
   /** 두 합동 삼각형 ㄱㄴㄷ·ㄹㅁㅂ (대응 꼭짓점 같은 위치) — 합동 대응변·대응각 학습용 */
-  | { kind: 'congruent-triangle-pair' };
+  | { kind: 'congruent-triangle-pair' }
+  /** 수직선 위 범위 — 이상/이하=●(닫힘), 초과/미만=○(열림). lo만/hi만이면 화살표 반직선 */
+  | {
+      kind: 'number-line';
+      min: number;
+      max: number;
+      lo?: { v: number; closed: boolean };
+      hi?: { v: number; closed: boolean };
+    };
 
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =

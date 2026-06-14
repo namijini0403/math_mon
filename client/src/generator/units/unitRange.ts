@@ -7,7 +7,7 @@
 import { RNG } from '../rng';
 import { buildChoices } from '../choices';
 import { ida, josa, nj } from '../josa';
-import type { ChoiceValue, MathExpr, SkillDef } from '../types';
+import type { ChoiceValue, FigureSpec, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
 const dec = (v: number): ChoiceValue => ({ kind: 'decimal', v });
@@ -126,6 +126,14 @@ const rangeInclude: SkillDef = {
       txt(` ${nj(answer, '이/가')} 조건을 만족해요.`),
     ];
 
+    const figMin = Math.max(0, N - 3);
+    const figMax = N + 3;
+    const figure: FigureSpec =
+      rangeType === '이상' ? { kind: 'number-line', min: figMin, max: figMax, lo: { v: N, closed: true } }
+        : rangeType === '이하' ? { kind: 'number-line', min: figMin, max: figMax, hi: { v: N, closed: true } }
+          : rangeType === '초과' ? { kind: 'number-line', min: figMin, max: figMax, lo: { v: N, closed: false } }
+            : { kind: 'number-line', min: figMin, max: figMax, hi: { v: N, closed: false } };
+
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -135,6 +143,7 @@ const rangeInclude: SkillDef = {
       choices,
       answerIndex,
       explanation,
+      figure,
     };
   },
 };
@@ -171,7 +180,7 @@ const rangeBoundary: SkillDef = {
     count = hi >= lo ? hi - lo + 1 : 0;
 
     const expr: MathExpr = [
-      txt(`${a} ${leftType} b ${rightType}인 자연수: `),
+      txt(`${a} ${leftType} ${b} ${rightType}인 자연수: `),
       { kind: 'blank', slot: 0 },
       txt('개'),
     ];
@@ -198,6 +207,13 @@ const rangeBoundary: SkillDef = {
       expr,
       blankAnswers: [count],
       explanation,
+      figure: {
+        kind: 'number-line',
+        min: Math.max(0, a - 1),
+        max: b + 1,
+        lo: { v: a, closed: leftType === '이상' },
+        hi: { v: b, closed: rightType === '이하' },
+      },
     };
   },
 };
