@@ -73,6 +73,7 @@ import { unitCircleSkills } from './units/unitCircle';
 import { unitRound3dSkills } from './units/unitRound3d';
 import { challengeG2S1Skills } from './units/challengeG2S1';
 import { challengeG2S2Skills } from './units/challengeG2S2';
+import { challengeG3S1Skills } from './units/challengeG3S1';
 import { challengeG5S1Skills } from './units/challengeG5S1';
 import { challengeG5S2Skills } from './units/challengeG5S2';
 import { challengeG6S1Skills } from './units/challengeG6S1';
@@ -167,6 +168,7 @@ export const SKILLS: SkillDef[] = [
   // 심화 (최고수준 2·3단계 유형화 — 단원 id에 귀속, challenge: true)
   ...challengeG2S1Skills,
   ...challengeG2S2Skills,
+  ...challengeG3S1Skills,
   ...challengeG5S1Skills,
   ...challengeG5S2Skills,
   ...challengeG6S1Skills,
