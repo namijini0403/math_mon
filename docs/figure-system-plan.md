@@ -68,8 +68,8 @@ return { ...앞과 동일..., figure: { kind: 'staircase', squares: n, side: a }
 ## 5. 단계별 적용 순서
 
 1. **✅ 1단계(골격) 완료(커밋 3db3e8d)**: types.ts `figure?:FigureSpec` 필드 + FigureView + **5개 표시부 배선**(ProblemBody·Lesson·Exam·FinalExam·Practice) + **staircase·painted-cube** 2종 + figure.test.ts(렌더 스모크 + 스펙↔답 교차검증) + Playwright 실화면 검수(계단 답60·정육면체 답24 일치). 연결: ch51-stairs, ch52-paintcut.
-2. **2단계(심화 그림 의존)**: congruent-triangles·paper-fold·line-symmetry·point-symmetry·overlap — TEACHER-VERIFY ②의 '그림 의존' 항목 해소.
-3. **3단계(정규 단원)**: cuboid 겨냥도(unitCuboid), unitSym 합동/대칭 기본형. 그 다음 6학년 도형(각기둥·각뿔 전개도는 난도 높음 — 별도 검토).
+2. **✅ 2단계(심화 그림 의존) 완료(커밋 c962a1e)**: congruent-parallelogram(ch52-congtriangle, ⓐ=a+b 소각 분해)·paper-fold(ch52-paperfold, 90°를 ①·②로)·rhombus-symmetry(ch52-symaxis, 세로 대칭축)·overlap-rect-square(ch51-overlap, 교집합 음영) 4종 + figure.test.ts 8종 + Playwright 4종 실화면 검수. TEACHER-VERIFY ②의 '그림 의존' 항목 해소. **point-symmetry는 보류**(현재 점대칭 심화 스킬은 거리 문장제라 그림 비의존 — 필요 스킬 생기면 추가).
+3. **3단계(정규 단원)**: cuboid 겨냥도(unitCuboid), unitSym 합동 기본형(corrSide·corrAngle에 두 합동삼각형 ㄱㄴㄷ/ㄹㅁㅂ 그림). 그 다음 6학년 도형(각기둥·각뿔 전개도는 난도 높음 — 별도 검토).
 4. **확장**: bar-graph·number-line 등으로 자료/범위 단원까지(현재는 텍스트 서술).
 
 ## 6. 검증
