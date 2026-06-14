@@ -199,6 +199,8 @@ export interface GraduateRecord {
 /** 드래곤 저장 상태 */
 export interface DragonState {
   gp: number;
+  /** 아이가 지어 준 드래곤 이름 (선택). 없으면 기본 호칭 사용 */
+  name?: string;
   affinities: Record<Affinity, number>;
   /** 과일 보유량 */
   fruits: Record<string, number>;

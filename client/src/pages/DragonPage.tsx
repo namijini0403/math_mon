@@ -32,6 +32,7 @@ import { dragonArt } from '../game/dragonArt';
 import { activityWeightedHumanEndingVariant, frontAscendHumanEndingSrc, type HumanEndingVariant } from '../game/dragonEnding';
 import { DragonRoom } from '../components/DragonRoom';
 import { StepsCard } from '../components/StepsCard';
+import { DragonNameTag } from '../components/DragonNameTag';
 import { todayStr } from '../game/missions';
 import { sfx } from '../game/sounds';
 
@@ -99,16 +100,18 @@ function ItemIcon({ id, emoji }: { id: string; emoji: string }) {
 
 // ── 드래곤 무대 ─────────────────────────────────────────────────────────────
 
-function DragonStage({ dragon, fullness, mood }: {
+function DragonStage({ dragon, fullness, mood, activity }: {
   dragon: import('../game/dragon').DragonState;
   fullness: number;
   mood: 'happy' | 'normal' | 'hungry' | 'sad';
+  activity?: 'eat' | 'sleep';
 }) {
   const [imgError, setImgError] = useState(false);
 
-  const art = dragonArt(dragon, fullness);
+  const art = dragonArt(dragon, fullness, activity);
   const imgSrc = art.src;
   const fallbackEmoji = art.fallbackEmoji;
+  const visualMood = activity === 'sleep' ? 'normal' : mood;
 
   // 오라 색 — 성체면 확정 속성색, 아니면 우세 속성, 기본은 달빛 보라
   const auraColor = dragon.adult
@@ -171,8 +174,8 @@ function DragonStage({ dragon, fullness, mood }: {
       />
 
       <motion.div
-        animate={moodAnimate[mood]}
-        transition={moodTransition[mood]}
+        animate={moodAnimate[visualMood]}
+        transition={moodTransition[visualMood]}
         className="relative z-10"
       >
         {!imgError && imgSrc ? (
@@ -191,7 +194,7 @@ function DragonStage({ dragon, fullness, mood }: {
             {fallbackEmoji}
           </span>
         )}
-        {mood === 'sad' && (
+        {mood === 'sad' && activity !== 'sleep' && (
           <motion.span
             className="absolute -right-4 top-2 text-2xl"
             animate={{ y: [0, 8, 0], opacity: [1, 0.4, 1] }}
@@ -619,6 +622,9 @@ export default function DragonPage() {
           ←
         </Link>
         <h1 className="text-xl">나의 드래곤</h1>
+        <div className="ml-auto">
+          <DragonNameTag />
+        </div>
       </div>
 
       {/* ── 드래곤 무대 ── */}
@@ -685,7 +691,12 @@ export default function DragonPage() {
           animate={dragonPop ? { scale: 1.25 } : { scale: 1 }}
           transition={{ duration: 0.25, type: 'spring' }}
         >
-          <DragonStage dragon={dragon} fullness={fullness} mood={mood} />
+          <DragonStage
+            dragon={dragon}
+            fullness={fullness}
+            mood={mood}
+            activity={dragonPop ? 'eat' : mood === 'sad' ? 'sleep' : undefined}
+          />
         </motion.div>
 
         {/* 말풍선 */}

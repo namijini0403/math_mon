@@ -13,10 +13,18 @@
  *   stage 4 (완전한 성체, GP 600+, adult 미확정) → teen-default
  *   adult 확정 후                   → 기존 동작(이모지/기존 에셋)
  *
- * 무드 변형 (toddler, child-04-05 한정):
+ * 무드 변형:
  *   fullness < 30  → hungry
  *   fullness >= 80 → best (toddler) / happy (child-04-05)
  *   그 외          → happy (toddler·child-04-05)
+ * 활동 오버라이드:
+ *   eat   → 먹이 주기 직후 잠깐 표시
+ *   sleep → 기운 없는 상태에서 누워 쉬는 컷
+ *   study → 학습/훈련 직후 표시할 수 있는 컷
+ *   proud → 성취/칭찬 직후 표시할 수 있는 컷
+ *   sad   → 실패/속상함 상태에서 표시할 수 있는 컷
+ *   welcome → 입장/재회 시 표시할 수 있는 컷
+ *   best    → 최고 기분·큰 성공 직후 표시할 수 있는 컷
  */
 
 import { type DragonState, DRAGON_STAGES, AFFINITY_INFO, stageForGp } from './dragon';
@@ -27,6 +35,8 @@ export interface DragonArtResult {
   /** img 로드 실패 시 표시할 이모지 */
   fallbackEmoji: string;
 }
+
+export type DragonArtActivity = 'eat' | 'sleep' | 'study' | 'proud' | 'sad' | 'welcome' | 'best';
 
 /** fullness(0-100) 기준 toddler 무드 파일명 접미사를 반환 */
 function toddlerMoodSuffix(fullness: number): string {
@@ -45,7 +55,7 @@ function child0405MoodSuffix(fullness: number): string {
  * dragon 상태와 fullness(0-100)를 받아 Codex 일러스트 경로와 폴백 이모지를 반환.
  * adult 가 확정된 경우 src = '' 를 반환하며 기존 동작(이모지)으로 폴백.
  */
-export function dragonArt(dragon: DragonState, fullness: number): DragonArtResult {
+export function dragonArt(dragon: DragonState, fullness: number, activity?: DragonArtActivity): DragonArtResult {
   const stagesArr = DRAGON_STAGES as readonly {
     stage: number;
     name: string;
@@ -97,7 +107,7 @@ export function dragonArt(dragon: DragonState, fullness: number): DragonArtResul
 
   // stage 2: 아기 드래곤 → toddler + moods
   if (stage === 2) {
-    const suffix = toddlerMoodSuffix(fullness);
+    const suffix = activity ?? toddlerMoodSuffix(fullness);
     // hungry / welcome / happy / best 파일 존재
     // welcome은 무드 조건 없이 여기선 미사용 (happy로 퉁)
     return {
@@ -110,7 +120,7 @@ export function dragonArt(dragon: DragonState, fullness: number): DragonArtResul
   if (stage === 3) {
     if (gp < 450) {
       // child-04-05 + moods
-      const suffix = child0405MoodSuffix(fullness);
+      const suffix = activity ?? child0405MoodSuffix(fullness);
       return {
         src: `assets/dragon/evolution/moods/child-04-05/child-04-05-${suffix}.png`,
         fallbackEmoji: stagesArr[3].emoji,
@@ -118,12 +128,16 @@ export function dragonArt(dragon: DragonState, fullness: number): DragonArtResul
     }
     if (gp < 550) {
       return {
-        src: 'assets/dragon/evolution/full/child-07-10-default.png',
+        src: activity
+          ? `assets/dragon/evolution/moods/child-07-10/child-07-10-${activity}.png`
+          : 'assets/dragon/evolution/full/child-07-10-default.png',
         fallbackEmoji: stagesArr[3].emoji,
       };
     }
     return {
-      src: 'assets/dragon/evolution/full/preteen-11-14-default.png',
+      src: activity
+        ? `assets/dragon/evolution/moods/preteen-11-14/preteen-11-14-${activity}.png`
+        : 'assets/dragon/evolution/full/preteen-11-14-default.png',
       fallbackEmoji: stagesArr[3].emoji,
     };
   }
@@ -131,7 +145,9 @@ export function dragonArt(dragon: DragonState, fullness: number): DragonArtResul
   // stage 4: 완전한 성체 (adult 미확정)
   if (stage === 4) {
     return {
-      src: 'assets/dragon/evolution/full/teen-default.png',
+      src: activity
+        ? `assets/dragon/evolution/moods/teen/teen-${activity}.png`
+        : 'assets/dragon/evolution/full/teen-default.png',
       fallbackEmoji: stagesArr[4]?.emoji ?? '✨',
     };
   }
@@ -149,7 +165,7 @@ export function dragonArt(dragon: DragonState, fullness: number): DragonArtResul
  * CSS 크기를 작게 렌더링하는 방식으로 처리.
  * adult 확정 시 기존 mini/stage*.png 경로 반환.
  */
-export function dragonMiniArt(dragon: DragonState, fullness: number): DragonArtResult {
+export function dragonMiniArt(dragon: DragonState, fullness: number, activity?: DragonArtActivity): DragonArtResult {
   // adult 이전 단계는 dragonArt 와 동일 경로 (위젯에서 작게 렌더링)
-  return dragonArt(dragon, fullness);
+  return dragonArt(dragon, fullness, activity);
 }

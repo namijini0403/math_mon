@@ -163,6 +163,8 @@ interface GameState {
   toggleShowAnswers: () => void;
   /** [교사용] 모든 스테이지 잠금 해제 (체험·시연용) */
   devUnlockAll: (stageIds: string[]) => void;
+  /** 아이가 드래곤 이름을 지어 준다 (최대 12자, 공백이면 기본 호칭) */
+  nameDragon: (name: string) => void;
   /** [교사용] 드래곤만 알로 초기화 (성장 미리보기 후 되돌리기) */
   resetDragon: () => void;
   resetAll: () => void;
@@ -675,6 +677,12 @@ export const useGame = create<GameState>()(
         void track('mission.claim', { policy_tag: String(missionId) });
         return get().addXp(XP_MISSION_REWARD);
       },
+
+      nameDragon: (name) =>
+        set((s) => {
+          const trimmed = name.trim().slice(0, 12);
+          return { dragon: { ...s.dragon, name: trimmed || undefined } };
+        }),
 
       // 새 알로 다시 시작 — 성체까지 키웠다면 그 미니미를 졸업생으로 곁에 남긴다.
       resetDragon: () =>
