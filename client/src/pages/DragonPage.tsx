@@ -26,6 +26,7 @@ import {
   type RoomDecorDef,
 } from '../game/dragon';
 import { dragonArt } from '../game/dragonArt';
+import { activityWeightedHumanEndingVariant, frontAscendHumanEndingSrc, type HumanEndingVariant } from '../game/dragonEnding';
 import { DragonRoom } from '../components/DragonRoom';
 import { StepsCard } from '../components/StepsCard';
 import { todayStr } from '../game/missions';
@@ -304,11 +305,12 @@ function EvolutionModal({ fromStage, toStage, onClose }: {
 
 // ── 엔딩 오버레이 ────────────────────────────────────────────────────────────
 
-function EndingOverlay({ affinity, form, nickname, title, evolution, onClose }: {
+function EndingOverlay({ affinity, form, nickname, title, evolution, humanEndingVariant, onClose }: {
   affinity: Affinity;
   form: 'human' | 'dragon';
   nickname: string;
   title: string;
+  humanEndingVariant: HumanEndingVariant;
   evolution?: { id: string; tier: 'common' | 'rare' | 'superrare' };
   onClose: () => void;
 }) {
@@ -318,6 +320,8 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, onClose }: 
   const artSrc =
     evolution && evolution.tier !== 'common'
       ? `assets/dragon/evolution-card/${evolution.id}.png`
+      : form === 'human'
+        ? frontAscendHumanEndingSrc(humanEndingVariant)
       : `assets/dragon/ending/${affinity}-${form}.png`;
 
   return (
@@ -332,7 +336,7 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, onClose }: 
       </div>
 
       {/* 짜자잔! — 빛줄기 + 플래시 위로 성체가 스프링으로 등장 */}
-      <div className="relative flex items-center justify-center w-64 h-64">
+      <div className="relative flex items-center justify-center w-72 h-[27rem] max-h-[52vh]">
         {/* 회전하는 빛줄기 */}
         <motion.div
           aria-hidden
@@ -363,7 +367,7 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, onClose }: 
             <img
               src={artSrc}
               alt={title}
-              className="w-56 h-56 object-contain rounded-3xl"
+              className="max-w-full max-h-full object-contain rounded-3xl"
               style={{ filter: `drop-shadow(0 0 32px ${info.color}cc)` }}
               onError={() => setImgError(true)}
             />
@@ -414,7 +418,20 @@ function EndingOverlay({ affinity, form, nickname, title, evolution, onClose }: 
 // ── 메인 페이지 ──────────────────────────────────────────────────────────────
 
 export default function DragonPage() {
-  const { dragon, streak, rewardCards, nickname, feedDragon, togglePlacedDecor, earnedDecorList } = useGame();
+  const {
+    dragon,
+    streak,
+    rewardCards,
+    nickname,
+    records,
+    practice,
+    attendance,
+    stages,
+    steps,
+    feedDragon,
+    togglePlacedDecor,
+    earnedDecorList,
+  } = useGame();
   const today = todayStr();
   const stage = stageForGp(dragon.gp);
   const fullness = currentFullness(dragon, today);
@@ -486,6 +503,25 @@ export default function DragonPage() {
   const [showEnding, setShowEnding] = useState(false);
   const hasRareEnding = dragon.adult != null && rewardCards.length >= RARE_ENDING_CARDS;
   const endingTitle = dragon.adult ? adultTitle(dragon.adult) : '';
+  const sealedBosses = Object.keys(stages).filter(
+    (id) => id.endsWith('-boss') && (stages[id]?.stars ?? 0) > 0,
+  ).length;
+  const humanEndingVariant = activityWeightedHumanEndingVariant({
+    affinities: dragon.affinities,
+    lessonsCompleted: records.lessonsCompleted,
+    perfectLessons: records.perfectLessons,
+    sealedBosses,
+    attendanceDays: attendance.totalDays,
+    feedCount: dragon.feedCount,
+    rewardCardCount: rewardCards.length,
+    basicSets: practice.basicSets,
+    wordSets: practice.wordSets,
+    challengeSets: practice.challengeSets,
+    challengeCleared: records.challengeCleared,
+    finalExamsPassed: records.finalExamsPassed,
+    reviewCleared: records.reviewCleared,
+    stepGoalDays: steps.goalDays,
+  });
 
   // 성장 게이지 계산
   const stagesArr = DRAGON_STAGES as readonly { stage: number; name: string; emoji: string; minGp: number }[];
@@ -865,6 +901,7 @@ export default function DragonPage() {
             nickname={nickname ?? '모험가'}
             title={endingTitle}
             evolution={dragon.adult.evolution}
+            humanEndingVariant={humanEndingVariant}
             onClose={() => setShowEnding(false)}
           />
         )}

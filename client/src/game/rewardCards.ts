@@ -34,8 +34,14 @@ export const REWARD_CARDS: RewardCardDef[] = [
   { id: 'reward-rare-04', rarity: 'rare', name: '사파이어 용 학자', title: 'Sapphire Dragon Scholar', src: 'assets/reward-cards/reward-rare-04.png' },
   { id: 'reward-rare-05', rarity: 'rare', name: '해와 달의 제단', title: 'Sun-Moon Equation Altar', src: 'assets/reward-cards/reward-rare-05.png' },
   { id: 'reward-rare-06', rarity: 'rare', name: '비전의 연꽃', title: 'Arcane Lotus', src: 'assets/reward-cards/reward-rare-06.png' },
+  { id: 'reward-dragon-rare-04', rarity: 'rare', name: '성좌 나침반의 용현자', title: 'Astral Compass Dragon Sage', src: 'assets/reward-cards-dragon/reward-dragon-rare-04.png' },
+  { id: 'reward-dragon-rare-05', rarity: 'rare', name: '별등 숲의 용신탁자', title: 'Starlit Grove Dragon Oracle', src: 'assets/reward-cards-dragon/reward-dragon-rare-05.png' },
   { id: 'reward-legendary-01', rarity: 'legendary', name: '빛나는 기하학자', title: 'Radiant Geometer', src: 'assets/reward-cards/reward-legendary-01.png' },
   { id: 'reward-legendary-02', rarity: 'legendary', name: '무한한 별들의 왕관', title: 'Crown of Infinite Stars', src: 'assets/reward-cards/reward-legendary-02.png' },
+  { id: 'reward-dragon-legendary-02', rarity: 'legendary', name: '무한성좌의 대점성왕', title: 'Grand Astrologer of Infinite Stars', src: 'assets/reward-cards-dragon/reward-dragon-legendary-02.png' },
+  { id: 'reward-dragon-legendary-03', rarity: 'legendary', name: '수정천문의 성좌군주', title: 'Crystal Observatory Star Monarch', src: 'assets/reward-cards-dragon/reward-dragon-legendary-03.png' },
+  { id: 'reward-dragon-legendary-04', rarity: 'legendary', name: '달빛 수정연꽃의 대현자', title: 'Moonlit Crystal Lotus Oracle', src: 'assets/reward-cards-dragon/reward-dragon-legendary-04.png' },
+  { id: 'reward-dragon-legendary-05', rarity: 'legendary', name: '별빛 정원의 신탁여제', title: 'Empress Oracle of the Star Garden', src: 'assets/reward-cards-dragon/reward-dragon-legendary-05.png' },
 ];
 
 export const RARITY_LABEL: Record<RewardRarity, string> = {

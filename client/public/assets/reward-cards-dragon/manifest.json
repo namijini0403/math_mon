@@ -8,5 +8,11 @@
   { "id": "reward-dragon-rare-01", "rarity": "rare", "title": "Seraphic Dawn Dragon", "src": "assets/reward-cards-dragon/reward-dragon-rare-01.png" },
   { "id": "reward-dragon-rare-02", "rarity": "rare", "title": "Sapphire Oracle Dragon", "src": "assets/reward-cards-dragon/reward-dragon-rare-02.png" },
   { "id": "reward-dragon-rare-03", "rarity": "rare", "title": "Rose-Gold Eclipse Dragon", "src": "assets/reward-cards-dragon/reward-dragon-rare-03.png" },
-  { "id": "reward-dragon-legendary-01", "rarity": "legendary", "title": "Crowned Dragon of Infinite Stars", "src": "assets/reward-cards-dragon/reward-dragon-legendary-01.png" }
+  { "id": "reward-dragon-rare-04", "rarity": "rare", "title": "Astral Compass Dragon Sage", "src": "assets/reward-cards-dragon/reward-dragon-rare-04.png" },
+  { "id": "reward-dragon-rare-05", "rarity": "rare", "title": "Starlit Grove Dragon Oracle", "src": "assets/reward-cards-dragon/reward-dragon-rare-05.png" },
+  { "id": "reward-dragon-legendary-01", "rarity": "legendary", "title": "Crowned Dragon of Infinite Stars", "src": "assets/reward-cards-dragon/reward-dragon-legendary-01.png" },
+  { "id": "reward-dragon-legendary-02", "rarity": "legendary", "title": "Grand Astrologer of Infinite Stars", "src": "assets/reward-cards-dragon/reward-dragon-legendary-02.png" },
+  { "id": "reward-dragon-legendary-03", "rarity": "legendary", "title": "Crystal Observatory Star Monarch", "src": "assets/reward-cards-dragon/reward-dragon-legendary-03.png" },
+  { "id": "reward-dragon-legendary-04", "rarity": "legendary", "title": "Moonlit Crystal Lotus Oracle", "src": "assets/reward-cards-dragon/reward-dragon-legendary-04.png" },
+  { "id": "reward-dragon-legendary-05", "rarity": "legendary", "title": "Empress Oracle of the Star Garden", "src": "assets/reward-cards-dragon/reward-dragon-legendary-05.png" }
 ]

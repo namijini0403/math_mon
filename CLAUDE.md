@@ -89,4 +89,5 @@ npm run build -w client               # PWA 빌드
 - 보스전: 문장제 위주(단순계산 ≈25%/문장제 ≈75%), 스테이지 전체 제한시간 10분(문제별 타이머 아님), 시간 초과 또는 오답 3개 시 패배. 심화 강제 혼합 없음.
 - 드래곤: game/dragon.ts — GP 5단계(0/50/120/300/600)로 몸 성장. 속성 4종(해/달/별/숲).
 - 드래곤 진화(game/dragonEvolution.ts): 보스를 '봉인'하면 보스 고유 속성·세기가 귀속 → 누적 분포+봉인수로 최종 캐릭터 결정. 모든 티어가 드래곤·인간 한 세트(form). common 8(속성4×form2) → rare 8(각성, 속성4×form2, ~6보스+뚜렷한 으뜸) → superrare 4(무지개=균형/흑요석=편향, 각 form2, ~12보스). 더 높은 티어 도달 시 성장(갱신). 보스 텍스트는 '봉인'(비폭력). 레어 엔딩 카드 15장은 별개 연출.
+- 성체 엔딩은 작은/미니 버전이 아니며, 카드 프레임이 붙은 보상카드도 아니다. 정본은 보상카드급 디테일을 가진 **투명 배경 단독 성체 캐릭터**다. `assets/ASSET_SPEC_DRAGON.md` 1-B의 `dragon/mini/adult-*.png`는 방/위젯용 작은 아바타일 뿐이다. 인간형 최종 직업은 `dragon/ending-final/adult-*-v1/v2.png` 기준의 성좌 대점성왕/신탁의 대현자 계열(은백색 머리, 뿔+왕관, 마법서, 천체의, 별 오브, 금장 남색 로브)이며, 런타임 캐릭터는 `dragon/ending-final/adult-male-character.png`, `adult-female-character.png` 같은 투명 PNG로 제작한다. 청소년처럼 보이면 중간 성장/이벤트 후보로만 보존.
 - 진화 에셋(ASSET_SPEC_DRAGON 1-D): rare/super 각 캐릭터는 미니미(dragon/rare·super/{id}.png, 512²)+카드급 화려(dragon/evolution-card/{id}.png, 1280×1810, 엔딩 오버레이용) 2종. id=rare-{속성}-{form}/super-{rainbow|obsidian}-{form}. 부재 시 이모지/기존 엔딩 폴백.
