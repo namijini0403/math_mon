@@ -159,7 +159,7 @@ const chCoin: SkillDef = {
         b > 0 ? txt(`100×${b}=${100 * b}원, `) : txt(''),
         c > 0 ? txt(`50×${c}=${50 * c}원, `) : txt(''),
         d > 0 ? txt(`10×${d}=${10 * d}원, `) : txt(''),
-        txt(`모두 더하면 ${ida(total)}원.`),
+        txt(`모두 더하면 ${total}${ida('원')}.`),
       ];
 
       return {
@@ -275,7 +275,7 @@ const chCond: SkillDef = {
       txt(`② 십의 자리 숫자와 일의 자리 숫자가 같아요. `),
       txt(`③ 십의 자리 숫자는 백의 자리 숫자보다 ${k} 더 커요. `),
       txt(`백의 자리를 □라 하면 십의 자리=일의 자리=□+${k}이고, `),
-      txt(`조건 ①을 만족하는 수는 ${ida(ans)}뿐이에요.`),
+      txt(`조건 ①을 만족하는 수는 ${ans}뿐이에요.`),
     ];
 
     return {
@@ -385,7 +385,7 @@ const chSquareRow: SkillDef = {
     const explanation: MathExpr = [
       txt(`정사각형 ${n}개를 한 줄로 이어 붙인 모양에서 사각형을 크기별로 세요. `),
       txt(breakdown.join(', ') + '. '),
-      txt(`모두 더하면 ${Array.from({ length: n }, (_, i) => n - i).join(' + ')} = ${ida(ans)}개.`),
+      txt(`모두 더하면 ${Array.from({ length: n }, (_, i) => n - i).join(' + ')} = ${ans}${ida('개')}.`),
     ];
 
     return {
@@ -428,7 +428,7 @@ const chFold: SkillDef = {
     const explanation: MathExpr = [
       txt(`한 번 접을 때마다 칸 수가 2배가 돼요. `),
       txt(steps.join(' → ') + '. '),
-      txt(`${n}번 접으면 ${ans}칸 → 선을 따라 자르면 사각형이 ${ida(ans)}개.`),
+      txt(`${n}번 접으면 ${ans}칸 → 선을 따라 자르면 사각형이 ${ans}${ida('개')}.`),
     ];
 
     return {
@@ -491,7 +491,7 @@ const chBetween: SkillDef = {
       txt(`먼저 두 식을 계산해요. `),
       txt(`${A}+${B}=${lo}, ${C}−${D}=${hi}. `),
       txt(`${lo}보다 크고 ${hi}보다 작은 두 자리 수: ${between.join(', ')}. `),
-      txt(`모두 ${ida(cnt)}개.`),
+      txt(`모두 ${cnt}${ida('개')}.`),
     ];
 
     return {
@@ -675,7 +675,7 @@ const chIterate: SkillDef = {
     const explanation: MathExpr = [
       txt(`${unit.a} 1개의 길이가 ${unit.b}로 ${m}번이에요. `),
       txt(`${unit.a} ${k}개의 길이는 ${unit.b}로 ${m}번을 ${k}번 더한 것과 같아요. `),
-      txt(`${m} × ${k} = ${ida(ans)}번.`),
+      txt(`${m} × ${k} = ${ans}${ida('번')}.`),
     ];
 
     return {
@@ -908,7 +908,7 @@ const chCountDiff: SkillDef = {
     const explanation: MathExpr = [
       txt(`종류별로 분류하면: ${catSummary}. `),
       txt(`가장 많은 것: ${Math.max(...counts)}개, 가장 적은 것: ${Math.min(...counts)}개. `),
-      txt(`차: ${Math.max(...counts)}−${Math.min(...counts)}=${ida(answerVal)}개.`),
+      txt(`차: ${Math.max(...counts)}−${Math.min(...counts)}=${answerVal}${ida('개')}.`),
     ];
 
     return {
@@ -1057,7 +1057,7 @@ const chRelation: SkillDef = {
       txt(`전체 ${N}마리 중 ${LABELS[shownIdx]}이(가) ${shownVal}마리이므로, `),
       txt(`나머지 두 무리(${LABELS[bigIdx]}, ${LABELS[smallIdx]})의 합은 ${N}−${shownVal}=${pairSum}마리예요. `),
       txt(`${LABELS[bigIdx]}이(가) ${diff}마리 더 많으니, 차 ${nj(diff, '을/를')} 빼고 반으로 나누면 적은 쪽이 ${smallVal}마리, 더하면 많은 쪽이 ${bigVal}마리예요. `),
-      txt(`따라서 ${LABELS[askIdx]}은 ${ida(ans)}마리.`),
+      txt(`따라서 ${LABELS[askIdx]}은 ${ans}${ida('마리')}.`),
     ];
 
     return {
@@ -1112,7 +1112,7 @@ const chArray: SkillDef = {
 
       const explanation: MathExpr = [
         txt(`한 줄에 ${r}개씩 ${c}줄이면 한 상자에 ${r}×${c}=${r * c}개. `),
-        txt(`${b}상자이면 ${r * c}×${b}=${ida(ans)}개.`),
+        txt(`${b}상자이면 ${r * c}×${b}=${ans}${ida('개')}.`),
       ];
 
       return {
@@ -1142,7 +1142,7 @@ const chArray: SkillDef = {
 
       const explanation: MathExpr = [
         txt(`${instrument}의 줄이 전체 ${T}개예요. `),
-        txt(`${g}개씩 묶으면 ${g}×□=${T}, □=${ida(ans)}묶음.`),
+        txt(`${g}개씩 묶으면 ${g}×□=${T}, □=${ans}${ida('묶음')}.`),
       ];
 
       return {
@@ -1197,7 +1197,7 @@ const chLeftover: SkillDef = {
     const explanation: MathExpr = [
       txt(`전체 사탕: ${p}×${q}=${p * q}개. `),
       txt(`나눠 준 사탕: ${r}×${s}=${r * s}개. `),
-      txt(`남은 사탕: ${p * q}−${r * s}=${ida(ans)}개.`),
+      txt(`남은 사탕: ${p * q}−${r * s}=${ans}${ida('개')}.`),
     ];
 
     return {
@@ -1234,7 +1234,7 @@ const chCombo: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`윗옷 1가지마다 치마 ${n}가지를 짝지을 수 있어요. `),
-      txt(`윗옷이 ${m}가지이므로 ${n}씩 ${m}묶음: ${n}×${m}=${ida(ans)}가지.`),
+      txt(`윗옷이 ${m}가지이므로 ${n}씩 ${m}묶음: ${n}×${m}=${ans}${ida('가지')}.`),
     ];
 
     return {
