@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { STAGES, UNIT_TITLES } from '../game/stages';
 import { levelFromXp } from '../game/xp';
 import { getSkill } from '../generator';
+import AssignmentPanel from '../components/teacher/AssignmentPanel';
 
 interface StudentRow {
   nickname: string;
@@ -28,7 +29,7 @@ interface ReportRow {
   created_at: string;
 }
 
-type Tab = 'students' | 'help' | 'reports';
+type Tab = 'students' | 'help' | 'reports' | 'assignments';
 
 /** skillId → 읽기 쉬운 유형 이름 (없으면 id 그대로) */
 function skillLabel(skillId: string | null): string {
@@ -135,8 +136,8 @@ export default function TeacherPage() {
 
       {loaded && (
         <>
-          <div className="mt-5 flex gap-2">
-            {([['students', '📊 진도'], ['help', '⭐ 길잡이 별'], ['reports', '🐞 오류 신고']] as const).map(([t, label]) => (
+          <div className="mt-5 flex gap-2 flex-wrap">
+            {([['students', '📊 진도'], ['help', '⭐ 길잡이 별'], ['reports', '🐞 오류 신고'], ['assignments', '📜 단원평가']] as const).map(([t, label]) => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
@@ -156,6 +157,13 @@ export default function TeacherPage() {
 
           {tab === 'students' && <StudentsTable students={students!} />}
           {tab === 'help' && <HelpView help={help} />}
+          {tab === 'assignments' && (
+            <AssignmentPanel
+              classCode={code()}
+              teacherKey={key}
+              students={students ?? []}
+            />
+          )}
           {tab === 'reports' && (
             <ReportsView
               reports={reports}

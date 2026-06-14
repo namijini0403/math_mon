@@ -321,6 +321,50 @@ export async function flushReportQueues(): Promise<void> {
   }
 }
 
+// ── Phase D 단원평가 — 학생 수신/제출 ────────────────────────────────────────
+export interface PendingAssignment {
+  id: string;
+  title: string;
+  target_type: 'class' | 'student';
+  config: {
+    unitIds: string[];
+    count: number;
+    mix: { low: number; mid: number; high: number };
+    weakWeight?: boolean;
+  };
+  seed: number;
+  created_at: string;
+}
+
+/** 나에게 도착한(미응시) 시험 목록 — 서버/토큰 없으면 빈 배열 */
+export async function fetchMyAssignments(): Promise<PendingAssignment[]> {
+  await ensureFreshToken().catch(() => undefined);
+  if (!_accessToken) return [];
+  try {
+    const res = await fetch('/api/student/assignments', {
+      headers: { Authorization: `Bearer ${_accessToken}` },
+    });
+    if (!res.ok) return [];
+    const ct = res.headers.get('content-type') ?? '';
+    if (!ct.includes('json')) return [];
+    const data = (await res.json()) as { assignments?: PendingAssignment[] };
+    return Array.isArray(data.assignments) ? data.assignments : [];
+  } catch {
+    return [];
+  }
+}
+
+export interface AssignmentSubmission {
+  score: number;
+  total: number;
+  items: Array<{ skillId: string; seed: number; correct: boolean }>;
+}
+
+/** 시험 결과 제출 (1회) — 성공 여부 반환 */
+export async function submitAssignment(id: string, result: AssignmentSubmission): Promise<boolean> {
+  return postAuthed(`/api/student/assignments/${id}/submit`, result);
+}
+
 /** 진도 스냅샷 + 전체 세이브 업로드 */
 export async function pushProgress(s: {
   studentId: string | null;

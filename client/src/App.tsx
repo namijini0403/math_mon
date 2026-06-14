@@ -15,6 +15,7 @@ import PracticeHubPage from './pages/PracticeHubPage';
 import FinalExamPage from './pages/FinalExamPage';
 import CorridorPage from './pages/CorridorPage';
 import TowerPage from './pages/TowerPage';
+import AssignmentPage from './pages/AssignmentPage';
 import { CompanionCheer } from './components/CompanionCheer';
 import { ErrorReportButton } from './components/ErrorReportButton';
 
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/corridor" element={<CorridorPage />} />
           <Route path="/corridor/:unitId" element={<CorridorPage />} />
           <Route path="/tower/:skillId" element={<TowerPage />} />
+          <Route path="/assignment/:id" element={<AssignmentPage />} />
           <Route path="/finalexam/:semesterId" element={<FinalExamPage />} />
           <Route path="/cards" element={<CardGalleryPage />} />
         </>

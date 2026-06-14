@@ -515,6 +515,134 @@ app.post('/api/teacher/:classCode/reports/resolve', async (c) => {
   return c.json({ ok: true, updated: res.rowCount ?? 0 });
 });
 
+// ── Phase D 단원평가 배포 ─────────────────────────────────────────────────────
+
+/** 교사 — 단원평가 발행 (X-Teacher-Key) */
+app.post('/api/teacher/:classCode/assignments', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  if (!teacherAuthorized(c.req.header('X-Teacher-Key'))) return c.json({ error: 'forbidden' }, 403);
+  const classCode = c.req.param('classCode');
+  const body = await c.req.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>));
+
+  const title = str(body.title, 60) ?? '';
+  const targetType = body.targetType === 'student' ? 'student' : 'class';
+  const targetNickname = targetType === 'student' ? str(body.targetNickname, 20) : null;
+  if (targetType === 'student' && !targetNickname) return c.json({ error: 'target nickname required' }, 400);
+
+  // config 검증 — 신뢰 가능한 형태로만 보관 (출제 엔진 입력)
+  const rawCfg = (body.config && typeof body.config === 'object' ? body.config : {}) as Record<string, unknown>;
+  const unitIds = Array.isArray(rawCfg.unitIds)
+    ? rawCfg.unitIds.filter((x): x is string => typeof x === 'string').slice(0, 30)
+    : [];
+  if (unitIds.length === 0) return c.json({ error: 'unitIds required' }, 400);
+  const count = Math.max(1, Math.min(50, Math.floor(Number(rawCfg.count) || 10)));
+  const rawMix = (rawCfg.mix && typeof rawCfg.mix === 'object' ? rawCfg.mix : {}) as Record<string, unknown>;
+  const num = (v: unknown) => (typeof v === 'number' && v >= 0 && Number.isFinite(v) ? v : 0);
+  const mix = { low: num(rawMix.low), mid: num(rawMix.mid), high: num(rawMix.high) };
+  const config = { unitIds, count, mix, weakWeight: rawCfg.weakWeight === true };
+
+  const seed =
+    typeof body.seed === 'number' && Number.isFinite(body.seed)
+      ? Math.floor(body.seed) >>> 0
+      : Math.floor(Math.random() * 0xffffffff);
+
+  const inserted = await pool.query(
+    `INSERT INTO assignments (class_code, title, target_type, target_nickname, config, seed)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, created_at`,
+    [classCode, title, targetType, targetNickname, JSON.stringify(config), seed],
+  );
+  const row = inserted.rows[0] as { id: string; created_at: string };
+  return c.json({ ok: true, id: row.id, seed, createdAt: row.created_at });
+});
+
+/** 교사 — 발행 목록 + 응시 결과 (X-Teacher-Key) */
+app.get('/api/teacher/:classCode/assignments', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  if (!teacherAuthorized(c.req.header('X-Teacher-Key'))) return c.json({ error: 'forbidden' }, 403);
+  const classCode = c.req.param('classCode');
+  const [assignments, results] = await Promise.all([
+    pool.query(
+      `SELECT id, title, target_type, target_nickname, config, seed, status, created_at
+       FROM assignments WHERE class_code = $1 ORDER BY created_at DESC LIMIT 200`,
+      [classCode],
+    ),
+    pool.query(
+      `SELECT r.assignment_id, r.nickname, r.score, r.total, r.items, r.submitted_at
+       FROM assignment_results r JOIN assignments a ON a.id = r.assignment_id
+       WHERE a.class_code = $1 ORDER BY r.submitted_at ASC`,
+      [classCode],
+    ),
+  ]);
+  return c.json({ assignments: assignments.rows, results: results.rows });
+});
+
+/** 교사 — 발행 마감/재개 (X-Teacher-Key) */
+app.post('/api/teacher/:classCode/assignments/:id/status', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  if (!teacherAuthorized(c.req.header('X-Teacher-Key'))) return c.json({ error: 'forbidden' }, 403);
+  const body = await c.req.json<{ status?: string }>().catch(() => ({} as Record<string, unknown>));
+  const status = body.status === 'closed' ? 'closed' : 'open';
+  const res = await pool.query(
+    `UPDATE assignments SET status = $1 WHERE id = $2 AND class_code = $3`,
+    [status, c.req.param('id'), c.req.param('classCode')],
+  );
+  return c.json({ ok: true, updated: res.rowCount ?? 0 });
+});
+
+/** 학생 — 나에게 도착한(미응시) 시험 목록 (Bearer 토큰) */
+app.get('/api/student/assignments', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  const token = extractBearer(c.req.header('Authorization'));
+  const payload = token ? verifyToken(token) : null;
+  if (!payload || payload.typ === 'refresh') return c.json({ error: 'unauthorized' }, 401);
+  const stu = await pool.query('SELECT class_code, nickname FROM students WHERE id = $1', [payload.sid]);
+  if (stu.rowCount === 0) return c.json({ error: 'student not found' }, 404);
+  const { class_code, nickname } = stu.rows[0] as { class_code: string; nickname: string };
+
+  const rows = await pool.query(
+    `SELECT a.id, a.title, a.target_type, a.config, a.seed, a.created_at
+     FROM assignments a
+     WHERE a.class_code = $1 AND a.status = 'open'
+       AND (a.target_type = 'class' OR (a.target_type = 'student' AND a.target_nickname = $2))
+       AND NOT EXISTS (
+         SELECT 1 FROM assignment_results r WHERE r.assignment_id = a.id AND r.student_id = $3
+       )
+     ORDER BY a.created_at DESC LIMIT 50`,
+    [class_code, nickname, payload.sid],
+  );
+  return c.json({ assignments: rows.rows });
+});
+
+/** 학생 — 시험 제출 (Bearer 토큰, 1회) */
+app.post('/api/student/assignments/:id/submit', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  const token = extractBearer(c.req.header('Authorization'));
+  const payload = token ? verifyToken(token) : null;
+  if (!payload || payload.typ === 'refresh') return c.json({ error: 'unauthorized' }, 401);
+  const stu = await pool.query('SELECT class_code, nickname FROM students WHERE id = $1', [payload.sid]);
+  if (stu.rowCount === 0) return c.json({ error: 'student not found' }, 404);
+  const { class_code, nickname } = stu.rows[0] as { class_code: string; nickname: string };
+
+  const assignmentId = c.req.param('id');
+  const asg = await pool.query('SELECT class_code FROM assignments WHERE id = $1', [assignmentId]);
+  if (asg.rowCount === 0) return c.json({ error: 'assignment not found' }, 404);
+  if ((asg.rows[0] as { class_code: string }).class_code !== class_code) return c.json({ error: 'forbidden' }, 403);
+
+  const body = await c.req.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>));
+  const total = Math.max(0, Math.min(50, Math.floor(Number(body.total) || 0)));
+  const score = Math.max(0, Math.min(total, Math.floor(Number(body.score) || 0)));
+  const items = Array.isArray(body.items) ? body.items.slice(0, 50) : [];
+
+  const res = await pool.query(
+    `INSERT INTO assignment_results (assignment_id, student_id, nickname, score, total, items)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (assignment_id, student_id) DO NOTHING
+     RETURNING id`,
+    [assignmentId, payload.sid, nickname, score, total, JSON.stringify(items)],
+  );
+  return c.json({ ok: true, recorded: (res.rowCount ?? 0) > 0 });
+});
+
 app.get('/api/health', (c) => c.json({ ok: true, db: !!pool }));
 
 // ── 정적 서빙 (client 빌드 결과) ──

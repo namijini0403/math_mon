@@ -98,5 +98,35 @@ export async function bootstrap() {
     CREATE INDEX IF NOT EXISTS error_reports_class_idx ON error_reports(class_code, created_at DESC);
   `);
 
+  // ── Phase D 단원평가 배포 — 교사가 발행한 특별 시험 + 학생 응시 결과 ──────────
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS assignments (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      class_code TEXT NOT NULL,
+      title TEXT NOT NULL DEFAULT '',
+      target_type TEXT NOT NULL DEFAULT 'class',
+      target_nickname TEXT,
+      config JSONB NOT NULL DEFAULT '{}',
+      seed BIGINT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS assignments_class_idx ON assignments(class_code, created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS assignment_results (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      assignment_id UUID NOT NULL REFERENCES assignments(id) ON DELETE CASCADE,
+      student_id UUID REFERENCES students(id) ON DELETE SET NULL,
+      nickname TEXT NOT NULL,
+      score INT NOT NULL DEFAULT 0,
+      total INT NOT NULL DEFAULT 0,
+      items JSONB NOT NULL DEFAULT '[]',
+      submitted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      UNIQUE (assignment_id, student_id)
+    );
+    CREATE INDEX IF NOT EXISTS assignment_results_aid_idx ON assignment_results(assignment_id);
+    CREATE INDEX IF NOT EXISTS assignment_results_sid_idx ON assignment_results(student_id, submitted_at DESC);
+  `);
+
   console.log('DB 스키마 준비 완료');
 }

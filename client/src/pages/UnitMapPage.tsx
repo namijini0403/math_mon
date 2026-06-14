@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import DailyRewardModal from '../components/DailyRewardModal';
 import DragonWidget from '../components/DragonWidget';
+import { AssignmentInbox } from '../components/AssignmentInbox';
 import { DragonAvatar } from '../components/DragonAvatar';
 import { SEMESTERS, STAGES, UNIT_TITLES, type StageDef } from '../game/stages';
 import { parseGradeSemester, accessZoneForSemester, type AccessZone } from '../game/gradeAccess';
@@ -175,6 +176,8 @@ export default function UnitMapPage() {
           🔥<span className="text-sm">{streak.count}</span>
         </div>
       </div>
+
+      <AssignmentInbox />
 
       <div className="mt-3">
         <MissionPanel />
