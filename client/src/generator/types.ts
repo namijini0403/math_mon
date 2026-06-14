@@ -21,7 +21,15 @@ export type FigureSpec =
   /** 한 변 side cm 정사각형 squares개를 대각 계단으로 이어 붙인 도형 (둘레=4·n·a) */
   | { kind: 'staircase'; squares: number; side: number }
   /** n×n×n 정육면체 겉면 색칠 후 1칸씩 자르기 — 한 면만 색칠된 칸(면 중앙) 강조 */
-  | { kind: 'painted-cube'; n: number; highlight: 'one-face' };
+  | { kind: 'painted-cube'; n: number; highlight: 'one-face' }
+  /** 합동 삼각형 둘을 이어 붙인 평행사변형 — 한 꼭짓점 각 ⓐ = a + b (위·아래 소각으로 분해 표시) */
+  | { kind: 'congruent-parallelogram'; a: number; b: number }
+  /** 정사각형 종이의 한 꼭짓점(90°)을 접음 — 크레아스가 90°를 ①(fold)과 ②(90−fold)로 나눔 */
+  | { kind: 'paper-fold'; fold: number }
+  /** 선대칭 마름모 — 한 각 given, 이웃각 ⓐ=180−given. 세로 대칭축 점선 */
+  | { kind: 'rhombus-symmetry'; given: number }
+  /** 직사각형(w×h)과 정사각형(s)이 일부 겹친 그림 — 교집합 음영 */
+  | { kind: 'overlap-rect-square'; w: number; h: number; s: number; k: number };
 
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =

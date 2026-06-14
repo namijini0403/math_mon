@@ -1109,6 +1109,7 @@ const chOverlap: SkillDef = {
       expr: [txt('전체 넓이 = '), blank(0), txt(' cm²')],
       blankAnswers: [ans],
       explanation,
+      figure: { kind: 'overlap-rect-square', w, h, s, k },
     };
   },
 };

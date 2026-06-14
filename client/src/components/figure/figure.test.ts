@@ -31,6 +31,37 @@ describe('FigureView 렌더 스모크', () => {
     // 면 중앙 칸 강조색(amber)이 들어간다
     expect(html.toLowerCase()).toContain('#f59e0b');
   });
+
+  it('congruent-parallelogram: ⓐ=a+b를 aria-label에 표기', () => {
+    const html = renderFigure({ kind: 'congruent-parallelogram', a: 35, b: 65 });
+    expect(html).toContain('<svg');
+    expect(html).toContain('35°');
+    expect(html).toContain('65°');
+    expect(html).toContain('100°'); // a+b
+  });
+
+  it('paper-fold: ①과 ②를 aria-label에 표기', () => {
+    const html = renderFigure({ kind: 'paper-fold', fold: 30 });
+    expect(html).toContain('<svg');
+    expect(html).toContain('30°'); // ①
+    expect(html).toContain('60°'); // ② = 90-30
+  });
+
+  it('rhombus-symmetry: 대칭축(점선)과 두 각을 그린다', () => {
+    const html = renderFigure({ kind: 'rhombus-symmetry', given: 70 });
+    expect(html).toContain('<svg');
+    expect(html).toContain('70°');
+    expect(html).toContain('110°'); // 180-70
+    expect(html).toContain('dasharray'); // 대칭축
+  });
+
+  it('overlap-rect-square: 두 도형과 교집합 음영', () => {
+    const html = renderFigure({ kind: 'overlap-rect-square', w: 6, h: 5, s: 4, k: 4 });
+    expect(html).toContain('<svg');
+    expect(html).toContain('직사각형');
+    expect(html).toContain('정사각형');
+    expect(html.toLowerCase()).toContain('#f59e0b'); // 교집합 음영
+  });
 });
 
 describe('그림 연결 스킬의 figure 스펙 일관성', () => {
@@ -62,6 +93,58 @@ describe('그림 연결 스킬의 figure 스펙 일관성', () => {
       if (p.format !== 'fill-blanks') continue;
       expect(f.n).toBeGreaterThanOrEqual(3);
       expect(p.blankAnswers[0]).toBe(6 * (f.n - 2) * (f.n - 2));
+    }
+  });
+
+  it('ch52-congtriangle: figure.a+b가 ⓐ(정답)와 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'ch52-congtriangle');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'fill-blanks') continue;
+      expect(p.figure!.kind).toBe('congruent-parallelogram');
+      const f = p.figure as Extract<FigureSpec, { kind: 'congruent-parallelogram' }>;
+      expect(f.a + f.b).toBe(p.blankAnswers[0]);
+      expect(f.a).toBeGreaterThan(0);
+      expect(f.b).toBeGreaterThan(0);
+    }
+  });
+
+  it('ch52-paperfold: figure.fold가 문제 수치(차=90−2·fold)와 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'ch52-paperfold');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'fill-blanks') continue;
+      expect(p.figure!.kind).toBe('paper-fold');
+      const f = p.figure as Extract<FigureSpec, { kind: 'paper-fold' }>;
+      expect(f.fold).toBeGreaterThan(0);
+      expect(f.fold).toBeLessThan(45);
+      expect(p.blankAnswers[0]).toBe(90 - 2 * f.fold);
+    }
+  });
+
+  it('ch52-symaxis: figure.given이 문제 수치(ⓐ=180−given)와 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'ch52-symaxis');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'fill-blanks') continue;
+      expect(p.figure!.kind).toBe('rhombus-symmetry');
+      const f = p.figure as Extract<FigureSpec, { kind: 'rhombus-symmetry' }>;
+      expect(p.blankAnswers[0]).toBe(180 - f.given);
+    }
+  });
+
+  it('ch51-overlap: figure(w,h,s,k)가 전체 넓이(정답)와 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'ch51-overlap');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'fill-blanks') continue;
+      expect(p.figure!.kind).toBe('overlap-rect-square');
+      const f = p.figure as Extract<FigureSpec, { kind: 'overlap-rect-square' }>;
+      expect(p.blankAnswers[0]).toBe(f.w * f.h + f.s * f.s - (f.s * f.s) / f.k);
     }
   });
 });

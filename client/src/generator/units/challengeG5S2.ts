@@ -565,6 +565,7 @@ const chCongTriangle: SkillDef = {
       expr: [txt('ⓐ = '), blank(0), txt(' °')],
       blankAnswers: [targetAng],
       explanation,
+      figure: { kind: 'congruent-parallelogram', a: angA, b: angB },
     };
   },
 };
@@ -622,6 +623,7 @@ const chPaperFold: SkillDef = {
       expr: [txt('② − ① = '), blank(0), txt(' °')],
       blankAnswers: [diff],
       explanation,
+      figure: { kind: 'paper-fold', fold: foldAngle },
     };
   },
   minVariety: 31, // foldAngle: 10~40 = 31가지
@@ -677,6 +679,7 @@ const chSymAxis: SkillDef = {
       expr: [txt('ⓐ = '), blank(0), txt(' °')],
       blankAnswers: [targetAngle],
       explanation,
+      figure: { kind: 'rhombus-symmetry', given: givenAngle },
     };
   },
   minVariety: 51, // givenAngle: 30~80 = 51가지

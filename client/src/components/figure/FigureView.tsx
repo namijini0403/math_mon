@@ -15,6 +15,23 @@ const STROKE = '#a5b4fc'; // indigo-300
 const EDGE = '#1e1b4b'; // 칸 경계
 const HILITE = '#f59e0b'; // amber — 색칠된 면
 const LABEL = '#c7d2fe';
+const ANG = '#fbbf24'; // amber-300 — 각도 호·라벨
+const TARGET = '#fcd34d'; // amber-200 — 구하는 각 ⓐ
+const AXIS = '#f472b6'; // pink-400 — 대칭축 점선
+
+// 각도 기하 헬퍼 (수학각: +x 기준 반시계, 단 SVG는 y가 아래로 → sin 부호 반전)
+const rad = (deg: number) => (deg * Math.PI) / 180;
+function pAt(cx: number, cy: number, r: number, deg: number) {
+  return { x: cx + r * Math.cos(rad(deg)), y: cy - r * Math.sin(rad(deg)) };
+}
+/** (cx,cy) 중심, 반지름 r, 수학각 d0→d1 호 path. SVG(y하향)에서 각 증가=시계방향=sweep 1 */
+function arcPath(cx: number, cy: number, r: number, d0: number, d1: number) {
+  const s = pAt(cx, cy, r, d0);
+  const e = pAt(cx, cy, r, d1);
+  const large = Math.abs(d1 - d0) > 180 ? 1 : 0;
+  const sweep = d1 > d0 ? 1 : 0;
+  return `M${s.x.toFixed(1)},${s.y.toFixed(1)} A${r},${r} 0 ${large} ${sweep} ${e.x.toFixed(1)},${e.y.toFixed(1)}`;
+}
 
 export function FigureView({ spec }: { spec: FigureSpec }) {
   let svg;
@@ -24,6 +41,18 @@ export function FigureView({ spec }: { spec: FigureSpec }) {
       break;
     case 'painted-cube':
       svg = <PaintedCube n={spec.n} />;
+      break;
+    case 'congruent-parallelogram':
+      svg = <CongruentParallelogram a={spec.a} b={spec.b} />;
+      break;
+    case 'paper-fold':
+      svg = <PaperFold fold={spec.fold} />;
+      break;
+    case 'rhombus-symmetry':
+      svg = <RhombusSymmetry given={spec.given} />;
+      break;
+    case 'overlap-rect-square':
+      svg = <OverlapRectSquare w={spec.w} h={spec.h} s={spec.s} k={spec.k} />;
       break;
     default:
       // 미구현 kind 폴백 (타입상 도달 불가지만 방어적으로)
@@ -153,6 +182,175 @@ function PaintedCube({ n }: { n: number }) {
       {cells.map((cell, idx) => (
         <polygon key={idx} points={cell.pts} fill={cell.fill} stroke={EDGE} strokeWidth={1} strokeLinejoin="round" />
       ))}
+    </svg>
+  );
+}
+
+// ── 합동 삼각형 → 평행사변형: 한 꼭짓점 ⓐ = a + b (위 소각 a, 아래 소각 b) ──
+function CongruentParallelogram({ a, b }: { a: number; b: number }) {
+  const base = 150;
+  const ta = Math.tan(rad(a));
+  const tb = Math.tan(rad(b));
+  const Rx = (base * tb) / (ta + tb); // 위 꼭짓점 R의 x
+  const Rh = Rx * ta; // 높이
+  const pad = 30;
+  // 꼭짓점: P(왼쪽 공유), Q(오른쪽 공유), R(위), Rp(아래)
+  const P = { x: pad, y: pad + Rh };
+  const Q = { x: pad + base, y: pad + Rh };
+  const R = { x: pad + Rx, y: pad }; // 위 (y 작음)
+  const Rp = { x: pad + base - Rx, y: pad + 2 * Rh }; // 아래
+  const w = base + pad * 2;
+  const h = 2 * Rh + pad * 2;
+
+  // P 코너의 소각: 위(대각선 PQ ~ +x 방향, 0°)→PR(+a°), 아래 PQ→PRp(−b°)
+  const aArc = arcPath(P.x, P.y, 20, 0, a);
+  const bArc = arcPath(P.x, P.y, 20, 0, -b);
+  const aLab = pAt(P.x, P.y, 34, a / 2);
+  const bLab = pAt(P.x, P.y, 34, -b / 2);
+  const tLab = pAt(P.x, P.y, 60, (a - b) / 2); // ⓐ는 코너 전체 바깥쪽
+
+  return (
+    <svg
+      viewBox={`0 0 ${w.toFixed(1)} ${h.toFixed(1)}`}
+      width={Math.min(w, 250)}
+      role="img"
+      aria-label={`합동인 두 삼각형을 이어 붙인 평행사변형. 한 삼각형의 두 각 ${a}°와 ${b}°가 한 꼭짓점에서 만나 ⓐ = ${a + b}°를 이룬다`}
+    >
+      <polygon
+        points={`${P.x},${P.y} ${R.x},${R.y} ${Q.x},${Q.y} ${Rp.x},${Rp.y}`}
+        fill={FILL}
+        stroke={STROKE}
+        strokeWidth={2.5}
+        strokeLinejoin="round"
+      />
+      {/* 두 삼각형 경계(공유 대각선 PQ) */}
+      <line x1={P.x} y1={P.y} x2={Q.x} y2={Q.y} stroke={STROKE} strokeWidth={1.5} strokeDasharray="5 4" opacity={0.8} />
+      <path d={aArc} fill="none" stroke={ANG} strokeWidth={1.5} />
+      <path d={bArc} fill="none" stroke={ANG} strokeWidth={1.5} />
+      <text x={aLab.x} y={aLab.y} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={ANG}>{a}°</text>
+      <text x={bLab.x} y={bLab.y} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={ANG}>{b}°</text>
+      <text x={tLab.x} y={tLab.y} textAnchor="middle" dominantBaseline="middle" fontSize="15" fontWeight="bold" fill={TARGET}>ⓐ</text>
+    </svg>
+  );
+}
+
+// ── 정사각형 종이접기: 90° 코너를 크레아스가 ①(fold)·②(90−fold)로 나눔 ──
+function PaperFold({ fold }: { fold: number }) {
+  const S = 120;
+  const pad = 26;
+  const C = { x: pad, y: pad + S }; // 접는 꼭짓점(왼쪽 아래)
+  // 정사각형: C(좌하), (좌상), (우상), (우하)
+  const sq = `${pad},${pad} ${pad + S},${pad} ${pad + S},${pad + S} ${pad},${pad + S}`;
+  // 크레아스: C에서 수학각 fold 방향 → 오른쪽 변(x=pad+S)에서 나감
+  const M = { x: pad + S, y: C.y - S * Math.tan(rad(fold)) };
+  // 접히는 플랩: 바닥변 위 점 P1 = C + (d,0), 크레아스 대칭 → P1' (수학각 2·fold)
+  const d = S * 0.6;
+  const P1 = { x: C.x + d, y: C.y };
+  const P1p = pAt(C.x, C.y, d, 2 * fold);
+  const w = S + pad * 2;
+  const h = S + pad * 2;
+
+  const a1 = arcPath(C.x, C.y, 22, 0, fold); // ① 바닥↔크레아스
+  const a2 = arcPath(C.x, C.y, 30, fold, 90); // ② 크레아스↔왼쪽변
+  const l1 = pAt(C.x, C.y, 40, fold / 2);
+  const l2 = pAt(C.x, C.y, 46, (fold + 90) / 2);
+
+  return (
+    <svg
+      viewBox={`0 0 ${w} ${h}`}
+      width={Math.min(w, 200)}
+      role="img"
+      aria-label={`정사각형 종이의 90° 꼭짓점을 접어 ①=${fold}°와 ②=${90 - fold}°로 나눈 그림`}
+    >
+      <polygon points={sq} fill={FILL} stroke={STROKE} strokeWidth={2.5} strokeLinejoin="round" />
+      {/* 접힌 플랩 */}
+      <polygon points={`${C.x},${C.y} ${P1.x},${P1.y} ${P1p.x.toFixed(1)},${P1p.y.toFixed(1)}`} fill={HILITE} opacity={0.55} stroke={HILITE} strokeWidth={1} />
+      {/* 크레아스 */}
+      <line x1={C.x} y1={C.y} x2={M.x} y2={M.y} stroke={TARGET} strokeWidth={2} />
+      <path d={a1} fill="none" stroke={ANG} strokeWidth={1.5} />
+      <path d={a2} fill="none" stroke={ANG} strokeWidth={1.5} />
+      <text x={l1.x} y={l1.y} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={ANG}>①</text>
+      <text x={l2.x} y={l2.y} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={ANG}>②</text>
+    </svg>
+  );
+}
+
+// ── 선대칭 마름모: 한 각 given, 이웃각 ⓐ=180−given, 세로 대칭축 ──
+function RhombusSymmetry({ given }: { given: number }) {
+  const p = 70; // 세로 반대각선
+  const q = p * Math.tan(rad(given / 2)); // 가로 반대각선
+  const pad = 30;
+  const cx = pad + q;
+  const cy = pad + p;
+  const T = { x: cx, y: pad }; // 위
+  const Bo = { x: cx, y: pad + 2 * p }; // 아래
+  const L = { x: pad, y: cy }; // 왼
+  const Rr = { x: pad + 2 * q, y: cy }; // 오른
+  const w = 2 * q + pad * 2;
+  const h = 2 * p + pad * 2;
+
+  // T 각(given): 두 변 T→L, T→R 사이. ⓐ는 오른쪽 꼭짓점 R(=180−given)
+  const tLab = { x: cx, y: pad + 20 };
+  const aLab = { x: Rr.x + 11, y: cy }; // 꼭짓점 바깥에 두어 그 각을 가리킴
+
+  return (
+    <svg
+      viewBox={`0 0 ${w.toFixed(1)} ${h.toFixed(1)}`}
+      width={Math.min(w, 210)}
+      role="img"
+      aria-label={`선대칭 마름모. 한 각 ${given}°, 이웃한 각 ⓐ = ${180 - given}°. 세로 대칭축`}
+    >
+      {/* 세로 대칭축 */}
+      <line x1={cx} y1={pad - 12} x2={cx} y2={pad + 2 * p + 12} stroke={AXIS} strokeWidth={1.5} strokeDasharray="6 4" />
+      <polygon
+        points={`${T.x},${T.y} ${Rr.x},${Rr.y} ${Bo.x},${Bo.y} ${L.x},${L.y}`}
+        fill={FILL}
+        stroke={STROKE}
+        strokeWidth={2.5}
+        strokeLinejoin="round"
+      />
+      <text x={tLab.x} y={tLab.y} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill={ANG}>{given}°</text>
+      <text x={aLab.x} y={aLab.y} textAnchor="middle" dominantBaseline="middle" fontSize="14" fontWeight="bold" fill={TARGET}>ⓐ</text>
+    </svg>
+  );
+}
+
+// ── 직사각형 + 정사각형 겹침: 교집합 음영(개념 도해) ──
+function OverlapRectSquare({ w, h, s, k }: { w: number; h: number; s: number; k: number }) {
+  const maxPx = 150;
+  const scale = Math.min(maxPx / (w + s * 0.6), maxPx / Math.max(h, s));
+  const pad = 16;
+  const RW = w * scale;
+  const RH = h * scale;
+  const SQ = s * scale;
+  // 정사각형을 직사각형 오른쪽-위 모서리에 겹치게: 왼쪽 변이 직사각형 안으로 (s/k 폭 만큼)
+  const inset = (s / k) * scale; // 겹치는 가로 폭
+  const rectX = pad;
+  const rectY = pad + Math.max(0, SQ - RH); // 바닥 정렬 비슷하게
+  const sqX = rectX + RW - inset;
+  const sqY = pad;
+  // 교집합(직사각형 ∩ 정사각형)
+  const ix0 = Math.max(rectX, sqX);
+  const iy0 = Math.max(rectY, sqY);
+  const ix1 = Math.min(rectX + RW, sqX + SQ);
+  const iy1 = Math.min(rectY + RH, sqY + SQ);
+  const totalW = (sqX + SQ) - rectX + pad * 2;
+  const totalH = Math.max(rectY + RH, sqY + SQ) - pad + pad * 2;
+
+  return (
+    <svg
+      viewBox={`0 0 ${totalW.toFixed(1)} ${totalH.toFixed(1)}`}
+      width={Math.min(totalW, 240)}
+      role="img"
+      aria-label={`가로 ${w}cm 세로 ${h}cm 직사각형과 한 변 ${s}cm 정사각형이 일부 겹친 그림. 겹친 부분은 정사각형의 1/${k}`}
+    >
+      <rect x={rectX} y={rectY} width={RW} height={RH} fill={FILL} stroke={STROKE} strokeWidth={2.5} />
+      <rect x={sqX} y={sqY} width={SQ} height={SQ} fill={FILL2} fillOpacity={0.85} stroke={STROKE} strokeWidth={2.5} />
+      {ix1 > ix0 && iy1 > iy0 && (
+        <rect x={ix0} y={iy0} width={ix1 - ix0} height={iy1 - iy0} fill={HILITE} opacity={0.6} />
+      )}
+      <text x={rectX + RW / 2} y={rectY + RH - 5} textAnchor="middle" fontSize="10" fill={LABEL}>직사각형</text>
+      <text x={sqX + SQ / 2} y={sqY + 12} textAnchor="middle" fontSize="10" fill={LABEL}>정사각형</text>
     </svg>
   );
 }
