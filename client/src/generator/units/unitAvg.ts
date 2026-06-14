@@ -5,7 +5,7 @@
 
 import { RNG } from '../rng';
 import { buildChoices } from '../choices';
-import { josa } from '../josa';
+import { josa, ida, nj } from '../josa';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -63,7 +63,7 @@ const avgCalc: SkillDef = {
     ];
 
     const explanation: MathExpr = [
-      txt(`평균 = 자료 값의 합 ÷ 자료 수 = (${numsStr}) ÷ ${count} = ${sum} ÷ ${count} = ${answer}${topic.unit}이에요.`),
+      txt(`평균 = 자료 값의 합 ÷ 자료 수 = (${numsStr}) ÷ ${count} = ${sum} ÷ ${count} = ${answer}${ida(topic.unit)}.`),
     ];
 
     return {
@@ -71,7 +71,7 @@ const avgCalc: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${name}${josa(name, '이/가')}의 ${count}회 ${topic.subject}${josa(topic.subject, '이/가')} ${numsStr}${topic.unit}이에요. 평균은 몇 ${topic.unit}인가요?`,
+      prompt: `${name}${josa(name, '이/가')}의 ${count}회 ${topic.subject}${josa(topic.subject, '이/가')} ${numsStr}${ida(topic.unit)}. 평균은 몇 ${topic.unit}인가요?`,
       expr,
       blankAnswers: [answer],
       explanation,
@@ -108,7 +108,7 @@ const avgSum: SkillDef = {
     ];
 
     const explanation: MathExpr = [
-      txt(`합계 = 평균 × 자료 수 = ${avg} × ${count} = ${total}${topic.unit}이에요.`),
+      txt(`합계 = 평균 × 자료 수 = ${avg} × ${count} = ${total}${ida(topic.unit)}.`),
     ];
 
     return {
@@ -116,7 +116,7 @@ const avgSum: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${count}회 ${topic.subject}의 평균이 ${avg}${topic.unit}이에요. ${count}회의 합계는 몇 ${topic.unit}인가요?`,
+      prompt: `${count}회 ${topic.subject}의 평균이 ${avg}${ida(topic.unit)}. ${count}회의 합계는 몇 ${topic.unit}인가요?`,
       expr,
       blankAnswers: [total],
       explanation,
@@ -166,7 +166,7 @@ const avgMissing: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`4회의 합계 = 평균 × 4 = ${avg} × 4 = ${avg * 4}${topic.unit}. `),
-      txt(`4회 값 = ${avg * 4} − (${a} + ${b} + ${c}) = ${avg * 4} − ${a + b + c} = ${fourth}${topic.unit}이에요.`),
+      txt(`4회 값 = ${avg * 4} − (${a} + ${b} + ${c}) = ${avg * 4} − ${a + b + c} = ${fourth}${ida(topic.unit)}.`),
     ];
 
     return {
@@ -174,7 +174,7 @@ const avgMissing: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${name}${josa(name, '이/가')}의 4회 ${topic.subject} 평균이 ${avg}${topic.unit}이에요. 1회부터 3회까지의 점수가 ${a}, ${b}, ${c}${topic.unit}이라면 4회 기록은 몇 ${topic.unit}이어야 할까요?`,
+      prompt: `${name}${josa(name, '이/가')}의 4회 ${topic.subject} 평균이 ${avg}${ida(topic.unit)}. 1회부터 3회까지의 점수가 ${a}, ${b}, ${c}${topic.unit}이라면 4회 기록은 몇 ${topic.unit}이어야 할까요?`,
       expr,
       blankAnswers: [fourth],
       explanation,
@@ -400,7 +400,7 @@ const chanceNum: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`가능성은 0(불가능) ~ 1(확실) 사이의 수로 나타내요. `),
-      txt(`이 경우의 가능성은 ${situation.answerLabel}이에요.`),
+      txt(`이 경우의 가능성은 ${ida(situation.answerLabel)}.`),
     ];
 
     return {
@@ -455,7 +455,7 @@ const avgWord: SkillDef = {
     const explanation: MathExpr = [
       txt(`5회까지의 합계 = 목표 평균 × 5 = ${m2} × 5 = ${m2 * 5}${topic.unit}. `),
       txt(`지난 4회의 합계 = 지난 평균 × 4 = ${m1} × 4 = ${m1 * 4}${topic.unit}. `),
-      txt(`5회 ${topic.subject} = ${m2 * 5} − ${m1 * 4} = ${fifth}${topic.unit}이에요.`),
+      txt(`5회 ${topic.subject} = ${m2 * 5} − ${m1 * 4} = ${fifth}${ida(topic.unit)}.`),
     ];
 
     return {
@@ -463,7 +463,7 @@ const avgWord: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${topic.actor}${josa(topic.actor, '이/가')}의 지난 4회 ${topic.subject} 평균이 ${m1}${topic.unit}이에요. 5회까지의 평균을 ${m2}${topic.unit}로 만들려면 5회 기록은 몇 ${topic.unit}이어야 할까요?`,
+      prompt: `${topic.actor}${josa(topic.actor, '이/가')}의 지난 4회 ${topic.subject} 평균이 ${m1}${ida(topic.unit)}. 5회까지의 평균을 ${m2}${nj(topic.unit, '으로/로')} 만들려면 5회 기록은 몇 ${topic.unit}이어야 할까요?`,
       expr,
       blankAnswers: [fifth],
       explanation,

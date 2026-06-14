@@ -7,7 +7,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -217,7 +217,7 @@ const guguMissing: SkillDef = {
         prompt: '□에 알맞은 수를 쓰세요.',
         expr,
         blankAnswers: [n],
-        explanation: [txt(`${dan}단을 외워 보면 ${dan} × ${n} = ${result}이에요. 곱셈은 순서를 바꿔도 결과가 같으니 □ × ${dan} = ${result}에서 □ = ${n}이에요.`)],
+        explanation: [txt(`${dan}단을 외워 보면 ${dan} × ${n} = ${ida(result)}. 곱셈은 순서를 바꿔도 결과가 같으니 □ × ${dan} = ${result}에서 □ = ${ida(n)}.`)],
       };
     } else {
       // dan × □ = result  (answer: n)
@@ -234,7 +234,7 @@ const guguMissing: SkillDef = {
         prompt: '□에 알맞은 수를 쓰세요.',
         expr,
         blankAnswers: [n],
-        explanation: [txt(`${dan}단을 외워 보면 ${dan} × ${n} = ${result}이에요. 그래서 ${dan} × □ = ${result}에서 □ = ${n}이에요.`)],
+        explanation: [txt(`${dan}단을 외워 보면 ${dan} × ${n} = ${ida(result)}. 그래서 ${dan} × □ = ${result}에서 □ = ${ida(n)}.`)],
       };
     }
   },

@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -110,7 +110,7 @@ const comp1Most: SkillDef = {
       choices,
       answerIndex,
       explanation: [
-        txt(`${vals.map((v, i) => `${NAMES[i]}=${v}${topic.unit}`).join(', ')}. 가장 ${adj} 것은 ${answerName}이에요.`),
+        txt(`${vals.map((v, i) => `${NAMES[i]}=${v}${topic.unit}`).join(', ')}. 가장 ${adj} 것은 ${ida(answerName)}.`),
       ],
     };
   },

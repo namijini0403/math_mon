@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -74,7 +74,7 @@ const muliTimes: SkillDef = {
         prompt: `${a}의 ${b}배는 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a}의 ${b}배는 ${nj(a, '을/를')} ${b}번 더한 것이에요: ${Array(b).fill(String(a)).join(' + ')} = ${ans}. 곱셈식으로는 ${a} × ${b} = ${ans}이에요.`)],
+        explanation: [txt(`${a}의 ${b}배는 ${nj(a, '을/를')} ${b}번 더한 것이에요: ${Array(b).fill(String(a)).join(' + ')} = ${ans}. 곱셈식으로는 ${a} × ${b} = ${ida(ans)}.`)],
       };
     } else {
       // 몇 배인지 구하기
@@ -87,7 +87,7 @@ const muliTimes: SkillDef = {
         prompt: `${a}의 몇 배가 ${ans}인가요?`,
         expr,
         blankAnswers: [b],
-        explanation: [txt(`${a}씩 뛰어 세 보면 ${Array(b).fill(0).map((_, i) => a * (i + 1)).join(', ')}이에요. ${nj(a, '을/를')} ${b}번 더하면 ${nj(ans, '이/가')} 되니까 ${a}의 ${b}배예요.`)],
+        explanation: [txt(`${a}씩 뛰어 세 보면 ${ida(Array(b).fill(0).map((_, i) => a * (i + 1)).join(', '))}. ${nj(a, '을/를')} ${b}번 더하면 ${nj(ans, '이/가')} 되니까 ${a}의 ${b}배예요.`)],
       };
     }
   },

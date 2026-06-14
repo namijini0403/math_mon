@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -95,7 +95,7 @@ const num50Split: SkillDef = {
       prompt: `${nj(total, '을/를')} 10과 얼마로 가를 수 있나요?`,
       expr,
       blankAnswers: [singles],
-      explanation: [txt(`${total} = 10 + ${singles}이에요.`)],
+      explanation: [txt(`${total} = 10 + ${ida(singles)}.`)],
     };
   },
 };
@@ -122,19 +122,19 @@ const num50Order: SkillDef = {
       const n = rng.int(10, 49);
       answer = n + 1;
       promptStr = `${n}보다 1 큰 수는 얼마인가요?`;
-      explanation = [txt(`${n} 다음 수를 세면 ${answer}이에요. 그래서 ${n}보다 1 큰 수는 ${answer}이에요.`)];
+      explanation = [txt(`${n} 다음 수를 세면 ${ida(answer)}. 그래서 ${n}보다 1 큰 수는 ${ida(answer)}.`)];
     } else if (pat === 1) {
       // 1 작은 수
       const n = rng.int(11, 50);
       answer = n - 1;
       promptStr = `${n}보다 1 작은 수는 얼마인가요?`;
-      explanation = [txt(`${n} 바로 앞의 수는 ${answer}예요. 그래서 ${n}보다 1 작은 수는 ${answer}예요.`)];
+      explanation = [txt(`${n} 바로 앞의 수는 ${ida(answer)}. 그래서 ${n}보다 1 작은 수는 ${ida(answer)}.`)];
     } else {
       // 사이 수: a, ?, a+2
       const a = rng.int(10, 48);
       answer = a + 1;
       promptStr = `${nj(a, '과/와')} ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${ida(answer)}.`)];
     }
 
     return {
@@ -181,7 +181,7 @@ const num50Compare: SkillDef = {
       answer,
       // 부등호는 클릭 선택(ComparisonView). 풀이는 어느 수가 큰지 말로 짚고 기호도 함께.
       explanation: [
-        txt(`${nj(a, '과/와')} ${b} 중에서 ${nj(Math.max(a, b), '이/가')} 더 커요. 그래서 ${a} ${answer} ${b}예요.`),
+        txt(`${nj(a, '과/와')} ${b} 중에서 ${nj(Math.max(a, b), '이/가')} 더 커요. 그래서 ${a} ${answer} ${ida(b)}.`),
       ],
     };
   },
@@ -229,7 +229,7 @@ const num50Word: SkillDef = {
       answer = a + b;
       const item2 = rng.pick(BUNDLE_ITEMS.filter(i => i !== item));
       promptStr = `${nj(item, '이/가')} ${a}개, ${nj(item2, '이/가')} ${b}개 있어요. 모두 몇 개인가요?`;
-      explanation = [txt(`${a}개와 ${b}개를 더하면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
+      explanation = [txt(`${a}개와 ${b}개를 더하면 ${a} + ${b} = ${ida(answer)}. 모두 ${answer}개예요.`)];
     }
 
     const expr: MathExpr = [

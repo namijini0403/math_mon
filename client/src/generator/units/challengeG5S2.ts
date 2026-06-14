@@ -66,8 +66,8 @@ const chRoundDiff: SkillDef = {
     }
 
     const explanation: MathExpr = [
-      txt(`${nj(N, '을/를')} 올림하여 만의 자리까지 나타내면 ${roundUpVal}이에요. `),
-      txt(`${nj(N, '을/를')} 버림하여 천의 자리까지 나타내면 ${roundDownVal}이에요. `),
+      txt(`${nj(N, '을/를')} 올림하여 만의 자리까지 나타내면 ${ida(roundUpVal)}. `),
+      txt(`${nj(N, '을/를')} 버림하여 천의 자리까지 나타내면 ${ida(roundDownVal)}. `),
       txt(`두 값의 차: ${roundUpVal} − ${roundDownVal} = ${ans}.`),
     ];
 
@@ -278,8 +278,8 @@ const chFracIneqNat: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`${nj(lWholePart, '과/와')} ${lFracN}/${lowerD} < □ × ${p}/${q} < ${nj(uWholePart, '과/와')} ${uFracN}/${upperD}에서 `),
-      txt(`각 변을 ${p}/${q}로 나눠요 (= ${q}/${nj(p, '을/를')} 곱해요). `),
-      txt(`${lowerN}/${lowerD} × ${q}/${p} = ${lowerN * q}/${lowerD * p},  ${upperN}/${upperD} × ${q}/${p} = ${upperN * q}/${upperD * p}이에요. `),
+      txt(`각 변을 ${p}/${nj(q, '으로/로')} 나눠요 (= ${q}/${nj(p, '을/를')} 곱해요). `),
+      txt(`${lowerN}/${lowerD} × ${q}/${p} = ${lowerN * q}/${lowerD * p},  ${upperN}/${upperD} × ${q}/${p} = ${upperN * q}/${ida(upperD * p)}. `),
       txt(`따라서 □는 ${lowerN * q}/${lowerD * p}보다 크고 ${upperN * q}/${upperD * p}보다 작은 자연수예요. `),
       txt(`만족하는 자연수는 ${minAns}부터 ${maxAns}까지예요. `),
       txt(`가장 작은 자연수는 ${minAns}, 가장 큰 자연수는 ${ida(maxAns)}.`),

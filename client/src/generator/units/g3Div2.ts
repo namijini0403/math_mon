@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -38,7 +38,7 @@ const div32Tens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [q * 10],
-      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개예요. ${a / 10} ÷ ${b} = ${q}이니 ${a} ÷ ${nj(b, '은/는')} 그 10배인 ${q * 10}이에요.`)],
+      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개예요. ${a / 10} ÷ ${b} = ${q}이니 ${a} ÷ ${nj(b, '은/는')} 그 10배인 ${ida(q * 10)}.`)],
     };
   },
 };
@@ -78,7 +78,7 @@ const div32NoRem: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [q],
-      explanation: [txt(`${b}에 어떤 수를 곱하면 ${nj(a, '이/가')} 되는지 찾아요. ${b} × ${q} = ${a}이니 ${a} ÷ ${b} = ${q}예요. 나머지 없이 나누어떨어져요.`)],
+      explanation: [txt(`${b}에 어떤 수를 곱하면 ${nj(a, '이/가')} 되는지 찾아요. ${b} × ${q} = ${a}이니 ${a} ÷ ${b} = ${ida(q)}. 나머지 없이 나누어떨어져요.`)],
     };
   },
 };
@@ -120,7 +120,7 @@ const div32Rem: SkillDef = {
       prompt: '몫과 나머지를 구하세요.',
       expr,
       blankAnswers: [q, r],
-      explanation: [txt(`${b}단에서 ${nj(a, '을/를')} 넘지 않는 가장 큰 곱은 ${b} × ${q} = ${b * q}예요. 남은 ${a} - ${b * q} = ${nj(r, '이/가')} 나머지예요. ${a} ÷ ${b} = ${q} … ${r}. 검산하면 ${b} × ${q} + ${r} = ${a}로 맞아요.`)],
+      explanation: [txt(`${b}단에서 ${nj(a, '을/를')} 넘지 않는 가장 큰 곱은 ${b} × ${q} = ${ida(b * q)}. 남은 ${a} - ${b * q} = ${nj(r, '이/가')} 나머지예요. ${a} ÷ ${b} = ${q} … ${r}. 검산하면 ${b} × ${q} + ${r} = ${nj(a, '으로/로')} 맞아요.`)],
     };
   },
 };
@@ -217,13 +217,13 @@ const div32Word: SkillDef = {
 
     if (pat === 0) {
       prompt = `마법사 ${a}명이 ${b}명씩 모둠을 만들어요. 모둠이 몇 개 만들어지고, 몇 명이 남나요?`;
-      explanation = `${a}명을 ${b}명씩 묶으면 ${a} ÷ ${b} = ${q} … ${r}이에요. 모둠 ${q}개가 생기고 ${r}명이 남아요.`;
+      explanation = `${a}명을 ${b}명씩 묶으면 ${a} ÷ ${b} = ${q} … ${ida(r)}. 모둠 ${q}개가 생기고 ${r}명이 남아요.`;
     } else if (pat === 1) {
       prompt = `보석 ${a}개를 상자 ${b}개에 똑같이 나누면, 한 상자에 몇 개씩 담기고 몇 개가 남나요?`;
-      explanation = `${a}개를 ${b}상자에 똑같이 나누면 ${a} ÷ ${b} = ${q} … ${r}이에요. 한 상자에 ${q}개씩 담기고 ${r}개가 남아요.`;
+      explanation = `${a}개를 ${b}상자에 똑같이 나누면 ${a} ÷ ${b} = ${q} … ${ida(r)}. 한 상자에 ${q}개씩 담기고 ${r}개가 남아요.`;
     } else {
       prompt = `별 스티커 ${a}장을 ${b}장씩 봉투에 담으면, 봉투가 몇 개 필요하고 몇 장이 남나요?`;
-      explanation = `${a}장을 ${b}장씩 담으면 ${a} ÷ ${b} = ${q} … ${r}이에요. 봉투 ${q}개가 필요하고 ${r}장이 남아요.`;
+      explanation = `${a}장을 ${b}장씩 담으면 ${a} ÷ ${b} = ${q} … ${ida(r)}. 봉투 ${q}개가 필요하고 ${r}장이 남아요.`;
     }
 
     const expr: MathExpr = [

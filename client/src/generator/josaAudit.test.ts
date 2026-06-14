@@ -7,7 +7,7 @@
 
 import { describe, it } from 'vitest';
 import { SKILLS } from './index';
-import { hasBatchim } from './josa';
+import { hasBatchim, josa } from './josa';
 import type { MathToken, Problem } from './types';
 
 function collectText(p: Problem): string[] {
@@ -34,7 +34,13 @@ const JOSA_NEEDS_BATCHIM: Record<string, boolean> = {
   '과': true, '와': false,
 };
 // 숫자 바로 뒤 조사, 조사 뒤는 단어 경계(공백/문장부호/끝)일 때만 — 'N가지' 같은 의존명사 오탐 방지
-const RE = /([0-9])(이|가|은|는|을|를|과|와)(?=[\s,.?!)」』]|$)/g;
+const BD = `(?=[\\s,.?!)」』]|$)`;
+const RE = new RegExp(`(\\d+)(이|가|은|는|을|를|과|와)${BD}`, 'g');
+// 서술격 조사(이에요/예요)와 으로/로도 숫자 기준으로 검사
+const RE_COP = /(\d+)(이에요|예요)/g; // 이에요=받침 / 예요=받침없음
+const RE_RO = new RegExp(`(\\d+)(으로|로)${BD}`, 'g');
+// 분수 분모(예: 1/10로 = '십분의 일로')는 읽기가 분자에 따라 정해져 받침 규칙이 다름 → 건너뜀
+const isFraction = (s: string, idx: number) => s[idx - 1] === '/';
 
 describe('숫자-조사 감사', () => {
   it('숫자 뒤 조사가 받침 규칙과 일치', () => {
@@ -44,14 +50,23 @@ describe('숫자-조사 감사', () => {
         let p: Problem;
         try { p = skill.generate(seed); } catch { continue; }
         for (const s of collectText(p)) {
+          const flag = (m: RegExpMatchArray, ok: boolean) => {
+            if (ok) return;
+            const idx = m.index ?? 0;
+            const ctx = s.slice(Math.max(0, idx - 8), idx + 12);
+            violations.add(`${skill.id}: …${ctx}… ("${m[1]}${m[2]}")`);
+          };
           for (const m of s.matchAll(RE)) {
-            const digit = Number(m[1]);
-            const josaCh = m[2];
-            if (hasBatchim(digit) !== JOSA_NEEDS_BATCHIM[josaCh]) {
-              const idx = m.index ?? 0;
-              const ctx = s.slice(Math.max(0, idx - 8), idx + 10);
-              violations.add(`${skill.id}: …${ctx}… ("${m[1]}${m[2]}")`);
-            }
+            if (isFraction(s, m.index ?? 0)) continue;
+            flag(m, hasBatchim(Number(m[1])) === JOSA_NEEDS_BATCHIM[m[2]]);
+          }
+          for (const m of s.matchAll(RE_COP)) {
+            if (isFraction(s, m.index ?? 0)) continue;
+            flag(m, hasBatchim(Number(m[1])) === (m[2] === '이에요'));
+          }
+          for (const m of s.matchAll(RE_RO)) {
+            if (isFraction(s, m.index ?? 0)) continue;
+            flag(m, m[2] === josa(Number(m[1]), '으로/로'));
           }
         }
       }

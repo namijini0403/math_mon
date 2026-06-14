@@ -6,7 +6,7 @@
 import { RNG } from '../rng';
 import { gcd } from '../fraction';
 import { buildChoices } from '../choices';
-import { josa, nj } from '../josa';
+import { josa, nj, ida, yo } from '../josa';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -44,9 +44,9 @@ const propSimplify: SkillDef = {
     ];
 
     const explanation: MathExpr = [
-      txt(`${nj(a, '과/와')} ${b}의 최대공약수는 ${g}예요. `),
-      txt(`두 수를 각각 ${g}으로 나누면: ${a}÷${g}=${p}, ${b}÷${g}=${q}. `),
-      txt(`가장 간단한 자연수의 비는 ${p} : ${q}예요.`),
+      txt(`${nj(a, '과/와')} ${b}의 최대공약수는 ${ida(g)}. `),
+      txt(`두 수를 각각 ${nj(g, '으로/로')} 나누면: ${a}÷${g}=${p}, ${b}÷${g}=${q}. `),
+      txt(`가장 간단한 자연수의 비는 ${p} : ${ida(q)}.`),
     ];
 
     return {
@@ -98,7 +98,7 @@ const propSimplify2: SkillDef = {
       explanationTokens = [
         txt(`소수 한 자리 수이므로 두 수에 10을 곱해요. `),
         txt(`${dp}×10=${da}, ${dq}×10=${db}. `),
-        txt(`${nj(da, '과/와')} ${db}의 최대공약수는 1이므로 가장 간단한 자연수의 비는 ${p} : ${q}예요.`),
+        txt(`${nj(da, '과/와')} ${db}의 최대공약수는 1이므로 가장 간단한 자연수의 비는 ${p} : ${ida(q)}.`),
       ];
     } else {
       // 분수: 1/d1 : 1/d2 → d2 : d1 (분모 곱하기)
@@ -119,7 +119,7 @@ const propSimplify2: SkillDef = {
       explanationTokens = [
         txt(`분모의 최소공배수 ${nj(d1 * d2, '을/를')} 두 수에 곱해요. `),
         txt(`(1/${d1})×${d1 * d2}=${d2}, (1/${d2})×${d1 * d2}=${d1}. `),
-        txt(`${nj(d2, '과/와')} ${d1}의 최대공약수는 1이므로 가장 간단한 자연수의 비는 ${p} : ${q}예요.`),
+        txt(`${nj(d2, '과/와')} ${d1}의 최대공약수는 1이므로 가장 간단한 자연수의 비는 ${p} : ${ida(q)}.`),
       ];
     }
 
@@ -199,7 +199,7 @@ const propSolve: SkillDef = {
 
     const explanation: MathExpr = [
       txt('비례식에서 외항의 곱과 내항의 곱은 같아요. '),
-      txt(expl + '예요.'),
+      txt(expl + yo(answer) + '.'),
     ];
 
     return {
@@ -281,8 +281,8 @@ const propProperty: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`비례식은 비율이 같은 두 비로 이루어진 등식이에요. `),
-      txt(`${ca}:${cb}의 비율 = ${ca}÷${cb}, ${cc}:${cd}의 비율 = ${cc}÷${cd}로 같아요. `),
-      txt(`외항의 곱 ${ca}×${cd}=${ca * cd}, 내항의 곱 ${cb}×${cc}=${cb * cc}로 같으므로 비례식이에요.`),
+      txt(`${ca}:${cb}의 비율 = ${ca}÷${cb}, ${cc}:${cd}의 비율 = ${cc}÷${nj(cd, '으로/로')} 같아요. `),
+      txt(`외항의 곱 ${ca}×${cd}=${ca * cd}, 내항의 곱 ${cb}×${cc}=${nj(cb * cc, '으로/로')} 같으므로 비례식이에요.`),
     ];
 
     return {
@@ -363,7 +363,7 @@ const propDivide: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${item.name} ${total}${item.unit}${josa(total, '을/를')} ${nameA}${josa(nameA, '과/와')} ${nameB}${josa(nameB, '이/가')} ${a} : ${b}로 나누어 가지면 각각 몇 ${item.unit}씩일까요?`,
+      prompt: `${item.name} ${total}${item.unit}${josa(total, '을/를')} ${nameA}${josa(nameA, '과/와')} ${nameB}${josa(nameB, '이/가')} ${a} : ${nj(b, '으로/로')} 나누어 가지면 각각 몇 ${item.unit}씩일까요?`,
       expr,
       blankAnswers: [shareA, shareB],
       explanation,
@@ -417,10 +417,10 @@ const propWord: SkillDef = {
         if (guard > 200) { p = 5; q = 2; total = 350; break; }
       } while (p <= q || total > 600 || total < 100);
       answer = total * q / (p + q);
-      prompt = `물과 매실 원액을 ${p} : ${q}로 섞어 주스 ${total} mL를 만들려고 해요. 매실 원액은 몇 mL 필요할까요?`;
+      prompt = `물과 매실 원액을 ${p} : ${nj(q, '으로/로')} 섞어 주스 ${total} mL를 만들려고 해요. 매실 원액은 몇 mL 필요할까요?`;
       expr = [{ kind: 'blank', slot: 0 }, txt(' mL')];
       explanation = [
-        txt(`전체 ${total} mL를 물 : 원액 = ${p} : ${q}로 비례배분해요. `),
+        txt(`전체 ${total} mL를 물 : 원액 = ${p} : ${nj(q, '으로/로')} 비례배분해요. `),
         txt(`원액: ${total} × ${q}/(${p}+${q}) = ${total} × ${q}/${p + q} = ${answer} mL예요.`),
       ];
 

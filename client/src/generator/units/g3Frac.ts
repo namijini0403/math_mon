@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -220,7 +220,7 @@ const frac3DecCmp: SkillDef = {
         { kind: 'decimal', v: av },
         txt(` ${answer} `),
         { kind: 'decimal', v: bv },
-        txt(`. 소수 부분 ${a} ${a < b ? '<' : '>'} ${b}이에요.`),
+        txt(`. 소수 부분 ${a} ${a < b ? '<' : '>'} ${ida(b)}.`),
       ],
     };
   },

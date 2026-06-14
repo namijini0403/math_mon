@@ -262,7 +262,7 @@ const f4SubMixed: SkillDef = {
       txt(` < `),
       frT({ n: mb.n, d }),
       txt(`이므로 자연수 1에서 받아내립니다. `),
-      txt(`${nj(ma.whole, '을/를')} ${ma.whole - 1}로 줄이고 분자에 분모(${d})를 더해요. `),
+      txt(`${nj(ma.whole, '을/를')} ${nj(ma.whole - 1, '으로/로')} 줄이고 분자에 분모(${d})를 더해요. `),
       txt(`분수 부분: ${ma.n + d} − ${mb.n} = ${borrowedN} (분모 ${nj(d, '은/는')} 그대로). `),
       txt(`자연수 부분: ${ma.whole - 1} − ${mb.whole} = ${borrowedResult.whole}.`),
     ];

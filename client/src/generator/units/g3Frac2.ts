@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -109,7 +109,7 @@ const frac32Classify: SkillDef = {
       choices,
       answerIndex,
       explanation: [
-        txt(`진분수: 분자 < 분모, 가분수: 분자 ≥ 분모, 대분수: 자연수 + 진분수. "${fracStr}"은 ${answer}예요.`),
+        txt(`진분수: 분자 < 분모, 가분수: 분자 ≥ 분모, 대분수: 자연수 + 진분수. "${fracStr}"은 ${ida(answer)}.`),
       ],
     };
   },
@@ -145,7 +145,7 @@ const frac32Convert: SkillDef = {
       ansWhole = undefined;
       mixed = false;
       explanation = [
-        txt(`자연수 ${nj(whole, '은/는')} ${d}분의 ${nj(d, '이/가')} ${whole}개라 ${whole * d}/${d}이에요. 여기에 ${n}/${nj(d, '을/를')} 더하면 ${whole} × ${d} + ${n} = ${impN}, 그래서 `),
+        txt(`자연수 ${nj(whole, '은/는')} ${d}분의 ${nj(d, '이/가')} ${whole}개라 ${whole * d}/${ida(d)}. 여기에 ${n}/${nj(d, '을/를')} 더하면 ${whole} × ${d} + ${n} = ${impN}, 그래서 `),
         { kind: 'frac', n: impN, d },
         txt(`이에요.`),
       ];
@@ -160,7 +160,7 @@ const frac32Convert: SkillDef = {
       ansWhole = whole;
       mixed = true;
       explanation = [
-        txt(`${impN} ÷ ${d} = ${whole} 나머지 ${remN}이에요. 몫 ${nj(whole, '이/가')} 자연수, 나머지 ${nj(remN, '이/가')} 분자가 되어 `),
+        txt(`${impN} ÷ ${d} = ${whole} 나머지 ${ida(remN)}. 몫 ${nj(whole, '이/가')} 자연수, 나머지 ${nj(remN, '이/가')} 분자가 되어 `),
         { kind: 'frac', n: remN, d, whole },
         txt(`이에요.`),
       ];
@@ -261,7 +261,7 @@ const frac32Word: SkillDef = {
       ans = whole;
       unit = '';
       prompt = `${impN}/${nj(d, '을/를')} 대분수로 나타낼 때, 자연수 부분은 얼마인가요?`;
-      expl = `${impN} ÷ ${d} = ${whole} 나머지 ${remN}이라 ${nj(whole, '과/와')} ${remN}/${d}이에요. 자연수 부분은 ${whole}이에요.`;
+      expl = `${impN} ÷ ${d} = ${whole} 나머지 ${remN}이라 ${nj(whole, '과/와')} ${remN}/${ida(d)}. 자연수 부분은 ${ida(whole)}.`;
     } else {
       // 분수 크기 비교: 더 큰 쪽의 분자
       const d = rng.int(3, 10);
@@ -287,7 +287,7 @@ const frac32Word: SkillDef = {
       ans = maxN;
       unit = '개';
       prompt = `분모가 ${d}인 두 분수 ${n1}/${nj(d, '과/와')} ${n2}/${d} 중 더 큰 분수의 분자는 얼마인가요?`;
-      expl = `분모가 같을 때 분자가 클수록 커요. ${n1} ${n1 < n2 ? '<' : '>'} ${n2}이므로 더 큰 분수의 분자는 ${maxN}이에요.`;
+      expl = `분모가 같을 때 분자가 클수록 커요. ${n1} ${n1 < n2 ? '<' : '>'} ${n2}이므로 더 큰 분수의 분자는 ${ida(maxN)}.`;
     }
 
     if (ans <= 0) { ans = 1; }

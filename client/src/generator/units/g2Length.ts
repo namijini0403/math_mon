@@ -85,10 +85,10 @@ const len2Unit: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${tool.emoji} ${obj}의 길이를 ${tool.name}으로 재었더니 ${nj(tool.name, '이/가')} 딱 ${count}번이었어요. ${tool.name}으로 재면 몇 번인가요?`,
+      prompt: `${tool.emoji} ${obj}의 길이를 ${nj(tool.name, '으로/로')} 재었더니 ${nj(tool.name, '이/가')} 딱 ${count}번이었어요. ${nj(tool.name, '으로/로')} 재면 몇 번인가요?`,
       expr,
       blankAnswers: [count],
-      explanation: [txt(`${tool.name}으로 재면 ${count}번이에요.`)],
+      explanation: [txt(`${nj(tool.name, '으로/로')} 재면 ${count}번이에요.`)],
     };
   },
 };

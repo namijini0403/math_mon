@@ -221,7 +221,7 @@ const chFracRangeCount: SkillDef = {
       txt(`우변: ${nj(rhsWhole, '과/와')} ${rhsFN}/${rhsFD} ÷ ${rhsB} × ${rhsC} = `),
       frT({ n: rhsN, d: rhsD }),
       txt(` ≈ ${rhsVal}. `),
-      txt(`${lhsVal}... < □ < ${rhsVal}...에서 자연수는 ${minNat}부터 ${maxNat}까지 ${count}개${ida(count)}예요.`),
+      txt(`${lhsVal}... < □ < ${rhsVal}...에서 자연수는 ${minNat}부터 ${maxNat}까지 ${count}개${ida(ida(count))}.`),
     ];
 
     return {
@@ -608,7 +608,7 @@ const chDecWrong: SkillDef = {
       skillId: this.id,
       seed,
       format: 'decimal-input',
-      prompt: `어떤 수를 ${cDiv}로 나눠야 했는데 잘못하여 ${wDiv}로 나눴더니 ${nj(wrongQuotStr, '이/가')} 되었습니다. 바르게 계산한 몫을 구하세요.`,
+      prompt: `어떤 수를 ${nj(cDiv, '으로/로')} 나눠야 했는데 잘못하여 ${nj(wDiv, '으로/로')} 나눴더니 ${nj(wrongQuotStr, '이/가')} 되었습니다. 바르게 계산한 몫을 구하세요.`,
       answer: ansVal,
       explanation,
     };

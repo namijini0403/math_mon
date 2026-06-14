@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -36,7 +36,7 @@ const num3dCompose: SkillDef = {
         prompt: `백 모형이 ${h}개, 십 모형이 ${t}개, 일 모형이 ${u}개이면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`백 모형 ${h}개는 ${h * 100}, 십 모형 ${t}개는 ${t * 10}, 일 모형 ${u}개는 ${u}이에요. 모두 더하면 ${h * 100} + ${t * 10} + ${u} = ${ans}이에요.`)],
+        explanation: [txt(`백 모형 ${h}개는 ${h * 100}, 십 모형 ${t}개는 ${t * 10}, 일 모형 ${u}개는 ${ida(u)}. 모두 더하면 ${h * 100} + ${t * 10} + ${u} = ${ida(ans)}.`)],
       };
     } else if (pat === 1) {
       // 수 → 백 자리 숫자
@@ -53,7 +53,7 @@ const num3dCompose: SkillDef = {
         prompt: `${nj(num, '은/는')} 백 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [h],
-        explanation: [txt(`${nj(num, '을/를')} 백·십·일로 가르면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
+        explanation: [txt(`${nj(num, '을/를')} 백·십·일로 가르면 백의 자리 숫자가 ${ida(h)}. 그래서 백 모형은 ${h}개예요.`)],
       };
     } else {
       // 수 → 십 자리 숫자
@@ -70,7 +70,7 @@ const num3dCompose: SkillDef = {
         prompt: `${nj(num, '은/는')} 십 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [t],
-        explanation: [txt(`${nj(num, '을/를')} 백·십·일로 가르면 십의 자리 숫자가 ${t}이에요. 그래서 십 모형은 ${t}개예요.`)],
+        explanation: [txt(`${nj(num, '을/를')} 백·십·일로 가르면 십의 자리 숫자가 ${ida(t)}. 그래서 십 모형은 ${t}개예요.`)],
       };
     }
   },
@@ -114,7 +114,7 @@ const num3dPlace: SkillDef = {
       prompt: `${num}에서 ${posName}의 자리 숫자가 나타내는 값은 얼마인가요?`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${num}에서 ${posName}의 자리 숫자는 ${pos === 0 ? h : pos === 1 ? t : u}이에요. ${posName}의 자리에 있으므로 ${nj(ans, '을/를')} 나타내요.`)],
+      explanation: [txt(`${num}에서 ${posName}의 자리 숫자는 ${ida(pos === 0 ? h : pos === 1 ? t : u)}. ${posName}의 자리에 있으므로 ${nj(ans, '을/를')} 나타내요.`)],
     };
   },
 };
@@ -181,7 +181,7 @@ const num3dCompare: SkillDef = {
     if (ah !== bh) {
       reason = `백의 자리를 비교하면 ${nj(ah, '과/와')} ${bh}이라서, ${nj(bigger, '이/가')} 더 큽니다`;
     } else if (at !== bt) {
-      reason = `백의 자리는 ${ah}로 같으니 십의 자리를 비교하면 ${nj(at, '과/와')} ${bt}이라서, ${nj(bigger, '이/가')} 더 큽니다`;
+      reason = `백의 자리는 ${nj(ah, '으로/로')} 같으니 십의 자리를 비교하면 ${nj(at, '과/와')} ${bt}이라서, ${nj(bigger, '이/가')} 더 큽니다`;
     } else {
       reason = `백·십의 자리가 같으니 일의 자리를 비교하면 ${nj(au, '과/와')} ${bu}이라서, ${nj(bigger, '이/가')} 더 큽니다`;
     }
@@ -247,7 +247,7 @@ const num3dWord: SkillDef = {
         prompt: `${start}에서 ${step}씩 3번 뛰어 세면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${step}씩 3번 뛰어 세요: ${start} → ${start + step} → ${start + step * 2} → ${ans}. 그래서 ${ans}이에요.`)],
+        explanation: [txt(`${step}씩 3번 뛰어 세요: ${start} → ${start + step} → ${start + step * 2} → ${ans}. 그래서 ${ida(ans)}.`)],
       };
     }
   },

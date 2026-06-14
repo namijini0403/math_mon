@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -85,19 +85,19 @@ const num100Order: SkillDef = {
       const n = rng.int(51, 99);
       answer = n + 1;
       promptStr = `${n}보다 1 큰 수는 얼마인가요?`;
-      explanation = [txt(`${n} 다음 수를 세면 ${answer}이에요. 그래서 ${n}보다 1 큰 수는 ${answer}이에요.`)];
+      explanation = [txt(`${n} 다음 수를 세면 ${ida(answer)}. 그래서 ${n}보다 1 큰 수는 ${ida(answer)}.`)];
     } else if (pat === 1) {
       // 1 작은 수
       const n = rng.int(52, 100);
       answer = n - 1;
       promptStr = `${n}보다 1 작은 수는 얼마인가요?`;
-      explanation = [txt(`${n} 바로 앞의 수는 ${answer}예요. 그래서 ${n}보다 1 작은 수는 ${answer}예요.`)];
+      explanation = [txt(`${n} 바로 앞의 수는 ${ida(answer)}. 그래서 ${n}보다 1 작은 수는 ${ida(answer)}.`)];
     } else {
       // 사이 수: a, ?, a+2
       const a = rng.int(51, 98);
       answer = a + 1;
       promptStr = `${nj(a, '과/와')} ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${ida(answer)}.`)];
     }
 
     return {
@@ -142,7 +142,7 @@ const num100Compare: SkillDef = {
       right: [{ kind: 'decimal', v: b }],
       answer,
       // 부등호는 클릭 선택(ComparisonView). 풀이는 어느 수가 큰지 말로 + 기호 병기.
-      explanation: [txt(`${nj(a, '과/와')} ${b} 중에서 ${nj(Math.max(a, b), '이/가')} 더 커요. 그래서 ${a} ${answer} ${b}예요.`)],
+      explanation: [txt(`${nj(a, '과/와')} ${b} 중에서 ${nj(Math.max(a, b), '이/가')} 더 커요. 그래서 ${a} ${answer} ${ida(b)}.`)],
     };
   },
 };
@@ -224,7 +224,7 @@ const num100Word: SkillDef = {
       }
       answer = base + extra;
       promptStr = `${nj(item, '이/가')} ${base}개 있었어요. ${extra}개를 더 가져오면 모두 몇 개인가요?`;
-      explanation = [txt(`${base}개에 ${extra}개를 더하면 ${base} + ${extra} = ${answer}이에요. 모두 ${answer}개예요.`)];
+      explanation = [txt(`${base}개에 ${extra}개를 더하면 ${base} + ${extra} = ${ida(answer)}. 모두 ${answer}개예요.`)];
     }
 
     const expr: MathExpr = [

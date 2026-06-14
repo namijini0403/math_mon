@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -103,7 +103,7 @@ const tbg2Table: SkillDef = {
       prompt: `자료를 보고 표의 빈칸을 채우세요.\n${emojiList}\n\n[${data.topic.title}] ${blankItem}: □${data.topic.unit}`,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`${blankItem} 이모지가 ${answer}개이므로 ${answer}${data.topic.unit}이에요.`)],
+      explanation: [txt(`${blankItem} 이모지가 ${answer}개이므로 ${answer}${ida(data.topic.unit)}.`)],
     };
   },
 };
@@ -168,7 +168,7 @@ const tbg2Total: SkillDef = {
       prompt: `표를 보고 합계를 구하세요.\n[${data.topic.title}] ${tableText}\n\n합계: □${data.topic.unit}`,
       expr,
       blankAnswers: [data.total],
-      explanation: [txt(`각 항목의 수를 모두 더해요. ${data.values.join(' + ')} = ${data.total}${data.topic.unit}예요.`)],
+      explanation: [txt(`각 항목의 수를 모두 더해요. ${data.values.join(' + ')} = ${data.total}${ida(data.topic.unit)}.`)],
     };
   },
 };
@@ -205,7 +205,7 @@ const tbg2Most: SkillDef = {
       prompt: `표를 보고 ${questionWord} 좋아하는 것을 고르세요.\n[${data.topic.title}] ${tableText}`,
       choices,
       answerIndex,
-      explanation: [txt(`${nj(answer, '이/가')} ${targetVal}${data.topic.unit}으로 ${questionWord} 선택받았어요.`)],
+      explanation: [txt(`${nj(answer, '이/가')} ${targetVal}${nj(data.topic.unit, '으로/로')} ${questionWord} 선택받았어요.`)],
     };
   },
 };
@@ -250,7 +250,7 @@ const tbg2Word: SkillDef = {
         prompt: `표를 보고 답하세요.\n[${data.topic.title}] ${tableText}\n\n${nj(bigItem, '은/는')} ${smallItem}보다 몇 ${data.topic.unit} 더 많은가요?`,
         expr,
         blankAnswers: [diff],
-        explanation: [txt(`더 많은 ${Math.max(vA, vB)}${data.topic.unit}에서 더 적은 ${Math.min(vA, vB)}${nj(data.topic.unit, '을/를')} 빼요. ${Math.max(vA, vB)} − ${Math.min(vA, vB)} = ${diff}${data.topic.unit}예요.`)],
+        explanation: [txt(`더 많은 ${Math.max(vA, vB)}${data.topic.unit}에서 더 적은 ${Math.min(vA, vB)}${nj(data.topic.unit, '을/를')} 빼요. ${Math.max(vA, vB)} − ${Math.min(vA, vB)} = ${diff}${ida(data.topic.unit)}.`)],
       };
     } else {
       // 합계 문장제
@@ -265,7 +265,7 @@ const tbg2Word: SkillDef = {
         prompt: `표를 보고 답하세요.\n[${data.topic.title}] ${tableText}\n\n${name} 학생은 모두 몇 ${data.topic.unit}인가요?`,
         expr,
         blankAnswers: [data.total],
-        explanation: [txt(`각 항목의 수를 모두 더해요. ${data.values.join(' + ')} = ${data.total}${data.topic.unit}예요.`)],
+        explanation: [txt(`각 항목의 수를 모두 더해요. ${data.values.join(' + ')} = ${data.total}${ida(data.topic.unit)}.`)],
       };
     }
   },

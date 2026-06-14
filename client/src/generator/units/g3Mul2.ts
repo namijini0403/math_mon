@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -13,7 +13,7 @@ const txt = (text: string) => ({ kind: 'text' as const, text });
 function mul3x1Explain(a: number, b: number): string {
   const h = Math.floor(a / 100), t = Math.floor(a / 10) % 10, o = a % 10;
   const oProd = o * b, tProd = t * b * 10, hProd = h * b * 100;
-  return `일의 자리: ${o} × ${b} = ${oProd}. 십의 자리: ${t} × ${b} = ${t * b}인데 자리값이 십이라 ${tProd}. 백의 자리: ${h} × ${b} = ${h * b}인데 자리값이 백이라 ${hProd}. 모두 더하면 ${hProd} + ${tProd} + ${oProd} = ${a * b}이에요.`;
+  return `일의 자리: ${o} × ${b} = ${oProd}. 십의 자리: ${t} × ${b} = ${t * b}인데 자리값이 십이라 ${tProd}. 백의 자리: ${h} × ${b} = ${h * b}인데 자리값이 백이라 ${hProd}. 모두 더하면 ${hProd} + ${tProd} + ${oProd} = ${ida(a * b)}.`;
 }
 
 // ── 1. mul32-3by1  (세 자리)×(한 자리) (fill-blanks) ───────────────
@@ -82,7 +82,7 @@ const mul32TensTens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개, ${nj(b, '은/는')} 십이 ${b / 10}개예요. 먼저 ${a / 10} × ${b / 10} = ${nj((a / 10) * (b / 10), '을/를')} 구하고, 자리값이 백이라 100을 곱하면 ${ans}이에요.`)],
+      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개, ${nj(b, '은/는')} 십이 ${b / 10}개예요. 먼저 ${a / 10} × ${b / 10} = ${nj((a / 10) * (b / 10), '을/를')} 구하고, 자리값이 백이라 100을 곱하면 ${ida(ans)}.`)],
     };
   },
 };
@@ -127,7 +127,7 @@ const mul32TwoByTwo: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${nj(b, '을/를')} ${nj(bTens * 10, '과/와')} ${bOnes}로 나누어 곱해요. ${a} × ${bOnes} = ${partial1}, ${a} × ${bTens * 10} = ${partial2}. 두 곱을 더하면 ${partial1} + ${partial2} = ${ans}이에요.`)],
+      explanation: [txt(`${nj(b, '을/를')} ${nj(bTens * 10, '과/와')} ${nj(bOnes, '으로/로')} 나누어 곱해요. ${a} × ${bOnes} = ${partial1}, ${a} × ${bTens * 10} = ${partial2}. 두 곱을 더하면 ${partial1} + ${partial2} = ${ida(ans)}.`)],
     };
   },
 };

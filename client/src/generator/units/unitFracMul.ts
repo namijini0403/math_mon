@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { gcd, simplify, toMixed, fromMixed, type Frac, type Mixed } from '../fraction';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, MathToken, Problem, SkillDef } from '../types';
@@ -70,7 +71,7 @@ function explainFracNat(f: Frac, nat: number): MathExpr {
     exprs.push(opT('='), mixT(m));
   }
   if (g > 1) {
-    exprs.unshift(txt(`분자와 분모를 ${g}로 약분해요. `));
+    exprs.unshift(txt(`분자와 분모를 ${nj(g, '으로/로')} 약분해요. `));
   } else {
     exprs.unshift(txt('분자에 자연수를 곱해요. '));
   }

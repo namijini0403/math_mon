@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 // ── 공통 헬퍼 ──────────────────────────────────────────────
@@ -43,7 +43,7 @@ const cubCount: SkillDef = {
 
     const explanation: MathExpr = [
       txt(
-        `${shapeName}의 ${nj(part.name, '은/는')} 모두 ${part.count}${part.unit}이에요. ` +
+        `${shapeName}의 ${nj(part.name, '은/는')} 모두 ${part.count}${ida(part.unit)}. ` +
         `직육면체(정육면체 포함)는 면이 6개, 모서리가 12개, 꼭짓점이 8개예요.`,
       ),
     ];
@@ -232,7 +232,7 @@ const cubEdgeMissing: SkillDef = {
     const explanation: MathExpr = [
       txt(
         `직육면체 모서리 합 = (가로 + 세로 + 높이) × 4이므로 ` +
-        `가로 + 세로 + 높이 = ${S} ÷ 4 = ${S / 4}예요. ` +
+        `가로 + 세로 + 높이 = ${S} ÷ 4 = ${ida(S / 4)}. ` +
         `높이 = ${S / 4} − ${a} − ${b} = ${height} cm예요.`,
       ),
     ];

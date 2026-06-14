@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -65,7 +65,7 @@ const ddiv2Same: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`나누는 수와 나누어지는 수에 똑같이 10배를 하면 몫이 같아요. `),
-      txt(`${fmtDec(finalDividend)} ÷ ${fmtDec(finalDivisor)} = ${finalDividendInt} ÷ ${finalDivisorInt} = ${finalQuotient}이에요.`),
+      txt(`${fmtDec(finalDividend)} ÷ ${fmtDec(finalDivisor)} = ${finalDividendInt} ÷ ${finalDivisorInt} = ${ida(finalQuotient)}.`),
     ];
 
     return {
@@ -132,7 +132,7 @@ const ddiv2Diff: SkillDef = {
     // 100배, 10배 변환 설명
     const explanation: MathExpr = [
       txt(`나누는 수와 나누어지는 수에 똑같이 10배를 하면 몫이 같아요. `),
-      txt(`${fmtDec(finalDividend)} ÷ ${fmtDec(finalDivisor)} = ${fmtDec(dividendInt10)} ÷ ${divisorInt} = ${fmtDec(finalQuotient)}이에요.`),
+      txt(`${fmtDec(finalDividend)} ÷ ${fmtDec(finalDivisor)} = ${fmtDec(dividendInt10)} ÷ ${divisorInt} = ${ida(fmtDec(finalQuotient))}.`),
     ];
 
     return {
@@ -193,7 +193,7 @@ const ddiv2Nat: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`나누는 수와 나누어지는 수에 똑같이 10배를 하면 몫이 같아요. `),
-      txt(`${finalDividend} ÷ ${fmtDec(finalDivisor)} = ${dividendInt10} ÷ ${divisorInt} = ${finalQuotient}이에요.`),
+      txt(`${finalDividend} ÷ ${fmtDec(finalDivisor)} = ${dividendInt10} ÷ ${divisorInt} = ${ida(finalQuotient)}.`),
     ];
 
     return {
@@ -270,7 +270,7 @@ const ddiv2Round: SkillDef = {
       roundPlace === 0
         ? txt(`${a} × 10 = ${a * 10}, ${a * 10} ÷ ${b} ≈ ${Math.round((a * 10) / b)}이므로 `)
         : txt(`${a} × 100 = ${a * 100}, ${a * 100} ÷ ${b} ≈ ${Math.round((a * 100) / b)}이므로 `),
-      txt(`반올림하면 약 ${fmtDec(roundedAnswer)}이에요.`),
+      txt(`반올림하면 약 ${ida(fmtDec(roundedAnswer))}.`),
     ];
 
     return {
@@ -457,7 +457,7 @@ const ddiv2Word: SkillDef = {
         const distInt10 = Math.round(dist * 10);
         explanation = [
           txt(`${fmtDec(dist)} ÷ ${fmtDec(fuel)}에서 똑같이 10배를 하면 `),
-          txt(`${distInt10} ÷ ${fuelInt} = ${fmtDec(kmPerL)}이에요. `),
+          txt(`${distInt10} ÷ ${fuelInt} = ${ida(fmtDec(kmPerL))}. `),
           txt(`휘발유 1 L로 ${fmtDec(kmPerL)} km를 갈 수 있어요.`),
         ];
       }
@@ -477,7 +477,7 @@ const ddiv2Word: SkillDef = {
         prompt = `리본 9.6 m를 0.8 m씩 자르면 몇 도막이 되나요?`;
         explanation = [
           txt(`9.6 ÷ 0.8에서 나누는 수와 나누어지는 수에 똑같이 10배를 하면 `),
-          txt(`96 ÷ 8 = 12이에요. 리본은 12도막이 돼요.`),
+          txt(`96 ÷ 8 = 12예요. 리본은 12도막이 돼요.`),
         ];
       } else {
         const dividend = rawDividendInt / 10;
@@ -488,7 +488,7 @@ const ddiv2Word: SkillDef = {
         const dividendInt10 = Math.round(dividend * 10);
         explanation = [
           txt(`${fmtDec(dividend)} ÷ ${fmtDec(divisor)}에서 똑같이 10배를 하면 `),
-          txt(`${dividendInt10} ÷ ${divisorInt} = ${quotient}이에요. `),
+          txt(`${dividendInt10} ÷ ${divisorInt} = ${ida(quotient)}. `),
           txt(`리본은 ${quotient}도막이 돼요.`),
         ];
       }
@@ -512,7 +512,7 @@ const ddiv2Word: SkillDef = {
         prompt = `페인트 1.5 L로 3.6 m²를 칠할 수 있습니다. 페인트 1 L로 칠할 수 있는 넓이는 몇 m²인가요?`;
         explanation = [
           txt(`3.6 ÷ 1.5에서 나누는 수와 나누어지는 수에 똑같이 10배를 하면 `),
-          txt(`36 ÷ 15 = 2.4이에요. 페인트 1 L로 2.4 m²를 칠할 수 있어요.`),
+          txt(`36 ÷ 15 = 2.4예요. 페인트 1 L로 2.4 m²를 칠할 수 있어요.`),
         ];
       } else {
         const dividend = rawInt / 1000;
@@ -525,7 +525,7 @@ const ddiv2Word: SkillDef = {
         const divisorInt10 = Math.round(divisor * 10);
         explanation = [
           txt(`${fmtDec(dividend)} ÷ ${fmtDec(divisor)}에서 똑같이 10배를 하면 `),
-          txt(`${dividendInt10} ÷ ${divisorInt10} = ${fmtDec(kmPerL)}이에요. `),
+          txt(`${dividendInt10} ÷ ${divisorInt10} = ${ida(fmtDec(kmPerL))}. `),
           txt(`페인트 1 L로 ${fmtDec(kmPerL)} m²를 칠할 수 있어요.`),
         ];
       }
@@ -552,7 +552,7 @@ const ddiv2Word: SkillDef = {
         const dividendInt10 = Math.round(dividend * 10);
         explanation = [
           txt(`${fmtDec(dividend)} ÷ ${fmtDec(divisor)}에서 똑같이 10배를 하면 `),
-          txt(`${dividendInt10} ÷ ${divisorInt} = ${quotient}이에요. `),
+          txt(`${dividendInt10} ÷ ${divisorInt} = ${ida(quotient)}. `),
           txt(`설탕 ${quotient}봉지가 돼요.`),
         ];
       }
@@ -581,7 +581,7 @@ const ddiv2Word: SkillDef = {
         const dividendInt10 = dividend * 10;
         explanation = [
           txt(`${dividend} ÷ ${fmtDec(divisor)}에서 똑같이 10배를 하면 `),
-          txt(`${dividendInt10} ÷ ${divisorInt} = ${quotient}이에요. `),
+          txt(`${dividendInt10} ÷ ${divisorInt} = ${ida(quotient)}. `),
           txt(`물 ${quotient}컵이 돼요.`),
         ];
       }
@@ -599,7 +599,7 @@ const ddiv2Word: SkillDef = {
         answer = 7.5; unit = 'km';
         prompt = `자전거를 타고 2시간 동안 15 km를 갔습니다. 1시간에 몇 km를 간 셈인가요?`;
         explanation = [
-          txt(`15 ÷ 2 = 7.5이에요. `),
+          txt(`15 ÷ 2 = 7.5예요. `),
           txt(`1시간에 7.5 km를 간 셈이에요.`),
         ];
       } else {
@@ -612,7 +612,7 @@ const ddiv2Word: SkillDef = {
         const distInt10 = Math.round(dist * 10);
         explanation = [
           txt(`${fmtDec(dist)} ÷ ${fmtDec(time)}에서 똑같이 10배를 하면 `),
-          txt(`${distInt10} ÷ ${timeInt} = ${fmtDec(speed)}이에요. `),
+          txt(`${distInt10} ÷ ${timeInt} = ${ida(fmtDec(speed))}. `),
           txt(`1시간에 ${fmtDec(speed)} km를 간 셈이에요.`),
         ];
       }

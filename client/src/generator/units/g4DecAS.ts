@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, SkillDef } from '../types';
 
@@ -71,7 +71,7 @@ const dec4PlaceValue: SkillDef = {
         ],
         blankAnswers: [placeDigit],
         explanation: [
-          txt(`${displayStr}의 ${placeName} 자리 숫자는 ${placeDigit}이에요. `),
+          txt(`${displayStr}의 ${placeName} 자리 숫자는 ${ida(placeDigit)}. `),
           txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${nj(unitName, '이/가')} ${placeDigit}개를 나타내요.`),
         ],
       };
@@ -106,7 +106,7 @@ const dec4PlaceValue: SkillDef = {
         ],
         blankAnswers: [placeDigit],
         explanation: [
-          txt(`${displayStr}의 ${placeName} 자리 숫자는 ${placeDigit}이에요. `),
+          txt(`${displayStr}의 ${placeName} 자리 숫자는 ${ida(placeDigit)}. `),
           txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${nj(unitName, '이/가')} ${placeDigit}개를 나타내요.`),
         ],
       };
@@ -360,7 +360,7 @@ const dec4Scale: SkillDef = {
         answerIndex,
         explanation: [
           txt(`소수를 1/10로 하면 소수점이 왼쪽으로 한 칸 이동해요. `),
-          txt(`${baseStr}의 1/10은 ${resultStr}이에요.`),
+          txt(`${baseStr}의 1/10은 ${ida(resultStr)}.`),
         ],
       };
     } else {

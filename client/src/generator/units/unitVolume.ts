@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { MathExpr, SkillDef } from '../types';
 
@@ -501,7 +502,7 @@ const volWord: SkillDef = {
           format: 'fill-blanks',
           prompt:
             `가로 ${a} cm, 세로 ${b} cm, 높이 ${c} cm인 직육면체 모양 선물 상자를 ` +
-            `${wrap}로 빈틈없이 싸려고 해요. 필요한 ${wrap}의 넓이는 몇 cm²인가요?`,
+            `${nj(wrap, '으로/로')} 빈틈없이 싸려고 해요. 필요한 ${wrap}의 넓이는 몇 cm²인가요?`,
           expr,
           blankAnswers: [surf],
           explanation,

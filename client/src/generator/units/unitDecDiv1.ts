@@ -7,7 +7,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -69,7 +69,7 @@ const ddiv1Basic: SkillDef = {
       txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이므로 `),
       txt(`${fmtDec(dividend)} ÷ ${nj(n, '은/는')} ${dividendInt / n}의 `),
       { kind: 'frac', n: 1, d: 10 },
-      txt(`인 ${fmtDec(q)}이에요.`),
+      txt(`인 ${ida(fmtDec(q))}.`),
     ];
 
     return {
@@ -142,7 +142,7 @@ const ddiv1Carry: SkillDef = {
       txt(`${dividendInt} ÷ ${finalN} = ${dividendInt / finalN}이므로 `),
       txt(`${fmtDec(finalDividend)} ÷ ${finalN}의 몫은 ${dividendInt / finalN}의 `),
       { kind: 'frac', n: 1, d: dividendScale },
-      txt(`인 ${fmtDec(finalQ)}이에요.`),
+      txt(`인 ${ida(fmtDec(finalQ))}.`),
     ];
 
     return {
@@ -192,7 +192,7 @@ const ddiv1Zero: SkillDef = {
       txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이고, `),
       txt(`${nj(fmtDec(dividend), '은/는')} ${dividendInt}의 `),
       { kind: 'frac', n: 1, d: dividendScale },
-      txt(`이므로 몫은 ${fmtDec(q)}이에요.`),
+      txt(`이므로 몫은 ${ida(fmtDec(q))}.`),
     ];
 
     return {
@@ -263,7 +263,7 @@ const ddiv1NatNat: SkillDef = {
       txt(`${dividend} ÷ ${divisor} = `),
       { kind: 'frac', n: dividend, d: divisor },
       txt(`이고, 분모를 10 또는 100으로 바꾸면 `),
-      txt(`${fmtDec(answer)}이에요.`),
+      txt(`${ida(fmtDec(answer))}.`),
     ];
 
     return {
@@ -350,7 +350,7 @@ const ddiv1Point: SkillDef = {
       { kind: 'frac', n: 1, d: 100 },
       txt(`이므로, ${fmtDec(aDec)} ÷ ${n}의 몫은 ${qBase}의 `),
       { kind: 'frac', n: 1, d: 100 },
-      txt(`인 ${fmtDec(correctAnswer)}이에요.`),
+      txt(`인 ${ida(fmtDec(correctAnswer))}.`),
     ];
 
     return {

@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { MathExpr, SkillDef } from '../types';
 
@@ -157,7 +157,7 @@ const prismInverse: SkillDef = {
       expr = [txt(`면 ${count}개 → `), blank(0), txt('각기둥')];
       explanation = [
         txt(
-          `n각기둥의 면 수 = n+2이에요. n+2 = ${count}이면 n = ${count}−2 = ${n}이에요. ` +
+          `n각기둥의 면 수 = n+2예요. n+2 = ${count}이면 n = ${count}−2 = ${ida(n)}. ` +
           `따라서 면이 ${count}개인 각기둥은 ${name}기둥이에요.`,
         ),
       ];
@@ -167,7 +167,7 @@ const prismInverse: SkillDef = {
       expr = [txt(`모서리 ${count}개 → `), blank(0), txt('각기둥')];
       explanation = [
         txt(
-          `n각기둥의 모서리 수 = 3n이에요. 3n = ${count}이면 n = ${count}÷3 = ${n}이에요. ` +
+          `n각기둥의 모서리 수 = 3n이에요. 3n = ${count}이면 n = ${count}÷3 = ${ida(n)}. ` +
           `따라서 모서리가 ${count}개인 각기둥은 ${name}기둥이에요.`,
         ),
       ];
@@ -177,7 +177,7 @@ const prismInverse: SkillDef = {
       expr = [txt(`꼭짓점 ${count}개 → `), blank(0), txt('각기둥')];
       explanation = [
         txt(
-          `n각기둥의 꼭짓점 수 = 2n이에요. 2n = ${count}이면 n = ${count}÷2 = ${n}이에요. ` +
+          `n각기둥의 꼭짓점 수 = 2n이에요. 2n = ${count}이면 n = ${count}÷2 = ${ida(n)}. ` +
           `따라서 꼭짓점이 ${count}개인 각기둥은 ${name}기둥이에요.`,
         ),
       ];
@@ -229,7 +229,7 @@ const pyramidInverse: SkillDef = {
       expr = [txt(`면 ${count}개 → `), blank(0), txt('각뿔')];
       explanation = [
         txt(
-          `n각뿔의 면 수 = n+1이에요. n+1 = ${count}이면 n = ${count}−1 = ${n}이에요. ` +
+          `n각뿔의 면 수 = n+1이에요. n+1 = ${count}이면 n = ${count}−1 = ${ida(n)}. ` +
           `따라서 면이 ${count}개인 각뿔은 ${name}뿔이에요.`,
         ),
       ];
@@ -239,7 +239,7 @@ const pyramidInverse: SkillDef = {
       expr = [txt(`모서리 ${count}개 → `), blank(0), txt('각뿔')];
       explanation = [
         txt(
-          `n각뿔의 모서리 수 = 2n이에요. 2n = ${count}이면 n = ${count}÷2 = ${n}이에요. ` +
+          `n각뿔의 모서리 수 = 2n이에요. 2n = ${count}이면 n = ${count}÷2 = ${ida(n)}. ` +
           `따라서 모서리가 ${count}개인 각뿔은 ${name}뿔이에요.`,
         ),
       ];
@@ -249,7 +249,7 @@ const pyramidInverse: SkillDef = {
       expr = [txt(`꼭짓점 ${count}개 → `), blank(0), txt('각뿔')];
       explanation = [
         txt(
-          `n각뿔의 꼭짓점 수 = n+1이에요. n+1 = ${count}이면 n = ${count}−1 = ${n}이에요. ` +
+          `n각뿔의 꼭짓점 수 = n+1이에요. n+1 = ${count}이면 n = ${count}−1 = ${ida(n)}. ` +
           `따라서 꼭짓점이 ${count}개인 각뿔은 ${name}뿔이에요.`,
         ),
       ];

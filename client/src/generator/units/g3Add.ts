@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -25,7 +25,7 @@ function addExplain(a: number, b: number): string {
   const uStep = `일의 자리: ${u1} + ${u2} = ${uSum}.${carryU ? ' 10이 넘으니 십의 자리로 1을 받아올림해요.' : ''}`;
   const tStep = `십의 자리: ${t1} + ${t2}${carryU ? ' + 1(받아올림)' : ''} = ${tSum}.${carryT ? ' 10이 넘으니 백의 자리로 1을 받아올림해요.' : ''}`;
   const hStep = `백의 자리: ${h1} + ${h2}${carryT ? ' + 1(받아올림)' : ''} = ${hSum}.`;
-  return `${uStep} ${tStep} ${hStep} 그래서 ${a} + ${b} = ${a + b}이에요.`;
+  return `${uStep} ${tStep} ${hStep} 그래서 ${a} + ${b} = ${ida(a + b)}.`;
 }
 
 /** 세 자리 뺄셈을 일→십→백 자리별 단계로 풀어 설명한다(받아내림 짚기). a ≥ b. */
@@ -48,7 +48,7 @@ function subExplain(a: number, b: number): string {
     : `십의 자리: ${tBase} - ${t2} = ${tRes}.`;
   const hBase = borrowT ? `${h1} - 1(빌려줌)= ${h1 - borrowT}` : `${h1}`;
   const hStep = `백의 자리: ${hBase} - ${h2} = ${hRes}.`;
-  return `${uStep} ${tStep} ${hStep} 그래서 ${a} - ${b} = ${a - b}이에요.`;
+  return `${uStep} ${tStep} ${hStep} 그래서 ${a} - ${b} = ${ida(a - b)}.`;
 }
 
 // ── 1. add3-add  세 자리 덧셈 (받아올림 0→1→2회, difficulty 램프) ───
@@ -204,7 +204,7 @@ const add3Round: SkillDef = {
       choices,
       answerIndex,
       explanation: [
-        txt(`몇백으로 어림할 때는 십의 자리 숫자를 봐요. ${num}의 십의 자리는 ${Math.floor(rem / 10)}이라 ${rem >= 50 ? '5와 같거나 커서 올림' : '5보다 작아서 버림'}하면 ${rounded}이에요.`),
+        txt(`몇백으로 어림할 때는 십의 자리 숫자를 봐요. ${num}의 십의 자리는 ${Math.floor(rem / 10)}이라 ${rem >= 50 ? '5와 같거나 커서 올림' : '5보다 작아서 버림'}하면 ${ida(rounded)}.`),
       ],
     };
   },

@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -68,19 +68,19 @@ const num9Order: SkillDef = {
       const n = rng.int(1, 8);
       answer = n + 1;
       promptStr = `${n}보다 1 큰 수는 얼마인가요?`;
-      explanation = [txt(`${n} 다음 수를 세면 ${answer}이에요. 그래서 ${n}보다 1 큰 수는 ${answer}이에요.`)];
+      explanation = [txt(`${n} 다음 수를 세면 ${ida(answer)}. 그래서 ${n}보다 1 큰 수는 ${ida(answer)}.`)];
     } else if (pat === 1) {
       // 1 작은 수: 2~9 → 1~8
       const n = rng.int(2, 9);
       answer = n - 1;
       promptStr = `${n}보다 1 작은 수는 얼마인가요?`;
-      explanation = [txt(`${n} 바로 앞의 수는 ${answer}예요. 그래서 ${n}보다 1 작은 수는 ${answer}예요.`)];
+      explanation = [txt(`${n} 바로 앞의 수는 ${ida(answer)}. 그래서 ${n}보다 1 작은 수는 ${ida(answer)}.`)];
     } else {
       // 사이 수: a, _, a+2 → 빈칸에 a+1
       const a = rng.int(1, 7);
       answer = a + 1;
       promptStr = `${nj(a, '과/와')} ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${ida(answer)}.`)];
     }
 
     return {
@@ -173,7 +173,7 @@ const num9Ordinal: SkillDef = {
       choices,
       answerIndex,
       explanation: [
-        txt(`${fromFront ? '앞' : '뒤'}에서부터 하나씩 세면 ${ordinalIdx + 1}번째에 있어요. 그래서 ${answer}예요.`),
+        txt(`${fromFront ? '앞' : '뒤'}에서부터 하나씩 세면 ${ordinalIdx + 1}번째에 있어요. 그래서 ${ida(answer)}.`),
       ],
     };
   },
@@ -209,7 +209,7 @@ const num9Word: SkillDef = {
       }
       answer = a + b;
       promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 더 받으면 모두 몇 개인가요?`;
-      explanation = [txt(`${a}개에서 ${b}개를 더 세면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
+      explanation = [txt(`${a}개에서 ${b}개를 더 세면 ${a} + ${b} = ${ida(answer)}. 모두 ${answer}개예요.`)];
     } else if (pat === 1) {
       // 남은 수 세기: a개에서 b개 먹으면 (차 ≥ 1)
       let a = 5, b = 2;
@@ -220,7 +220,7 @@ const num9Word: SkillDef = {
       }
       answer = a - b;
       promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
-      explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} − ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
+      explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} − ${b} = ${ida(answer)}. ${answer}개가 남아요.`)];
     } else {
       // 비교: 두 묶음 중 더 많은 쪽
       let a = 3, b = 5;

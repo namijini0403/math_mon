@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -37,7 +37,7 @@ const num4dCompose: SkillDef = {
         prompt: `천 모형이 ${th}개, 백 모형이 ${h}개, 십 모형이 ${t}개, 일 모형이 ${u}개이면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`천 모형 ${th}개는 ${th * 1000}, 백 모형 ${h}개는 ${h * 100}, 십 모형 ${t}개는 ${t * 10}, 일 모형 ${u}개는 ${u}이에요. 모두 더하면 ${th * 1000} + ${h * 100} + ${t * 10} + ${u} = ${ans}이에요.`)],
+        explanation: [txt(`천 모형 ${th}개는 ${th * 1000}, 백 모형 ${h}개는 ${h * 100}, 십 모형 ${t}개는 ${t * 10}, 일 모형 ${u}개는 ${ida(u)}. 모두 더하면 ${th * 1000} + ${h * 100} + ${t * 10} + ${u} = ${ida(ans)}.`)],
       };
     } else if (pat === 1) {
       // 수 → 천 자리 숫자
@@ -55,7 +55,7 @@ const num4dCompose: SkillDef = {
         prompt: `${nj(num, '은/는')} 천 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [th],
-        explanation: [txt(`${nj(num, '을/를')} 천·백·십·일로 가르면 천의 자리 숫자가 ${th}이에요. 그래서 천 모형은 ${th}개예요.`)],
+        explanation: [txt(`${nj(num, '을/를')} 천·백·십·일로 가르면 천의 자리 숫자가 ${ida(th)}. 그래서 천 모형은 ${th}개예요.`)],
       };
     } else {
       // 수 → 백 자리 숫자
@@ -73,7 +73,7 @@ const num4dCompose: SkillDef = {
         prompt: `${nj(num, '은/는')} 백 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [h],
-        explanation: [txt(`${nj(num, '을/를')} 천·백·십·일로 가르면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
+        explanation: [txt(`${nj(num, '을/를')} 천·백·십·일로 가르면 백의 자리 숫자가 ${ida(h)}. 그래서 백 모형은 ${h}개예요.`)],
       };
     }
   },
@@ -113,7 +113,7 @@ const num4dPlace: SkillDef = {
       prompt: `${num}에서 ${posName}의 자리 숫자가 나타내는 값은 얼마인가요?`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${num}에서 ${posName}의 자리 숫자는 ${digit}이에요. ${posName}의 자리에 있으므로 ${nj(ans, '을/를')} 나타내요.`)],
+      explanation: [txt(`${num}에서 ${posName}의 자리 숫자는 ${ida(digit)}. ${posName}의 자리에 있으므로 ${nj(ans, '을/를')} 나타내요.`)],
     };
   },
 };
@@ -247,7 +247,7 @@ const num4dWord: SkillDef = {
         prompt: `${start}에서 ${step}씩 3번 뛰어 세면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${step}씩 3번 뛰어 세요: ${start} → ${start + step} → ${start + step * 2} → ${ans}. 그래서 ${ans}이에요.`)],
+        explanation: [txt(`${step}씩 3번 뛰어 세요: ${start} → ${start + step} → ${start + step * 2} → ${ans}. 그래서 ${ida(ans)}.`)],
       };
     }
   },

@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -117,7 +117,7 @@ const clock1Pattern: SkillDef = {
       prompt: `${sequence.join(' ')} ?  다음에 올 것은 무엇인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${a}, ${nj(b, '이/가')} 반복되는 규칙이에요. 다음은 ${nextIsA ? a : b}예요.`)],
+      explanation: [txt(`${a}, ${nj(b, '이/가')} 반복되는 규칙이에요. 다음은 ${ida(nextIsA ? a : b)}.`)],
     };
   },
 };
@@ -195,7 +195,7 @@ const clock1Word: SkillDef = {
       const n = rng.int(3, 5); // n번째를 물어봄
       answer = start + (n - 1) * step;
       promptStr = `${start}부터 ${step}씩 커지는 규칙으로 수를 쓰고 있어요. ${n}번째 수는 얼마인가요?`;
-      explanation = [txt(`${start}부터 ${step}씩 더해 가며 세면 ${n}번째 수는 ${answer}예요.`)];
+      explanation = [txt(`${start}부터 ${step}씩 더해 가며 세면 ${n}번째 수는 ${ida(answer)}.`)];
     }
 
     const expr: MathExpr = [{ kind: 'blank', slot: 0 }];

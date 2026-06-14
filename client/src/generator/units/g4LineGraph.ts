@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -92,7 +92,7 @@ const lineMaxChange: SkillDef = {
       answerIndex,
       explanation: [
         txt(`각 구간의 변화량: ${ch.map((c, i) => `${data.times[i]}~${data.times[i + 1]}: ${c}${data.topic.unit}`).join(', ')}`),
-        txt(`가장 큰 변화량은 ${data.times[maxIdx]}~${data.times[maxIdx + 1]} 구간의 ${ch[maxIdx]}${data.topic.unit}이에요.`),
+        txt(`가장 큰 변화량은 ${data.times[maxIdx]}~${data.times[maxIdx + 1]} 구간의 ${ch[maxIdx]}${ida(data.topic.unit)}.`),
       ],
     };
   },

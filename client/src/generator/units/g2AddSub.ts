@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -43,7 +43,7 @@ const as2Add: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`일의 자리끼리 더하면 ${u1} + ${u2} = ${u1 + u2}이라서, 10을 십의 자리로 받아올려요. 십의 자리는 ${at} + ${bt}에 받아올린 1을 더해 ${at + bt + 1}이에요. 그래서 ${a} + ${b} = ${ans}이에요.`)],
+      explanation: [txt(`일의 자리끼리 더하면 ${u1} + ${u2} = ${u1 + u2}이라서, 10을 십의 자리로 받아올려요. 십의 자리는 ${at} + ${bt}에 받아올린 1을 더해 ${ida(at + bt + 1)}. 그래서 ${a} + ${b} = ${ida(ans)}.`)],
     };
   },
 };
@@ -79,7 +79,7 @@ const as2Sub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`일의 자리 ${u1}에서 ${nj(u2, '을/를')} 뺄 수 없어요. 십의 자리에서 10을 받아내리면 ${10 + u1} - ${u2} = ${10 + u1 - u2}이에요. 십의 자리는 1을 빌려줬으니 ${at} - 1 - ${bt} = ${at - 1 - bt}이에요. 그래서 ${a} - ${b} = ${ans}이에요.`)],
+      explanation: [txt(`일의 자리 ${u1}에서 ${nj(u2, '을/를')} 뺄 수 없어요. 십의 자리에서 10을 받아내리면 ${10 + u1} - ${u2} = ${ida(10 + u1 - u2)}. 십의 자리는 1을 빌려줬으니 ${at} - 1 - ${bt} = ${ida(at - 1 - bt)}. 그래서 ${a} - ${b} = ${ida(ans)}.`)],
     };
   },
 };
@@ -129,13 +129,13 @@ const as2Three: SkillDef = {
     let step1: number, expStr: string;
     if (pat === 0) {
       step1 = n1 + n2;
-      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기에 ${nj(n3, '을/를')} 더하면 ${step1} + ${n3} = ${ans}이에요.`;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기에 ${nj(n3, '을/를')} 더하면 ${step1} + ${n3} = ${ida(ans)}.`;
     } else if (pat === 1) {
       step1 = n1 + n2;
-      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기서 ${nj(n3, '을/를')} 빼면 ${step1} - ${n3} = ${ans}이에요.`;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기서 ${nj(n3, '을/를')} 빼면 ${step1} - ${n3} = ${ida(ans)}.`;
     } else {
       step1 = n1 - n2;
-      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} - ${n2} = ${step1}, 거기에 ${nj(n3, '을/를')} 더하면 ${step1} + ${n3} = ${ans}이에요.`;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} - ${n2} = ${step1}, 거기에 ${nj(n3, '을/를')} 더하면 ${step1} + ${n3} = ${ida(ans)}.`;
     }
     const expr: MathExpr = [txt(`${opStr} = `), { kind: 'blank', slot: 0 }];
     return {

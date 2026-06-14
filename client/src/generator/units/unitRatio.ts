@@ -7,7 +7,7 @@
 import { RNG } from '../rng';
 import { simplify, gcd } from '../fraction';
 import { buildChoices } from '../choices';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -84,11 +84,11 @@ const ratioExpress: SkillDef = {
     const explanation: MathExpr = useKiJunExpr
       ? [
           txt(`"A에 대한 B의 비"는 B : A로 써요. 기준량이 A, 비교하는 양이 B예요. `),
-          txt(`${sc.aLabel}(${a}) 수에 대한 ${sc.bLabel}(${b}) 수의 비 → ${b} : ${a}예요.`),
+          txt(`${sc.aLabel}(${a}) 수에 대한 ${sc.bLabel}(${b}) 수의 비 → ${b} : ${ida(a)}.`),
         ]
       : [
           txt(`비는 두 양을 순서대로 기호 ':'로 나타내요. `),
-          txt(`${sc.aLabel} ${a}명 : ${sc.bLabel} ${b}명 → ${a} : ${b}예요.`),
+          txt(`${sc.aLabel} ${a}명 : ${sc.bLabel} ${b}명 → ${a} : ${ida(b)}.`),
         ];
 
     return {
@@ -136,7 +136,7 @@ const ratioValue: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`비율 = 비교하는 양 ÷ 기준량이에요. `),
-      txt(`비 ${compares} : ${base}에서 비교하는 양은 ${compares}, 기준량은 ${base}예요. `),
+      txt(`비 ${compares} : ${base}에서 비교하는 양은 ${compares}, 기준량은 ${ida(base)}. `),
       txt(`비율 = `),
       { kind: 'frac', n: compares, d: base },
       txt(` = `),

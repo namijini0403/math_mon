@@ -5,7 +5,7 @@
 
 import { RNG } from '../rng';
 import { buildChoices } from '../choices';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -95,7 +95,7 @@ const patTableFill: SkillDef = {
         blankAnswers: [safeAnswer],
         explanation: [
           txt(
-            `△가 1씩 커질 때 ○는 ${safeK}씩 커져요. ${ruleText(safeRule)}이므로 △가 ${deltas[3]}이면 ○는 ${deltas[3]} ${safeRule.kind === 'mul' ? '×' : '+'} ${safeK} = ${safeAnswer}이에요.`,
+            `△가 1씩 커질 때 ○는 ${safeK}씩 커져요. ${ruleText(safeRule)}이므로 △가 ${deltas[3]}이면 ○는 ${deltas[3]} ${safeRule.kind === 'mul' ? '×' : '+'} ${safeK} = ${ida(safeAnswer)}.`,
           ),
         ],
       };
@@ -119,7 +119,7 @@ const patTableFill: SkillDef = {
       blankAnswers: [blankAnswer],
       explanation: [
         txt(
-          `△가 1씩 커질 때 ○는 ${diffWord} 커져요. ${ruleText(rule)}이므로 △가 ${deltas[3]}이면 ○는 ${deltas[3]} ${opWord} ${rule.k} = ${blankAnswer}이에요.`,
+          `△가 1씩 커질 때 ○는 ${diffWord} 커져요. ${ruleText(rule)}이므로 △가 ${deltas[3]}이면 ○는 ${deltas[3]} ${opWord} ${rule.k} = ${ida(blankAnswer)}.`,
         ),
       ],
     };
@@ -180,7 +180,7 @@ const patRulePick: SkillDef = {
       answerIndex,
       explanation: [
         txt(
-          `△에 ${opWord}하면 ○가 돼요. 따라서 두 양의 대응 관계는 ${answerText}이에요.`,
+          `△에 ${opWord}하면 ○가 돼요. 따라서 두 양의 대응 관계는 ${ida(answerText)}.`,
         ),
       ],
     };
@@ -239,7 +239,7 @@ const patApply: SkillDef = {
       blankAnswers: [result],
       explanation: [
         txt(
-          `${exprText}이므로 △에 ${nj(delta, '을/를')} 넣으면 ○ = ${calcText}이에요.`,
+          `${exprText}이므로 △에 ${nj(delta, '을/를')} 넣으면 ○ = ${ida(calcText)}.`,
         ),
       ],
     };
@@ -278,7 +278,7 @@ const patInverse: SkillDef = {
       blankAnswers: [delta],
       explanation: [
         txt(
-          `○ = △ × ${k}이므로 △ = ○ ÷ ${k}이에요. ${circle} ÷ ${k} = ${delta}이에요.`,
+          `○ = △ × ${k}이므로 △ = ○ ÷ ${ida(k)}. ${circle} ÷ ${k} = ${ida(delta)}.`,
         ),
       ],
     };
@@ -310,7 +310,7 @@ const WORD_TEMPLATES: WordTemplate[] = [
     makePromptText: (n) =>
       `탁자 1개에 의자가 4개씩 놓여 있어요. 탁자가 ${n}개이면 의자는 모두 몇 개인가요?  의자 수 = `,
     makeExplain: (n, ans) =>
-      `탁자 수(△)와 의자 수(○) 사이의 관계는 ○ = △ × 4이에요. △가 ${n}이면 ○ = ${n} × 4 = ${ans}이에요.`,
+      `탁자 수(△)와 의자 수(○) 사이의 관계는 ○ = △ × 4예요. △가 ${n}이면 ○ = ${n} × 4 = ${ida(ans)}.`,
   },
   // 자동차·바퀴 (× 4)
   {
@@ -320,7 +320,7 @@ const WORD_TEMPLATES: WordTemplate[] = [
     makePromptText: (n) =>
       `자동차 한 대에 바퀴가 4개씩 있어요. 자동차가 ${n}대이면 바퀴는 모두 몇 개인가요?  바퀴 수 = `,
     makeExplain: (n, ans) =>
-      `자동차 수(△)와 바퀴 수(○) 사이의 관계는 ○ = △ × 4이에요. △가 ${n}이면 ○ = ${n} × 4 = ${ans}이에요.`,
+      `자동차 수(△)와 바퀴 수(○) 사이의 관계는 ○ = △ × 4예요. △가 ${n}이면 ○ = ${n} × 4 = ${ida(ans)}.`,
   },
   // 1분에 물 5 L (× 5)
   {
@@ -330,7 +330,7 @@ const WORD_TEMPLATES: WordTemplate[] = [
     makePromptText: (n) =>
       `수도에서 1분에 물이 5 L씩 나와요. ${n}분 동안 받은 물은 몇 L인가요?  물의 양 = `,
     makeExplain: (n, ans) =>
-      `시간(△)과 물의 양(○) 사이의 관계는 ○ = △ × 5이에요. △가 ${n}이면 ○ = ${n} × 5 = ${ans} L이에요.`,
+      `시간(△)과 물의 양(○) 사이의 관계는 ○ = △ × 5예요. △가 ${n}이면 ○ = ${n} × 5 = ${ans} L이에요.`,
   },
   // 성냥개비·삼각형 이어붙이기 (× 2 + 1)
   {
@@ -340,7 +340,7 @@ const WORD_TEMPLATES: WordTemplate[] = [
     makePromptText: (n) =>
       `성냥개비로 삼각형을 이어 붙여요. 삼각형 1개는 성냥개비 3개, 2개부터는 1개씩 추가할 때마다 2개씩 늘어나요. 삼각형 ${n}개를 만들려면 성냥개비가 몇 개 필요한가요?  성냥개비 수 = `,
     makeExplain: (n, ans) =>
-      `삼각형 수(△)와 성냥개비 수(○) 사이의 관계는 ○ = △ × 2 + 1이에요. △가 ${n}이면 ○ = ${n} × 2 + 1 = ${ans}이에요.`,
+      `삼각형 수(△)와 성냥개비 수(○) 사이의 관계는 ○ = △ × 2 + 1이에요. △가 ${n}이면 ○ = ${n} × 2 + 1 = ${ida(ans)}.`,
   },
   // 언니는 나보다 3살 많아요 (+ 3)
   {
@@ -360,7 +360,7 @@ const WORD_TEMPLATES: WordTemplate[] = [
     makePromptText: (n) =>
       `정사각형 1개는 변이 4개예요. 정사각형 ${n}개의 변은 모두 몇 개인가요?  변의 수 = `,
     makeExplain: (n, ans) =>
-      `정사각형 수(△)와 변의 수(○) 사이의 관계는 ○ = △ × 4이에요. △가 ${n}이면 ○ = ${n} × 4 = ${ans}이에요.`,
+      `정사각형 수(△)와 변의 수(○) 사이의 관계는 ○ = △ × 4예요. △가 ${n}이면 ○ = ${n} × 4 = ${ida(ans)}.`,
   },
   // 한 묶음에 6권씩 (× 6)
   {
@@ -370,7 +370,7 @@ const WORD_TEMPLATES: WordTemplate[] = [
     makePromptText: (n) =>
       `공책을 한 묶음에 6권씩 묶어요. ${n}묶음에 공책은 몇 권인가요?  공책 수 = `,
     makeExplain: (n, ans) =>
-      `묶음 수(△)와 공책 수(○) 사이의 관계는 ○ = △ × 6이에요. △가 ${n}이면 ○ = ${n} × 6 = ${ans}이에요.`,
+      `묶음 수(△)와 공책 수(○) 사이의 관계는 ○ = △ × 6이에요. △가 ${n}이면 ○ = ${n} × 6 = ${ida(ans)}.`,
   },
   // 사탕 3개씩 남겨 두기 (× k + 3)
   {
@@ -380,7 +380,7 @@ const WORD_TEMPLATES: WordTemplate[] = [
     makePromptText: (n) =>
       `상자에 사탕이 3개 있고, 친구 한 명이 올 때마다 사탕을 3개씩 더 가져와요. 친구가 ${n}명이면 사탕은 모두 몇 개인가요?  사탕 수 = `,
     makeExplain: (n, ans) =>
-      `친구 수(△)와 사탕 수(○) 사이의 관계는 ○ = △ × 3 + 3이에요. △가 ${n}이면 ○ = ${n} × 3 + 3 = ${n * 3} + 3 = ${ans}이에요.`,
+      `친구 수(△)와 사탕 수(○) 사이의 관계는 ○ = △ × 3 + 3이에요. △가 ${n}이면 ○ = ${n} × 3 + 3 = ${n * 3} + 3 = ${ida(ans)}.`,
   },
 ];
 

@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -47,7 +47,7 @@ const as1Gather: SkillDef = {
         prompt: `${nj(a, '과/와')} ${nj(b, '을/를')} 모으면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${nj(a, '과/와')} ${nj(b, '을/를')} 모으면 ${ans}이에요.`)],
+        explanation: [txt(`${nj(a, '과/와')} ${nj(b, '을/를')} 모으면 ${ida(ans)}.`)],
       };
     } else {
       // 가르기: n을 a와 ?로 가르기 (? ≥ 1)
@@ -71,7 +71,7 @@ const as1Gather: SkillDef = {
         prompt: `${nj(n, '을/를')} ${nj(a, '과/와')} 얼마로 가를 수 있나요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${n} = ${a} + ${ans}이에요.`)],
+        explanation: [txt(`${n} = ${a} + ${ida(ans)}.`)],
       };
     }
   },
@@ -108,7 +108,7 @@ const as1Add: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a}부터 ${b}만큼 이어 세면 ${ans}이에요. ${a} + ${b} = ${ans}.`)],
+      explanation: [txt(`${a}부터 ${b}만큼 이어 세면 ${ida(ans)}. ${a} + ${b} = ${ans}.`)],
     };
   },
 };
@@ -144,7 +144,7 @@ const as1Sub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a}에서 ${b}만큼 덜어 내면 ${ans}이에요. ${a} - ${b} = ${ans}.`)],
+      explanation: [txt(`${a}에서 ${b}만큼 덜어 내면 ${ida(ans)}. ${a} - ${b} = ${ans}.`)],
     };
   },
 };
@@ -276,7 +276,7 @@ const as1Word: SkillDef = {
       }
       answer = a + b;
       promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 더 사면 모두 몇 개인가요?`;
-      explanation = [txt(`${a}개에 ${b}개를 더하면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
+      explanation = [txt(`${a}개에 ${b}개를 더하면 ${a} + ${b} = ${ida(answer)}. 모두 ${answer}개예요.`)];
     } else {
       // 뺄셈
       let a = 5, b = 2;
@@ -287,7 +287,7 @@ const as1Word: SkillDef = {
       }
       answer = a - b;
       promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
-      explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} - ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
+      explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} - ${b} = ${ida(answer)}. ${answer}개가 남아요.`)];
     }
 
     const expr: MathExpr = [

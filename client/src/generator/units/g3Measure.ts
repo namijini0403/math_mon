@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -25,16 +25,16 @@ function compoundAddSubExplain(o: {
   if (isAdd) {
     const sum = small1 + small2;
     const smallStep = carry
-      ? `${smallU}끼리 더하면 ${small1} + ${small2} = ${sum} ${smallU}이에요. 1000 ${nj(smallU, '은/는')} 1 ${bigU}니 1 ${bigU}로 받아올림하고 ${sum - 1000} ${nj(smallU, '이/가')} 남아요.`
-      : `${smallU}끼리 더하면 ${small1} + ${small2} = ${rSmall} ${smallU}이에요.`;
-    const bigStep = `${bigU}끼리 더하면 ${big1} + ${big2}${carry ? ' + 1(받아올림)' : ''} = ${rBig} ${bigU}이에요.`;
-    return `${smallStep} ${bigStep} 그래서 ${rBig} ${bigU} ${rSmall} ${smallU}이에요.`;
+      ? `${smallU}끼리 더하면 ${small1} + ${small2} = ${sum} ${ida(smallU)}. 1000 ${nj(smallU, '은/는')} 1 ${bigU}니 1 ${nj(bigU, '으로/로')} 받아올림하고 ${sum - 1000} ${nj(smallU, '이/가')} 남아요.`
+      : `${smallU}끼리 더하면 ${small1} + ${small2} = ${rSmall} ${ida(smallU)}.`;
+    const bigStep = `${bigU}끼리 더하면 ${big1} + ${big2}${carry ? ' + 1(받아올림)' : ''} = ${rBig} ${ida(bigU)}.`;
+    return `${smallStep} ${bigStep} 그래서 ${rBig} ${bigU} ${rSmall} ${ida(smallU)}.`;
   }
   const smallStep = carry
-    ? `${smallU}끼리 빼요. ${small1} ${smallU}에서 ${small2} ${nj(smallU, '을/를')} 뺄 수 없으니 1 ${bigU}(1000 ${smallU})를 받아내림해서 ${small1} + 1000 - ${small2} = ${rSmall} ${smallU}예요.`
-    : `${smallU}끼리 빼면 ${small1} - ${small2} = ${rSmall} ${smallU}이에요.`;
-  const bigStep = `${bigU}끼리 빼면 ${big1}${carry ? ' - 1(받아내림)' : ''} - ${big2} = ${rBig} ${bigU}이에요.`;
-  return `${smallStep} ${bigStep} 그래서 ${rBig} ${bigU} ${rSmall} ${smallU}이에요.`;
+    ? `${smallU}끼리 빼요. ${small1} ${smallU}에서 ${small2} ${nj(smallU, '을/를')} 뺄 수 없으니 1 ${bigU}(1000 ${smallU})를 받아내림해서 ${small1} + 1000 - ${small2} = ${rSmall} ${ida(smallU)}.`
+    : `${smallU}끼리 빼면 ${small1} - ${small2} = ${rSmall} ${ida(smallU)}.`;
+  const bigStep = `${bigU}끼리 빼면 ${big1}${carry ? ' - 1(받아내림)' : ''} - ${big2} = ${rBig} ${ida(bigU)}.`;
+  return `${smallStep} ${bigStep} 그래서 ${rBig} ${bigU} ${rSmall} ${ida(smallU)}.`;
 }
 
 // ── 1. meas3-liquid-conv  L↔mL 변환 (fill-blanks) ──────────────────
@@ -419,7 +419,7 @@ const meas3UnitPick: SkillDef = {
       prompt: `"${item.name}"의 들이(무게)를 나타내기에 알맞은 단위는 무엇인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${item.name}의 ${nj(item.category === 'liquid' ? '들이' : '무게', '은/는')} ${item.answer}로 나타내요.`)],
+      explanation: [txt(`${item.name}의 ${nj(item.category === 'liquid' ? '들이' : '무게', '은/는')} ${nj(item.answer, '으로/로')} 나타내요.`)],
     };
   },
 };

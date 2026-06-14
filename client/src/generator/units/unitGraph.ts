@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -147,7 +147,7 @@ const graphRead: SkillDef = {
     const explanation: MathExpr = [
       txt(`(항목 수) = 전체 × 백분율 ÷ 100`),
       txt(` = ${d.total} × ${targetPct} ÷ 100`),
-      txt(` = ${answer}${d.topic.unit}이에요.`),
+      txt(` = ${answer}${ida(d.topic.unit)}.`),
     ];
 
     return {
@@ -155,7 +155,7 @@ const graphRead: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${d.graphName}예요. [${d.dataText}] ${nj(targetItem, '을/를')} 좋아하는 학생은 몇 ${d.topic.unit}인가요?`,
+      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${ida(d.graphName)}. [${d.dataText}] ${nj(targetItem, '을/를')} 좋아하는 학생은 몇 ${d.topic.unit}인가요?`,
       expr,
       blankAnswers: [answer],
       explanation,
@@ -209,7 +209,7 @@ const graphMost: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${d.graphName}예요. [${d.dataText}] ${isMost ? '가장 많은' : '가장 적은'} 학생이 좋아하는 것은 무엇인가요?`,
+      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${ida(d.graphName)}. [${d.dataText}] ${isMost ? '가장 많은' : '가장 적은'} 학생이 좋아하는 것은 무엇인가요?`,
       choices: shuffled,
       answerIndex,
       explanation,
@@ -324,7 +324,7 @@ const graphMissing: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${d.graphName}예요. ${knownStr}이고, ${missingItem}의 백분율이 빠져 있어요. ${nj(missingItem, '은/는')} 몇 %인가요?`,
+      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${ida(d.graphName)}. ${knownStr}이고, ${missingItem}의 백분율이 빠져 있어요. ${nj(missingItem, '은/는')} 몇 %인가요?`,
       expr,
       blankAnswers: [missingPct],
       explanation,
@@ -399,7 +399,7 @@ const graphTimes: SkillDef = {
     const explanation: MathExpr = [
       txt(`(항목 수) = 전체 × 백분율 ÷ 100이므로, `),
       txt(`${nj(largerItem, '을/를')} 좋아하는 학생 수 = ${total} × ${larger} ÷ 100 = ${(total * larger) / 100}${topic.unit}, `),
-      txt(`${nj(smallerItem, '을/를')} 좋아하는 학생 수 = ${total} × ${smaller} ÷ 100 = ${(total * smaller) / 100}${topic.unit}이에요. `),
+      txt(`${nj(smallerItem, '을/를')} 좋아하는 학생 수 = ${total} × ${smaller} ÷ 100 = ${(total * smaller) / 100}${ida(topic.unit)}. `),
       txt(`${(total * larger) / 100} ÷ ${(total * smaller) / 100} = ${k}이므로 ${k}배예요.`),
     ];
 
@@ -408,7 +408,7 @@ const graphTimes: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음은 ${nj(topic.title, '을/를')} 나타낸 ${graphName}예요. [${dataText}] ${nj(largerItem, '을/를')} 좋아하는 학생 수는 ${nj(smallerItem, '을/를')} 좋아하는 학생 수의 몇 배인가요?`,
+      prompt: `다음은 ${nj(topic.title, '을/를')} 나타낸 ${ida(graphName)}. [${dataText}] ${nj(largerItem, '을/를')} 좋아하는 학생 수는 ${nj(smallerItem, '을/를')} 좋아하는 학생 수의 몇 배인가요?`,
       expr,
       blankAnswers: [k],
       explanation,

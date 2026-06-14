@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -81,7 +81,7 @@ const dmulNat: SkillDef = {
       txt(`${finalAInt} × ${nat} = ${finalAInt * nat}이므로 `),
       txt(`${fmtDec(finalA)} × ${nj(nat, '은/는')} ${finalAInt * nat}의 `),
       { kind: 'frac', n: 1, d: 10 },
-      txt(`인 ${fmtDec(answer)}이에요.`),
+      txt(`인 ${ida(fmtDec(answer))}.`),
     ];
 
     return {
@@ -134,7 +134,7 @@ const dmulNat2: SkillDef = {
       txt(`${nat} × ${finalBInt} = ${nat * finalBInt}이므로 `),
       txt(`${nat} × ${nj(fmtDec(finalB), '은/는')} ${nat * finalBInt}의 `),
       { kind: 'frac', n: 1, d: 10 },
-      txt(`인 ${fmtDec(answer)}이에요.`),
+      txt(`인 ${ida(fmtDec(answer))}.`),
     ];
 
     return {
@@ -199,7 +199,7 @@ const dmulDec: SkillDef = {
       txt(`${finalAInt} × ${finalBInt} = ${productInt}이므로 `),
       txt(`${fmtDec(finalA)} × ${nj(fmtDec(finalB), '은/는')} ${productInt}의 `),
       { kind: 'frac', n: 1, d: 100 },
-      txt(`인 ${fmtDec(answer)}이에요.`),
+      txt(`인 ${ida(fmtDec(answer))}.`),
     ];
 
     return {
@@ -271,7 +271,7 @@ const dmulDec2: SkillDef = {
       txt(`${finalAInt} × ${finalBInt} = ${productInt}이므로 `),
       txt(`${fmtDec(finalA)} × ${nj(fmtDec(finalB), '은/는')} ${productInt}의 `),
       { kind: 'frac', n: 1, d: 1000 },
-      txt(`인 ${fmtDec(answer)}이에요.`),
+      txt(`인 ${ida(fmtDec(answer))}.`),
     ];
 
     return {
@@ -361,7 +361,7 @@ const dmulPoint: SkillDef = {
       { kind: 'frac', n: 1, d: 10 },
       txt(`이므로 두 소수의 곱은 ${productInt}의 `),
       { kind: 'frac', n: 1, d: 100 },
-      txt(`인 ${fmtDec(correctAnswer)}이에요.`),
+      txt(`인 ${ida(fmtDec(correctAnswer))}.`),
     ];
 
     return {

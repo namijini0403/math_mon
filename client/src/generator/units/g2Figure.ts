@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -78,7 +78,7 @@ const fig2Name: SkillDef = {
       prompt: `${nj(thing, '이/가')} ${num}개인 도형의 이름은 무엇인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${nj(thing, '이/가')} ${num}개인 도형은 ${shape.name}이에요.`)],
+      explanation: [txt(`${nj(thing, '이/가')} ${num}개인 도형은 ${ida(shape.name)}.`)],
     };
   },
 };
@@ -205,7 +205,7 @@ const fig2Word: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `민지가 그린 도형의 이름은 ${shape.name}이에요. 이 도형의 변은 몇 개인가요?`,
+        prompt: `민지가 그린 도형의 이름은 ${ida(shape.name)}. 이 도형의 변은 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`${shape.name}의 변은 ${ans}개예요.`)],

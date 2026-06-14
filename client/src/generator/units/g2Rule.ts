@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -67,7 +67,7 @@ const rule2NumSeq: SkillDef = {
       prompt: `규칙을 찾아 □에 알맞은 수를 쓰세요.\n${display}`,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`${ruleDesc}이에요. □ = ${answer}`)],
+      explanation: [txt(`${ida(ruleDesc)}. □ = ${answer}`)],
     };
   },
 };
@@ -172,7 +172,7 @@ const rule2Shape: SkillDef = {
       prompt: `모양의 규칙을 찾아 ${nthPos}번째에 올 모양을 고르세요.\n${shownStr} …`,
       choices,
       answerIndex,
-      explanation: [txt(`${nj(pattern.join(''), '이/가')} ${period}개씩 반복돼요. ${nthPos}번째는 반복되는 ${period}개 중 ${(nthPos - 1) % period + 1}번째와 같아서 ${answer}예요.`)],
+      explanation: [txt(`${nj(pattern.join(''), '이/가')} ${period}개씩 반복돼요. ${nthPos}번째는 반복되는 ${period}개 중 ${(nthPos - 1) % period + 1}번째와 같아서 ${ida(answer)}.`)],
     };
   },
 };
@@ -223,7 +223,7 @@ const rule2Stack: SkillDef = {
       prompt: `${context}\n${display}\n□에 알맞은 수는 얼마인가요?`,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`${ruleDesc}이에요. □ = ${answer}개`)],
+      explanation: [txt(`${ida(ruleDesc)}. □ = ${answer}개`)],
     };
   },
 };

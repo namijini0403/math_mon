@@ -59,7 +59,7 @@ function explainNatNat(a: number, b: number): MathExpr {
   const g = gcd(a, b);
   if (g > 1) {
     exprs.push(txt(` = `), mixT(m));
-    exprs.push(txt(` (분자와 분모를 ${g}로 약분해요.)`));
+    exprs.push(txt(` (분자와 분모를 ${nj(g, '으로/로')} 약분해요.)`));
   }
   return exprs;
 }
@@ -116,13 +116,13 @@ function explainFracNatDiv(f: Frac, nat: number): MathExpr {
   // 분자가 nat으로 나누어떨어짐: n/d ÷ nat = (n÷nat)/d
   const newN = f.n / nat;
   return [
-    txt(`분자 ${nj(f.n, '이/가')} ${nat}로 나누어떨어져요. `),
+    txt(`분자 ${nj(f.n, '이/가')} ${nj(nat, '으로/로')} 나누어떨어져요. `),
     frT(f),
     opT('÷'),
     txt(String(nat)),
     opT('='),
     { kind: 'frac', n: f.n, d: f.d },
-    txt(` → 분자를 ${nat}로 나눠요 → `),
+    txt(` → 분자를 ${nj(nat, '으로/로')} 나눠요 → `),
     { kind: 'frac', n: newN, d: f.d },
   ];
 }
@@ -204,7 +204,7 @@ function explainFracNat2Div(f: Frac, nat: number): MathExpr {
   ];
   if (g > 1) {
     exprs.push(opT('='), frT(result));
-    exprs.push(txt(` (${g}로 약분해요.)`));
+    exprs.push(txt(` (${nj(g, '으로/로')} 약분해요.)`));
   }
   return exprs;
 }
@@ -377,7 +377,7 @@ function explainMixedNatDiv(m: Mixed, nat: number): MathExpr {
   ];
   if (g > 1) {
     exprs.push(opT('='), mixT(rm));
-    exprs.push(txt(` (${g}로 약분해요.)`));
+    exprs.push(txt(` (${nj(g, '으로/로')} 약분해요.)`));
   } else if (rm.whole > 0) {
     exprs.push(opT('='), mixT(rm));
   }
@@ -584,7 +584,7 @@ const fdiv1Word: SkillDef = {
       // 해설
       if (f.n % nat === 0) {
         explanation = [
-          txt(`분자 ${nj(f.n, '이/가')} ${nat}로 나누어떨어져요. `),
+          txt(`분자 ${nj(f.n, '이/가')} ${nj(nat, '으로/로')} 나누어떨어져요. `),
           frT(f),
           opT('÷'),
           txt(String(nat)),

@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -144,7 +144,7 @@ const as12bCounting: SkillDef = {
       prompt: `${a}에서 ${b}칸 이어 세면? (${steps})`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a}에서 ${b}칸 이어 세면 ${ans}이에요.`)],
+      explanation: [txt(`${a}에서 ${b}칸 이어 세면 ${ida(ans)}.`)],
     };
   },
 };

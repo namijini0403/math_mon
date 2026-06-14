@@ -120,7 +120,7 @@ const bigRead: SkillDef = {
       answerIndex,
       explanation: [
         txt(`오른쪽에서 네 자리씩 끊어 읽어요: ${nStr}.`),
-        txt(`네 자리 묶음마다 만·억·조 단위를 붙이면 ${answer}이에요.`),
+        txt(`네 자리 묶음마다 만·억·조 단위를 붙이면 ${ida(answer)}.`),
       ],
     };
   },

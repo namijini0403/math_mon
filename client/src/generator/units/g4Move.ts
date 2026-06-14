@@ -112,7 +112,7 @@ const moveFlipTwice: SkillDef = {
     if (pat === 0) {
       // 같은 방향 2번 → 처음 모양으로 돌아옴
       const dir = rng.pick(['왼쪽', '오른쪽'] as const);
-      prompt = `도형을 ${dir}으로 뒤집기를 2번 하면 어떻게 되나요?`;
+      prompt = `도형을 ${nj(dir, '으로/로')} 뒤집기를 2번 하면 어떻게 되나요?`;
       answer = '처음 모양과 같아집니다.';
       wrongOpts.push(
         '위아래가 뒤집어진 모양이 됩니다.',
@@ -124,7 +124,7 @@ const moveFlipTwice: SkillDef = {
       const dirs = ['위', '오른쪽'] as const;
       const d1 = rng.pick(dirs);
       const d2 = d1 === '위' ? '오른쪽' : '위';
-      prompt = `도형을 ${d1}으로 뒤집기 1번, ${d2}으로 뒤집기 1번을 하면 어떻게 되나요?`;
+      prompt = `도형을 ${nj(d1, '으로/로')} 뒤집기 1번, ${nj(d2, '으로/로')} 뒤집기 1번을 하면 어떻게 되나요?`;
       answer = '180° 돌린 모양과 같아집니다.';
       wrongOpts.push(
         '처음 모양과 같아집니다.',

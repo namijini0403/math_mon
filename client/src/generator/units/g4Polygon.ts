@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -154,7 +154,7 @@ const pgonName: SkillDef = {
         expr: [txt(`변 수: ${n}개`)],
         choices,
         answerIndex,
-        explanation: [txt(`변이 ${n}개인 정다각형은 ${name}이에요.`)],
+        explanation: [txt(`변이 ${n}개인 정다각형은 ${ida(name)}.`)],
       };
     } else {
       // 이름 → 변 수

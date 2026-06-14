@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -17,7 +17,7 @@ function mul2x1Explain(a: number, b: number): string {
   const tens = Math.floor(a / 10), ones = a % 10;
   const onesProd = ones * b;
   const tensProd = tens * b * 10;
-  return `일의 자리: ${ones} × ${b} = ${onesProd}. 십의 자리: ${tens} × ${b} = ${tens * b}인데 자리값이 십이라 ${tensProd}이에요. 두 곱을 더하면 ${tensProd} + ${onesProd} = ${a * b}이에요.`;
+  return `일의 자리: ${ones} × ${b} = ${onesProd}. 십의 자리: ${tens} × ${b} = ${tens * b}인데 자리값이 십이라 ${ida(tensProd)}. 두 곱을 더하면 ${tensProd} + ${onesProd} = ${ida(a * b)}.`;
 }
 
 // ── 1. mul31-no-carry  (두 자리)×(한 자리) 올림 없음 (fill-blanks) ───
@@ -134,7 +134,7 @@ const mul31Tens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개예요. 먼저 ${a / 10} × ${b} = ${nj((a / 10) * b, '을/를')} 구하고, 자리값이 십이라 10을 곱하면 ${ans}이에요.`)],
+      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개예요. 먼저 ${a / 10} × ${b} = ${nj((a / 10) * b, '을/를')} 구하고, 자리값이 십이라 10을 곱하면 ${ida(ans)}.`)],
     };
   },
 };
@@ -193,7 +193,7 @@ const mul31Estimate: SkillDef = {
       expr: [txt(`${aDisplay} × ${b} ≈ ?`)],
       choices,
       answerIndex,
-      explanation: [txt(`${aDisplay}의 일의 자리가 ${rem10}이라 ${rem10 >= 5 ? '올림' : '버림'}하면 약 ${rounded}이에요. 어림한 ${rounded} × ${b} = ${ans}으로 어림해요.`)],
+      explanation: [txt(`${aDisplay}의 일의 자리가 ${rem10}이라 ${rem10 >= 5 ? '올림' : '버림'}하면 약 ${ida(rounded)}. 어림한 ${rounded} × ${b} = ${nj(ans, '으로/로')} 어림해요.`)],
     };
   },
 };

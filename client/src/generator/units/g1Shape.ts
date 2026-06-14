@@ -4,7 +4,7 @@
  */
 
 import { RNG } from '../rng';
-import { nj } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -69,7 +69,7 @@ const shape1Classify: SkillDef = {
       prompt: `${nj(item, '은/는')} 어떤 모양인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${nj(item, '은/는')} ${SHAPE_TRAIT[correct]}. 그래서 ${correct}이에요.`)],
+      explanation: [txt(`${nj(item, '은/는')} ${SHAPE_TRAIT[correct]}. 그래서 ${ida(correct)}.`)],
     };
   },
 };
