@@ -11,6 +11,45 @@ import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 const txt = (text: string) => ({ kind: 'text' as const, text });
 const txc = (text: string): ChoiceValue => ({ kind: 'text', text });
 
+/** 세 자리 덧셈을 일→십→백 자리별 단계로 풀어 설명한다(받아올림 짚기). */
+function addExplain(a: number, b: number): string {
+  const u1 = a % 10, u2 = b % 10;
+  const t1 = Math.floor(a / 10) % 10, t2 = Math.floor(b / 10) % 10;
+  const h1 = Math.floor(a / 100), h2 = Math.floor(b / 100);
+  const uSum = u1 + u2;
+  const carryU = uSum >= 10 ? 1 : 0;
+  const tSum = t1 + t2 + carryU;
+  const carryT = tSum >= 10 ? 1 : 0;
+  const hSum = h1 + h2 + carryT;
+  const uStep = `일의 자리: ${u1} + ${u2} = ${uSum}.${carryU ? ' 10이 넘으니 십의 자리로 1을 받아올림해요.' : ''}`;
+  const tStep = `십의 자리: ${t1} + ${t2}${carryU ? ' + 1(받아올림)' : ''} = ${tSum}.${carryT ? ' 10이 넘으니 백의 자리로 1을 받아올림해요.' : ''}`;
+  const hStep = `백의 자리: ${h1} + ${h2}${carryT ? ' + 1(받아올림)' : ''} = ${hSum}.`;
+  return `${uStep} ${tStep} ${hStep} 그래서 ${a} + ${b} = ${a + b}이에요.`;
+}
+
+/** 세 자리 뺄셈을 일→십→백 자리별 단계로 풀어 설명한다(받아내림 짚기). a ≥ b. */
+function subExplain(a: number, b: number): string {
+  const u1 = a % 10, u2 = b % 10;
+  const t1 = Math.floor(a / 10) % 10, t2 = Math.floor(b / 10) % 10;
+  const h1 = Math.floor(a / 100), h2 = Math.floor(b / 100);
+  let borrowU = 0, uRes: number;
+  if (u1 < u2) { uRes = u1 + 10 - u2; borrowU = 1; } else { uRes = u1 - u2; }
+  const t1e = t1 - borrowU;
+  let borrowT = 0, tRes: number;
+  if (t1e < t2) { tRes = t1e + 10 - t2; borrowT = 1; } else { tRes = t1e - t2; }
+  const hRes = h1 - borrowT - h2;
+  const uStep = borrowU
+    ? `일의 자리: ${u1}이 ${u2}보다 작으니 십의 자리에서 10을 빌려 ${u1} + 10 - ${u2} = ${uRes}.`
+    : `일의 자리: ${u1} - ${u2} = ${uRes}.`;
+  const tBase = borrowU ? `${t1} - 1(빌려줌)= ${t1e}` : `${t1}`;
+  const tStep = borrowT
+    ? `십의 자리: ${tBase}이 ${t2}보다 작으니 백의 자리에서 10을 빌려 ${t1e} + 10 - ${t2} = ${tRes}.`
+    : `십의 자리: ${tBase} - ${t2} = ${tRes}.`;
+  const hBase = borrowT ? `${h1} - 1(빌려줌)= ${h1 - borrowT}` : `${h1}`;
+  const hStep = `백의 자리: ${hBase} - ${h2} = ${hRes}.`;
+  return `${uStep} ${tStep} ${hStep} 그래서 ${a} - ${b} = ${a - b}이에요.`;
+}
+
 // ── 1. add3-add  세 자리 덧셈 (받아올림 0→1→2회, difficulty 램프) ───
 const add3Add: SkillDef = {
   id: 'add3-add',
@@ -76,15 +115,6 @@ const add3Add: SkillDef = {
       { kind: 'blank', slot: 0 },
     ];
 
-    const carryCount = (() => {
-      let c = 0;
-      const u = (a % 10) + (b % 10); if (u >= 10) c++;
-      const t = Math.floor((a % 100) / 10) + Math.floor((b % 100) / 10) + (u >= 10 ? 1 : 0);
-      if (t >= 10) c++;
-      return c;
-    })();
-    const hint = carryCount === 0 ? '받아올림이 없어요.' : `받아올림 ${carryCount}번 있어요.`;
-
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -93,7 +123,7 @@ const add3Add: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} + ${b} = ${ans}. ${hint}`)],
+      explanation: [txt(addExplain(a, b))],
     };
   },
 };
@@ -124,16 +154,6 @@ const add3Sub: SkillDef = {
       { kind: 'blank', slot: 0 },
     ];
 
-    const hasBorrow = (() => {
-      const u1 = a % 10; const u2 = b % 10;
-      if (u1 < u2) return true;
-      const t1 = Math.floor((a % 100) / 10);
-      const t2 = Math.floor((b % 100) / 10);
-      const borrow1 = u1 < u2 ? 1 : 0;
-      if (t1 - borrow1 < t2) return true;
-      return false;
-    })();
-
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -142,9 +162,7 @@ const add3Sub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [
-        txt(`${a} - ${b} = ${ans}. ${hasBorrow ? '받아내림에 주의해요.' : '받아내림이 없어요.'}`),
-      ],
+      explanation: [txt(subExplain(a, b))],
     };
   },
 };
@@ -185,7 +203,7 @@ const add3Round: SkillDef = {
       choices,
       answerIndex,
       explanation: [
-        txt(`${num}의 십의 자리는 ${rem >= 50 ? '5 이상이므로 올림' : '5 미만이므로 버림'}하여 ${rounded}이에요.`),
+        txt(`몇백으로 어림할 때는 십의 자리 숫자를 봐요. ${num}의 십의 자리는 ${Math.floor(rem / 10)}이라 ${rem >= 50 ? '5와 같거나 커서 올림' : '5보다 작아서 버림'}하면 ${rounded}이에요.`),
       ],
     };
   },
@@ -224,7 +242,7 @@ const add3Missing: SkillDef = {
       answer = ans;
       promptStr = `□ + ${b} = ${c}일 때, □에 알맞은 수를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `□ = ${c} - ${b} = ${ans}`;
+      explStr = `□에 ${b}를 더해서 ${c}가 되었어요. 그러니 전체 ${c}에서 ${b}를 빼면 □를 알 수 있어요. □ = ${c} - ${b} = ${ans}.`;
     } else if (pat === 1) {
       // a - □ = c
       let a = 543, c = 218, ans = 325;
@@ -239,7 +257,7 @@ const add3Missing: SkillDef = {
       answer = ans;
       promptStr = `${a} - □ = ${c}일 때, □에 알맞은 수를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `□ = ${a} - ${c} = ${ans}`;
+      explStr = `${a}에서 □를 빼서 ${c}가 남았어요. 빼낸 수는 처음 수에서 남은 수를 빼면 돼요. □ = ${a} - ${c} = ${ans}.`;
     } else {
       // a + □ = c
       let a = 234, c = 567, ans = 333;
@@ -254,7 +272,7 @@ const add3Missing: SkillDef = {
       answer = ans;
       promptStr = `${a} + □ = ${c}일 때, □에 알맞은 수를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `□ = ${c} - ${a} = ${ans}`;
+      explStr = `${a}에 □를 더해서 ${c}가 되었어요. 그러니 전체 ${c}에서 ${a}를 빼면 □를 알 수 있어요. □ = ${c} - ${a} = ${ans}.`;
     }
 
     return {
@@ -301,7 +319,7 @@ const add3Word: SkillDef = {
       unit = '개';
       answer = ans;
       prompt = `마법사가 마법 구슬 ${a}개를 가지고 있었어요. 모험을 마치고 ${b}개를 더 모았다면, 마법 구슬은 모두 몇 개인가요?`;
-      explanation = [txt(`${a} + ${b} = ${ans}`)];
+      explanation = [txt(`처음 ${a}개에 더 모은 ${b}개를 더해요. ${a} + ${b} = ${ans}이라 모두 ${ans}개예요.`)];
     } else if (pat === 1) {
       // 뺄셈 문장제
       let a = 543, b = 218, ans = 325;
@@ -316,7 +334,7 @@ const add3Word: SkillDef = {
       unit = '개';
       answer = ans;
       prompt = `용사의 배낭에 화살이 ${a}개 있었어요. 전투에서 ${b}개를 사용했다면, 남은 화살은 몇 개인가요?`;
-      explanation = [txt(`${a} - ${b} = ${ans}`)];
+      explanation = [txt(`처음 ${a}개에서 사용한 ${b}개를 빼요. ${a} - ${b} = ${ans}이라 ${ans}개가 남아요.`)];
     } else if (pat === 2) {
       // 어림셈 활용 문장제
       const a = rng.int(100, 499);
@@ -326,7 +344,7 @@ const add3Word: SkillDef = {
       unit = '원';
       answer = ans;
       prompt = `마법 약이 ${a}원, 회복 물약이 ${b}원이에요. 두 물약을 사면 모두 얼마인가요?`;
-      explanation = [txt(`${a} + ${b} = ${ans}`)];
+      explanation = [txt(`두 물약의 값을 더해요. ${a} + ${b} = ${ans}이라 모두 ${ans}원이에요.`)];
     } else {
       // 역산 활용 문장제: 전체에서 일부 알기
       let total = 750, part = 320, ans = 430;
@@ -341,7 +359,7 @@ const add3Word: SkillDef = {
       unit = '명';
       answer = ans;
       prompt = `성 안에 기사가 ${total}명 있었어요. 그 중 ${part}명은 붉은 갑옷을 입었다면, 나머지 기사는 몇 명인가요?`;
-      explanation = [txt(`${total} - ${part} = ${ans}`)];
+      explanation = [txt(`전체 ${total}명에서 붉은 갑옷 ${part}명을 빼면 나머지예요. ${total} - ${part} = ${ans}이라 ${ans}명이에요.`)];
     }
 
     const expr: MathExpr = [

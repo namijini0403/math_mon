@@ -29,8 +29,9 @@ const frac3Part: SkillDef = {
       format: 'fraction-input',
       prompt: `전체를 ${d}칸으로 나누었을 때 그 중 ${n}칸을 색칠했어요. 색칠한 부분을 분수로 쓰세요.`,
       explanation: [
+        txt(`전체를 똑같이 ${d}칸으로 나눈 것 중 ${n}칸이에요. 그래서 `),
         { kind: 'frac', n, d },
-        txt(` — 전체 ${d}칸 중 ${n}칸이에요.`),
+        txt(`이에요.`),
       ],
       mixed: false,
       answer: { n, d },
@@ -169,9 +170,11 @@ const frac3DecRel: SkillDef = {
       expr,
       blankAnswers: [n],
       explanation: [
-        txt(`0.${n}은 `),
+        txt(`0.${n}은 0.1이 ${n}개예요. 0.1은 `),
+        { kind: 'frac', n: 1, d: 10 },
+        txt(`과 같으니 0.${n} = `),
         { kind: 'frac', n, d: 10 },
-        txt(`과 같아요.`),
+        txt(`이에요.`),
       ],
     };
   },
@@ -256,7 +259,7 @@ const frac3Word: SkillDef = {
       ans = n;
       unit = '칸';
       prompt = `리본을 10칸으로 나누었을 때 0.${n}은 몇 칸인가요?`;
-      expl = `0.${n} = ${n}/10이므로 ${n}칸이에요.`;
+      expl = `10칸으로 나누면 한 칸이 0.1이에요. 0.${n}은 0.1이 ${n}개니 ${n}칸이에요.`;
     } else {
       // 분수 비교 문장제
       const d = rng.int(4, 12);

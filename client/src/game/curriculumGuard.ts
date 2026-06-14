@@ -43,6 +43,13 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unitTime2', // ④ 시각과 시간
   'unitTableGraph', // ⑤ 표와 그래프
   'unitRule2', // ⑥ 규칙 찾기
+  // 3-1 (÷·분수·소수 도입 — 가드 자동 허용. 학기 내 단원 순서는 docs/curriculum/g3.md)
+  'unitAdd3', // ① 덧셈과 뺄셈
+  'unitPlane3', // ② 평면도형
+  'unitDiv3', // ③ 나눗셈
+  'unitMul31', // ④ 곱셈
+  'unitTime3', // ⑤ 길이와 시간
+  'unitFrac3', // ⑥ 분수와 소수
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {

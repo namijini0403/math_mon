@@ -74,25 +74,25 @@ const div3Rel: SkillDef = {
       answer = q;
       promptStr = `□ × ${b} = ${a}일 때, □를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `${a} ÷ ${b} = ${q}이므로 □ = ${q}`;
+      explStr = `어떤 수에 ${b}를 곱해 ${a}가 되었어요. 곱셈을 거꾸로 하면 나눗셈이에요. ${a} ÷ ${b} = ${q}이니 □ = ${q}예요.`;
     } else if (pat === 1) {
       // q × □ = a (곱셈식에서 □ 다른 위치)
       answer = b;
       promptStr = `${q} × □ = ${a}일 때, □를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `${a} ÷ ${q} = ${b}이므로 □ = ${b}`;
+      explStr = `${q}에 어떤 수를 곱해 ${a}가 되었어요. ${a} ÷ ${q} = ${b}이니 □ = ${b}예요.`;
     } else if (pat === 2) {
       // a ÷ □ = q
       answer = b;
       promptStr = `${a} ÷ □ = ${q}일 때, □를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `${q} × □ = ${a}이므로 □ = ${b}`;
+      explStr = `${a}를 □로 나눠 몫이 ${q}예요. 나눗셈을 곱셈으로 바꾸면 □ × ${q} = ${a}이니, ${a} ÷ ${q} = ${b}, □ = ${b}예요.`;
     } else {
       // 나눗셈식 완성: a ÷ b = □
       answer = q;
       promptStr = `${b} × ${q} = ${a}를 나눗셈식으로 나타낼 때, ${a} ÷ ${b} = □를 구하세요.`;
       expr = [txt(`${a} ÷ ${b} = `), { kind: 'blank', slot: 0 }];
-      explStr = `${b} × ${q} = ${a}이므로 ${a} ÷ ${b} = ${q}`;
+      explStr = `곱셈식 ${b} × ${q} = ${a}는 나눗셈식으로 바꿀 수 있어요. ${a} ÷ ${b} = ${q}예요.`;
     }
 
     return {
@@ -174,25 +174,25 @@ const div3Word: SkillDef = {
     const a = b * q;
 
     if (pat === 0) {
-      unit = '명';
+      unit = '개';
       prompt = `마법사 ${a}명이 ${b}명씩 모둠을 만들면, 모둠이 몇 개 생기나요?`;
       answer = q;
-      explanation = [txt(`${a} ÷ ${b} = ${q}`)];
+      explanation = [txt(`전체 ${a}명을 ${b}명씩 묶으면 묶음(모둠)이 몇 개인지 구해요. ${a} ÷ ${b} = ${q}이라 ${q}개예요.`)];
     } else if (pat === 1) {
       unit = '개';
       prompt = `보물이 ${a}개 있어요. ${b}명의 용사에게 똑같이 나누면, 한 명이 몇 개씩 받나요?`;
       answer = q;
-      explanation = [txt(`${a} ÷ ${b} = ${q}`)];
+      explanation = [txt(`${a}개를 ${b}명에게 똑같이 나누면 한 명의 몫이에요. ${a} ÷ ${b} = ${q}이라 한 명이 ${q}개씩 받아요.`)];
     } else if (pat === 2) {
       unit = '개';
       prompt = `마법 약 ${a}개를 한 상자에 ${b}개씩 담으면, 상자가 몇 개 필요한가요?`;
       answer = q;
-      explanation = [txt(`${a} ÷ ${b} = ${q}`)];
+      explanation = [txt(`${a}개를 ${b}개씩 묶으면 상자가 몇 개 필요한지 구해요. ${a} ÷ ${b} = ${q}이라 ${q}개예요.`)];
     } else {
       unit = '줄';
       prompt = `별 스티커 ${a}개를 한 줄에 ${b}개씩 붙이면, 몇 줄이 되나요?`;
       answer = q;
-      explanation = [txt(`${a} ÷ ${b} = ${q}`)];
+      explanation = [txt(`${a}개를 한 줄에 ${b}개씩 놓으면 줄 수를 구해요. ${a} ÷ ${b} = ${q}이라 ${q}줄이에요.`)];
     }
 
     const expr: MathExpr = [

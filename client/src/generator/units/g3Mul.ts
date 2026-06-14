@@ -11,6 +11,14 @@ import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 const txt = (text: string) => ({ kind: 'text' as const, text });
 const txc = (text: string): ChoiceValue => ({ kind: 'text', text });
 
+/** (두 자리)×(한 자리)를 일의 자리·십의 자리 부분곱으로 나눠 설명한다. */
+function mul2x1Explain(a: number, b: number): string {
+  const tens = Math.floor(a / 10), ones = a % 10;
+  const onesProd = ones * b;
+  const tensProd = tens * b * 10;
+  return `일의 자리: ${ones} × ${b} = ${onesProd}. 십의 자리: ${tens} × ${b} = ${tens * b}인데 자리값이 십이라 ${tensProd}이에요. 두 곱을 더하면 ${tensProd} + ${onesProd} = ${a * b}이에요.`;
+}
+
 // ── 1. mul31-no-carry  (두 자리)×(한 자리) 올림 없음 (fill-blanks) ───
 const mul31NoCarry: SkillDef = {
   id: 'mul31-no-carry',
@@ -49,7 +57,7 @@ const mul31NoCarry: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} × ${b} = ${ans}. 각 자리를 따로 곱해요: ${Math.floor(a / 10)} × ${b} × 10 + ${a % 10} × ${b}.`)],
+      explanation: [txt(mul2x1Explain(a, b))],
     };
   },
 };
@@ -92,7 +100,7 @@ const mul31Carry: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} × ${b} = ${ans}. 받아올림에 주의해요.`)],
+      explanation: [txt(mul2x1Explain(a, b))],
     };
   },
 };
@@ -125,7 +133,7 @@ const mul31Tens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} × ${b} = ${a / 10} × ${b} × 10 = ${(a / 10) * b} × 10 = ${ans}`)],
+      explanation: [txt(`${a}는 십이 ${a / 10}개예요. 먼저 ${a / 10} × ${b} = ${(a / 10) * b}을 구하고, 자리값이 십이라 10을 곱하면 ${ans}이에요.`)],
     };
   },
 };
@@ -184,7 +192,7 @@ const mul31Estimate: SkillDef = {
       expr: [txt(`${aDisplay} × ${b} ≈ ?`)],
       choices,
       answerIndex,
-      explanation: [txt(`${aDisplay} ≈ ${rounded}이므로 ${rounded} × ${b} = ${ans}`)],
+      explanation: [txt(`${aDisplay}의 일의 자리가 ${rem10}이라 ${rem10 >= 5 ? '올림' : '버림'}하면 약 ${rounded}이에요. 어림한 ${rounded} × ${b} = ${ans}으로 어림해요.`)],
     };
   },
 };
@@ -204,6 +212,7 @@ const mul31Word: SkillDef = {
     let prompt: string;
     let a: number, b: number, ans: number;
     let unit: string;
+    let explStr: string;
 
     if (pat === 0) {
       // 물건 × 묶음
@@ -212,6 +221,7 @@ const mul31Word: SkillDef = {
       ans = a * b;
       unit = '개';
       prompt = `마법사가 마법 보석 ${a}개씩 ${b}봉지를 모았어요. 보석은 모두 몇 개인가요?`;
+      explStr = `한 봉지에 ${a}개씩 ${b}봉지예요. ${a} × ${b} = ${ans}이라 모두 ${ans}개예요.`;
     } else if (pat === 1) {
       // 거리 × 횟수
       a = rng.int(12, 39);
@@ -219,6 +229,7 @@ const mul31Word: SkillDef = {
       ans = a * b;
       unit = '걸음';
       prompt = `용사가 하루에 ${a}걸음씩 ${b}일 동안 걸었어요. 모두 몇 걸음인가요?`;
+      explStr = `하루에 ${a}걸음씩 ${b}일이에요. ${a} × ${b} = ${ans}이라 모두 ${ans}걸음이에요.`;
     } else {
       // 가격 × 수량
       a = rng.int(10, 49) * 10;
@@ -226,6 +237,7 @@ const mul31Word: SkillDef = {
       ans = a * b;
       unit = '원';
       prompt = `신비한 열매 한 개에 ${a}원이에요. ${b}개를 사면 얼마인가요?`;
+      explStr = `한 개에 ${a}원짜리 ${b}개예요. ${a} × ${b} = ${ans}이라 ${ans}원이에요.`;
     }
 
     const expr: MathExpr = [
@@ -242,7 +254,7 @@ const mul31Word: SkillDef = {
       prompt,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a} × ${b} = ${ans}`)],
+      explanation: [txt(explStr)],
     };
   },
 };

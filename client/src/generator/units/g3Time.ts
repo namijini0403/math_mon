@@ -160,7 +160,10 @@ const time3Add: SkillDef = {
       txt('분'),
     ];
 
-    const carryNote = carry ? ' 분이 60 이상이므로 1시간을 받아올림해요.' : '';
+    const minStep = carry
+      ? `분끼리 더하면 ${m1} + ${m2} = ${m1 + m2}분이에요. 60분이 넘으니 1시간으로 받아올림하고 ${m1 + m2 - 60}분이 남아요.`
+      : `분끼리 더하면 ${m1} + ${m2} = ${rm}분이에요.`;
+    const hourStep = `시끼리 더하면 ${h1} + ${h2}${carry ? ' + 1(받아올림)' : ''} = ${rh}시간이에요.`;
 
     return {
       id: `${this.id}:${seed}`,
@@ -170,7 +173,7 @@ const time3Add: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [rh, rm],
-      explanation: [txt(`${h1}시간 ${m1}분 + ${h2}시간 ${m2}분 = ${rh}시간 ${rm}분.${carryNote}`)],
+      explanation: [txt(`${minStep} ${hourStep} 그래서 ${rh}시간 ${rm}분이에요.`)],
     };
   },
 };
@@ -215,7 +218,10 @@ const time3Sub: SkillDef = {
       txt('분'),
     ];
 
-    const borrowNote = borrow ? ' 분이 부족하므로 1시간을 받아내림해요.' : '';
+    const minStep = borrow
+      ? `분끼리 빼요. ${m1}분에서 ${m2}분을 뺄 수 없으니 1시간(60분)을 받아내림해서 ${m1} + 60 - ${m2} = ${rm}분이에요.`
+      : `분끼리 빼면 ${m1} - ${m2} = ${rm}분이에요.`;
+    const hourStep = `시끼리 빼면 ${h1}${borrow ? ' - 1(받아내림)' : ''} - ${h2} = ${rh}시간이에요.`;
 
     return {
       id: `${this.id}:${seed}`,
@@ -225,7 +231,7 @@ const time3Sub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [rh, rm],
-      explanation: [txt(`${h1}시간 ${m1}분 - ${h2}시간 ${m2}분 = ${rh}시간 ${rm}분.${borrowNote}`)],
+      explanation: [txt(`${minStep} ${hourStep} 그래서 ${rh}시간 ${rm}분이에요.`)],
     };
   },
 };
@@ -255,7 +261,7 @@ const time3Word: SkillDef = {
       ans = totalM;
       unit = 'm';
       prompt = `용사가 마법 숲까지 ${km} km ${extraM} m를 걸어갔어요. 몇 m를 걸은 건가요?`;
-      expl = `${km} km = ${km * 1000} m, 합계 ${km * 1000} + ${extraM} = ${totalM} m`;
+      expl = `1 km = 1000 m이니 ${km} km = ${km * 1000} m예요. 여기에 ${extraM} m를 더하면 ${km * 1000} + ${extraM} = ${totalM} m예요.`;
     } else if (pat === 1) {
       // 시간 덧셈 문장제
       const m1 = rng.int(20, 50);
@@ -265,12 +271,12 @@ const time3Word: SkillDef = {
         ans = totalMin - 60;
         unit = '분';
         prompt = `드래곤이 ${m1}분 동안 하늘을 날고, 다시 ${m2}분 더 날았어요. 두 번째 날기가 끝난 때는 처음 날기 시작 후 1시간 몇 분인가요?`;
-        expl = `${m1} + ${m2} = ${totalMin}분 = 1시간 ${totalMin - 60}분`;
+        expl = `${m1} + ${m2} = ${totalMin}분이에요. 60분은 1시간이니 ${totalMin}분 = 1시간 ${totalMin - 60}분이에요.`;
       } else {
         ans = totalMin;
         unit = '분';
         prompt = `요정이 마법 배우기를 ${m1}분, 날기 연습을 ${m2}분 했어요. 모두 몇 분인가요?`;
-        expl = `${m1} + ${m2} = ${totalMin}분`;
+        expl = `두 시간을 더해요. ${m1} + ${m2} = ${totalMin}분이에요.`;
       }
     } else {
       // 시간 뺄셈 문장제
@@ -288,12 +294,12 @@ const time3Word: SkillDef = {
         ans = a - b;
         unit = '분';
         prompt = `마법 수업이 ${a}분 동안 있어요. 이미 ${b}분이 지났다면 남은 시간은 몇 분인가요?`;
-        expl = `${a} - ${b} = ${ans}분`;
+        expl = `전체 ${a}분에서 지난 ${b}분을 빼요. ${a} - ${b} = ${ans}분이 남아요.`;
       } else {
         ans = leftM;
         unit = '분';
         prompt = `모험이 ${totalH}시간 ${totalM}분 걸려요. 이미 ${usedH}시간 ${usedM}분이 지났다면 남은 시간은 몇 시간 몇 분인가요? (분만 구하세요)`;
-        expl = `${totalH}시간 ${totalM}분 - ${usedH}시간 ${usedM}분 = ${leftH}시간 ${leftM}분`;
+        expl = `${totalH}시간 ${totalM}분에서 ${usedH}시간 ${usedM}분을 빼면 ${leftH}시간 ${leftM}분이 남아요. 남은 분은 ${leftM}분이에요.`;
       }
     }
 
