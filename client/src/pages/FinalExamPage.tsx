@@ -17,6 +17,7 @@ import { sfx } from '../game/sounds';
 import { TreasureReveal } from '../components/TreasureReveal';
 import type { RewardCardDef } from '../game/rewardCards';
 import { MathView } from '../components/MathView';
+import { FigureView } from '../components/figure/FigureView';
 import { ChoiceView } from '../components/problem/ChoiceView';
 import { ComparisonView } from '../components/problem/ComparisonView';
 import { FractionInputView } from '../components/problem/FractionInputView';
@@ -312,6 +313,7 @@ export default function FinalExamPage() {
             className="w-full flex flex-col items-center gap-7"
           >
             <h2 className="text-xl text-center opacity-90">{problem.prompt}</h2>
+            {problem.figure && <FigureView spec={problem.figure} />}
             {showAnswers && (
               <div className="rounded-full bg-coin/15 text-coin px-4 py-1 text-xs">
                 🔑 [교사용] 정답: {answerToText(problem)}

@@ -12,6 +12,17 @@ export type MathToken =
 
 export type MathExpr = MathToken[];
 
+/**
+ * 문제 도해 명세 — 있으면 prompt 아래에 코드 렌더 SVG 그림을 그린다(FigureView).
+ * 순수·결정적: 시드로 정해진 숫자/문자열만 담는다. 그림과 풀이의 수치는 generator가 같은 변수에서 만든다.
+ * 미구현 kind는 FigureView가 빈 박스로 폴백(앱 안 깨짐). 없으면 기존 문제와 완전히 동일.
+ */
+export type FigureSpec =
+  /** 한 변 side cm 정사각형 squares개를 대각 계단으로 이어 붙인 도형 (둘레=4·n·a) */
+  | { kind: 'staircase'; squares: number; side: number }
+  /** n×n×n 정육면체 겉면 색칠 후 1칸씩 자르기 — 한 면만 색칠된 칸(면 중앙) 강조 */
+  | { kind: 'painted-cube'; n: number; highlight: 'one-face' };
+
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =
   | { kind: 'frac'; n: number; d: number; whole?: number }
@@ -29,6 +40,8 @@ interface ProblemBase {
   expr?: MathExpr;
   /** 해설 — 오답 시 표시 */
   explanation: MathExpr;
+  /** 도해 — 있으면 prompt 아래에 SVG 그림을 그린다. 없으면 기존과 동일(비파괴) */
+  figure?: FigureSpec;
 }
 
 /** 4지선다 */

@@ -1052,6 +1052,7 @@ const chStairs: SkillDef = {
       expr: [txt('둘레 = '), blank(0), txt(' cm')],
       blankAnswers: [ans],
       explanation,
+      figure: { kind: 'staircase', squares: n, side: a },
     };
   },
 };

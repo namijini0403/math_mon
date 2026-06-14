@@ -1024,6 +1024,7 @@ const chPaintCut: SkillDef = {
       expr: [txt('한 면만 색칠된 개수 = '), blank(0), txt(' 개')],
       blankAnswers: [ans],
       explanation,
+      figure: { kind: 'painted-cube', n, highlight: 'one-face' },
     };
   },
   minVariety: 10,
