@@ -38,10 +38,10 @@ export function CompanionCheer() {
       {shown && (
         <motion.div
           key={shown.id}
-          className="fixed bottom-4 left-1/2 z-[60] -translate-x-1/2 flex items-end gap-2 pointer-events-none"
-          initial={{ opacity: 0, y: 40, scale: 0.8 }}
+          className="fixed top-[34%] left-1/2 z-[60] -translate-x-1/2 flex items-end gap-2 pointer-events-none"
+          initial={{ opacity: 0, y: 24, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.9 }}
+          exit={{ opacity: 0, y: -16, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 320, damping: 22 }}
         >
           {/* 말풍선 */}

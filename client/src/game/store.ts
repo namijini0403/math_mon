@@ -106,11 +106,15 @@ interface GameState {
   answerRun: { correct: number; wrong: number };
   /** 미니미 응원 신호(전역 오버레이가 소비 후 clearCompanionCue). cheer=5연속정답 축하 / cheerup=2연속오답 응원 */
   companionCue: { kind: 'cheer' | 'cheerup'; id: number } | null;
+  /** 「길잡이 별」을 띄운 스킬별 횟수 — 약점 봉인 모드·연습 출제 가중에 반영(정답 시 감쇠) */
+  helpLog: Record<string, number>;
 
   setProfile: (p: { nickname: string; classCode?: string; studentId?: string }) => void;
   recordAnswer: (skillId: string, correct: boolean, seed?: number) => void;
   /** 미니미 응원 신호 소비(오버레이가 표시 후 호출) */
   clearCompanionCue: () => void;
+  /** 「길잡이 별」 도움 요청 기록(서버 전송과 별개로 로컬 약점 가중에 반영) */
+  recordHelpRequest: (skillId: string) => void;
   /** XP 추가 + 레벨업 카드 발급. 새로 얻은 카드 목록 반환 */
   addXp: (amount: number) => EarnedCard[];
   /** 보스 격파 카드 발급 */
@@ -214,6 +218,7 @@ export const useGame = create<GameState>()(
       steps: emptySteps(),
       answerRun: { correct: 0, wrong: 0 },
       companionCue: null,
+      helpLog: {},
 
       setProfile: ({ nickname, classCode, studentId }) =>
         set({ nickname, classCode: classCode ?? null, studentId: studentId ?? null }),
@@ -257,6 +262,11 @@ export const useGame = create<GameState>()(
           } else if (!correct && answerRun.wrong === 2) {
             companionCue = { kind: 'cheerup', id: Date.now() };
           }
+          // 길잡이 별 가중 감쇠: 그 스킬을 맞히면 도움 요청 1 줄임(실력이 오르면 약점 가중도 식음)
+          let helpLog = s.helpLog;
+          if (correct && (s.helpLog?.[skillId] ?? 0) > 0) {
+            helpLog = { ...s.helpLog, [skillId]: s.helpLog[skillId] - 1 };
+          }
           return {
             skillStats: {
               ...s.skillStats,
@@ -267,10 +277,14 @@ export const useGame = create<GameState>()(
             wrongLog,
             answerRun,
             companionCue,
+            helpLog,
           };
         }),
 
       clearCompanionCue: () => set({ companionCue: null }),
+
+      recordHelpRequest: (skillId) =>
+        set((s) => ({ helpLog: { ...s.helpLog, [skillId]: (s.helpLog?.[skillId] ?? 0) + 1 } })),
 
       addXp: (amount) => {
         const prevXp = get().xp;

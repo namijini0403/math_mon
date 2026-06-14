@@ -33,12 +33,14 @@ const TOTAL = 10;
 
 type Stats = Record<string, { c: number; w: number }>;
 
-/** 약점 가중 픽 — 정답률이 낮은(틀린 비율 높은) 스킬을 더 자주 뽑는다. */
-function pickWeighted(pool: SkillDef[], stats: Stats): SkillDef {
+/** 약점 가중 픽 — 정답률이 낮은(틀린 비율 높은) + 길잡이 별을 띄운 스킬을 더 자주 뽑는다. */
+function pickWeighted(pool: SkillDef[], stats: Stats, helpLog: Record<string, number> = {}): SkillDef {
   const entries = pool.map((s) => {
     const st = stats[s.id];
     // 표본 없으면 보통 가중, 오답이 많을수록 최대 3배까지 가중
-    const w = !st || st.c + st.w === 0 ? 1 : 1 + 2 * (st.w / (st.c + st.w));
+    const base = !st || st.c + st.w === 0 ? 1 : 1 + 2 * (st.w / (st.c + st.w));
+    // 길잡이 별(도움 요청)은 명시적 약점 신호 — 추가 가중(최대 +3)
+    const w = base + Math.min(3, (helpLog[s.id] ?? 0) * 1.5);
     return { s, w };
   });
   const totalW = entries.reduce((a, e) => a + e.w, 0);
@@ -54,7 +56,7 @@ function pickWeighted(pool: SkillDef[], stats: Stats): SkillDef {
  * 시험 문제 선택 — 앞 3문제 기초, 중간 보통, 마지막 3문제 도전(심화 혼합).
  * weak=true(약점 봉인 모드)면 같은 난이도 풀 안에서 '내가 틀린 유형'을 가중해 뽑는다.
  */
-function pickExamProblem(unitId: string, index: number, weak: boolean, stats: Stats): Problem {
+function pickExamProblem(unitId: string, index: number, weak: boolean, stats: Stats, helpLog: Record<string, number> = {}): Problem {
   const unitSkills = SKILLS.filter((s) => s.unitId === unitId);
   const target: 1 | 2 | 3 = index < 3 ? 1 : index < 7 ? 2 : 3;
   let pool: SkillDef[];
@@ -66,7 +68,7 @@ function pickExamProblem(unitId: string, index: number, weak: boolean, stats: St
     pool = unitSkills.filter((s) => !s.challenge && s.difficulty === target);
     if (pool.length === 0) pool = unitSkills.filter((s) => !s.challenge);
   }
-  const skill = weak ? pickWeighted(pool, stats) : pool[Math.floor(Math.random() * pool.length)];
+  const skill = weak ? pickWeighted(pool, stats, helpLog) : pool[Math.floor(Math.random() * pool.length)];
   return generateProblem(skill.id, randomSeed());
 }
 
@@ -107,7 +109,7 @@ export default function ExamPage() {
     setUnitId(uid);
     setIndex(0);
     setScore(0);
-    setProblem(pickExamProblem(uid, 0, weak, useGame.getState().skillStats));
+    setProblem(pickExamProblem(uid, 0, weak, useGame.getState().skillStats, useGame.getState().helpLog));
     servedAtRef.current = Date.now();
     setAnswer(null);
     void track('exam.start', { unit_id: uid, policy_tag: weak ? 'weak' : 'normal' });
@@ -166,7 +168,7 @@ export default function ExamPage() {
       return;
     }
     setIndex((i) => i + 1);
-    setProblem(pickExamProblem(unitId, index + 1, weak, useGame.getState().skillStats));
+    setProblem(pickExamProblem(unitId, index + 1, weak, useGame.getState().skillStats, useGame.getState().helpLog));
     servedAtRef.current = Date.now();
     setAnswer(null);
     setPhase('answering');

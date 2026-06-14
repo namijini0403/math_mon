@@ -36,6 +36,7 @@ export const SAVE_KEYS = [
   'records',
   'dragon',
   'practice',
+  'helpLog',
 ] as const;
 
 // ── 토큰 저장소 ──────────────────────────────────────────────────────────────

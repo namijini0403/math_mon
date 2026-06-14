@@ -73,12 +73,14 @@ function pickProblem(
   mode: PracticeMode,
   unitId: string,
   stats: Record<string, { c: number; w: number }>,
+  helpLog: Record<string, number> = {},
 ): Problem {
   const pool = MODES[mode].pool(unitId);
-  // 약한 스킬 가중
+  // 약한 스킬 + 길잡이 별을 띄운 스킬에 가중
   const entries = pool.map((s) => {
     const st = stats[s.id];
-    const w = !st || st.c + st.w === 0 ? 1.5 : 1 + 2 * (st.w / (st.c + st.w));
+    const base = !st || st.c + st.w === 0 ? 1.5 : 1 + 2 * (st.w / (st.c + st.w));
+    const w = base + Math.min(3, (helpLog[s.id] ?? 0) * 1.5);
     return { s, w };
   });
   const totalW = entries.reduce((a, e) => a + e.w, 0);
@@ -102,7 +104,7 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
   const zone = accessZone(parseGradeSemester(classCode), unitId);
   const rewarded = zone === 'current';
   const [problem, setProblem] = useState<Problem>(() =>
-    pickProblem(mode, unitId, useGame.getState().skillStats),
+    pickProblem(mode, unitId, useGame.getState().skillStats, useGame.getState().helpLog),
   );
   const [answer, setAnswer] = useState<UserAnswer | null>(null);
   const [phase, setPhase] = useState<'answering' | 'feedback'>('answering');
@@ -158,7 +160,7 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
   };
 
   const next = () => {
-    setProblem(pickProblem(mode, unitId, useGame.getState().skillStats));
+    setProblem(pickProblem(mode, unitId, useGame.getState().skillStats, useGame.getState().helpLog));
     servedAtRef.current = Date.now();
     setAnswer(null);
     setPhase('answering');

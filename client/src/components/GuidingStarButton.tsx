@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { sendHelpRequest } from '../api';
 import { getSkill } from '../generator';
 import { setReportProblem } from '../game/reportContext';
+import { useGame } from '../game/store';
 
 export function GuidingStarButton({ skillId, stageId, problemId }: {
   skillId?: string;
@@ -16,6 +17,7 @@ export function GuidingStarButton({ skillId, stageId, problemId }: {
 }) {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
+  const recordHelpRequest = useGame((s) => s.recordHelpRequest);
 
   // 문제가 바뀌면 다시 띄울 수 있도록 초기화 + 오류 신고용 현재 문제 등록
   useEffect(() => {
@@ -29,6 +31,7 @@ export function GuidingStarButton({ skillId, stageId, problemId }: {
     setBusy(true);
     let unitId: string | undefined;
     try { unitId = skillId ? getSkill(skillId).unitId : undefined; } catch { unitId = undefined; }
+    if (skillId) recordHelpRequest(skillId); // 로컬 약점 가중(서버 전송과 별개)
     await sendHelpRequest({ skillId, unitId, stageId, problemId });
     setBusy(false);
     setSent(true);
