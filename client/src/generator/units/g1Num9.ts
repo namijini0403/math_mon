@@ -78,8 +78,8 @@ const num9Order: SkillDef = {
       // 사이 수: a, _, a+2 → 빈칸에 a+1
       const a = rng.int(1, 7);
       answer = a + 1;
-      promptStr = `${a}과 ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${a + 2}을 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      promptStr = `${a}과(와) ${a + 2} 사이에 있는 수는 얼마인가요?`;
+      explanation = [txt(`${a}, ${answer}, ${a + 2}을(를) 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
     }
 
     return {

@@ -95,8 +95,8 @@ const num100Order: SkillDef = {
       // 사이 수: a, ?, a+2
       const a = rng.int(51, 98);
       answer = a + 1;
-      promptStr = `${a}과 ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${a + 2}을 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      promptStr = `${a}과(와) ${a + 2} 사이에 있는 수는 얼마인가요?`;
+      explanation = [txt(`${a}, ${answer}, ${a + 2}을(를) 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
     }
 
     return {
@@ -141,7 +141,7 @@ const num100Compare: SkillDef = {
       right: [{ kind: 'decimal', v: b }],
       answer,
       // 부등호는 클릭 선택(ComparisonView). 풀이는 어느 수가 큰지 말로 + 기호 병기.
-      explanation: [txt(`${a}와 ${b} 중에서 ${Math.max(a, b)}이 더 커요. 그래서 ${a} ${answer} ${b}예요.`)],
+      explanation: [txt(`${a}와(과) ${b} 중에서 ${Math.max(a, b)}이(가) 더 커요. 그래서 ${a} ${answer} ${b}예요.`)],
     };
   },
 };

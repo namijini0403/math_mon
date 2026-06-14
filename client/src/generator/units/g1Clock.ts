@@ -65,10 +65,10 @@ const clock1Half: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `짧은바늘이 ${hour}과 ${nextHour} 사이, 긴바늘이 6을 가리켜요. 몇 시 몇 분인가요?`,
+      prompt: `짧은바늘이 ${hour}과(와) ${nextHour} 사이, 긴바늘이 6을 가리켜요. 몇 시 몇 분인가요?`,
       expr,
       blankAnswers: [hour, 30],
-      explanation: [txt(`긴바늘이 6을 가리키면 30분이에요. 짧은바늘이 ${hour}과 ${nextHour} 사이이므로 ${hour}시 30분이에요.`)],
+      explanation: [txt(`긴바늘이 6을 가리키면 30분이에요. 짧은바늘이 ${hour}과(와) ${nextHour} 사이이므로 ${hour}시 30분이에요.`)],
     };
   },
 };
