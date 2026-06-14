@@ -221,7 +221,10 @@ const md4Verify: SkillDef = {
       prompt: '검산식을 이용하여 □에 알맞은 수를 구하세요.',
       expr,
       blankAnswers: [answer],
-      explanation: [txt(explStr)],
+      explanation: [
+        txt('검산은 (나누는 수) × (몫) + (나머지) = (나뉘는 수)로 확인해요.'),
+        txt(explStr),
+      ],
     };
   },
 };
@@ -255,7 +258,10 @@ const md4Word: SkillDef = {
       answer = ans;
       unit = '개';
       prompt = `성 안에 방이 ${a}개 있고, 방마다 보물이 ${b}개씩 있어요. 보물은 모두 몇 개인가요?`;
-      explanation = [txt(`${a} × ${b} = ${ans}`)];
+      explanation = [
+        txt(`방 ${a}개에 보물이 ${b}개씩이니 곱셈으로 구해요.`),
+        txt(`${a} × ${b} = ${ans}개.`),
+      ];
     } else if (pat === 1) {
       // (세 자리) × (몇십) 곱셈 문장제
       const a = rng.int(100, 500);
@@ -263,7 +269,10 @@ const md4Word: SkillDef = {
       answer = a * b;
       unit = '원';
       prompt = `마법 약 한 병에 ${a}원이에요. ${b}병을 사면 모두 얼마인가요?`;
-      explanation = [txt(`${a} × ${b} = ${answer}`)];
+      explanation = [
+        txt(`한 병 ${a}원짜리 ${b}병이니 곱셈이에요.`),
+        txt(`${a} × ${b} = ${answer}원.`),
+      ];
     } else if (pat === 2) {
       // (세 자리) ÷ (두 자리) 나눗셈 문장제 (나누어떨어짐)
       const b = rng.int(11, 30);
@@ -274,7 +283,10 @@ const md4Word: SkillDef = {
       const aCheck = a >= 100 && a <= 999 ? a : b * 5;
       const qCheck = aCheck / b;
       prompt = `모험대원 ${aCheck}명을 ${b}명씩 모둠으로 나누면 모둠이 몇 개인가요?`;
-      explanation = [txt(`${aCheck} ÷ ${b} = ${qCheck}`)];
+      explanation = [
+        txt(`${aCheck}명을 ${b}명씩 묶으면 모둠 수는 나눗셈으로 구해요.`),
+        txt(`${aCheck} ÷ ${b} = ${qCheck}개.`),
+      ];
       return {
         id: `${this.id}:${seed}`,
         skillId: this.id,
@@ -296,6 +308,7 @@ const md4Word: SkillDef = {
       unit = '모둠';
       prompt = `마법사가 ${safeA}개의 마나구슬을 ${b}개씩 상자에 담으려 해요. 상자 몇 개가 꽉 차고 ${r}개가 남나요?`;
       explanation = [
+        txt(`${b}개씩 담으면 꽉 찬 상자 수는 몫, 남는 구슬은 나머지예요.`),
         txt(`${safeA} ÷ ${b} = ${q} 나머지 ${r}. 상자 ${q}개가 꽉 차요.`),
       ];
       return {

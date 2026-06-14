@@ -118,7 +118,10 @@ const bigRead: SkillDef = {
       expr: [txt(nStr)],
       choices,
       answerIndex,
-      explanation: [txt(`${nStr} → ${answer}`)],
+      explanation: [
+        txt(`오른쪽에서 네 자리씩 끊어 읽어요: ${nStr}.`),
+        txt(`네 자리 묶음마다 만·억·조 단위를 붙이면 ${answer}이에요.`),
+      ],
     };
   },
 };
@@ -154,6 +157,7 @@ const bigWrite: SkillDef = {
     const candidates: ChoiceValue[] = wrongNums.map(v => dec(v));
     const { choices, answerIndex } = buildChoices(answerVal, candidates, rng);
 
+    const nStr = String(n).replace(/\B(?=(\d{4})+(?!\d))/g, ',');
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -162,7 +166,10 @@ const bigWrite: SkillDef = {
       prompt: `'${readStr}'을 수로 나타내면?`,
       choices,
       answerIndex,
-      explanation: [txt(`'${readStr}'은 ${ida(n)}.`)],
+      explanation: [
+        txt(`'${readStr}'을 만·억·조 단위로 끊어 각 자리 수를 써요.`),
+        txt(`네 자리씩 묶으면 ${nStr}, 곧 ${ida(n)}.`),
+      ],
     };
   },
 };
@@ -212,6 +219,7 @@ const bigPlace: SkillDef = {
       expr,
       blankAnswers: [answer],
       explanation: [
+        txt(`오른쪽에서 네 자리씩 끊으면 ${place.name} 자리를 찾기 쉬워요.`),
         txt(`${nStr}에서 ${place.name} 자리 숫자는 ${ida(answer)}.`),
       ],
     };
@@ -337,6 +345,8 @@ const bigCompare: SkillDef = {
     }
 
     const answer: '<' | '>' | '=' = a < b ? '<' : a > b ? '>' : '=';
+    const sameLen = String(a).length === String(b).length;
+    const bigger = a > b ? a : b;
 
     return {
       id: `${this.id}:${seed}`,
@@ -349,10 +359,11 @@ const bigCompare: SkillDef = {
       right: [{ kind: 'decimal', v: b }],
       answer,
       explanation: [
-        txt(`${formatKorean(a)} vs ${formatKorean(b)}: `),
-        txt(a < b ? `자릿수/앞 자리를 비교하면 ${formatKorean(a)}이 더 작아요.`
-          : a > b ? `자릿수/앞 자리를 비교하면 ${formatKorean(a)}이 더 커요.`
-          : '두 수가 같아요.'),
+        txt(`${formatKorean(a)} 와(과) ${formatKorean(b)} 의 크기를 비교해요.`),
+        txt(sameLen
+          ? `자리 수가 같으니 가장 높은 자리부터 차례로 비교하면 ${formatKorean(bigger)}이(가) 더 큽니다.`
+          : `자리 수가 더 많은 ${formatKorean(bigger)}이(가) 더 큽니다.`),
+        txt(a > b ? `${formatKorean(a)} > ${formatKorean(b)}` : `${formatKorean(a)} < ${formatKorean(b)}`),
       ],
     };
   },
@@ -385,7 +396,8 @@ const bigWord: SkillDef = {
       prompt = `마법 성의 보물 상자에 금화가 ${formatKorean(start)}개 있었어요. 매일 ${formatKorean(step)}개씩 ${count}일 동안 더 쌓였다면 지금 금화는 모두 몇 개인가요?`;
       unit = '개';
       explanation = [
-        txt(`${formatKorean(start)} + ${formatKorean(step)} × ${count} = ${formatKorean(answer)}`),
+        txt(`매일 ${formatKorean(step)}개씩 ${count}일이면 ${formatKorean(step)} × ${count} = ${formatKorean(step * count)}개 늘어요.`),
+        txt(`처음 금화에 더하면 ${formatKorean(start)} + ${formatKorean(step * count)} = ${formatKorean(answer)}개.`),
       ];
     } else if (pat === 1) {
       // 자릿값 묶음 개수 활용
@@ -396,7 +408,8 @@ const bigWord: SkillDef = {
       prompt = `탐험대 금고에 ${formatKorean(total)}골드가 있어요. ${formatKorean(placeVal)}짜리 금덩이로만 가득 쌓여 있다면 금덩이는 모두 몇 개인가요?`;
       unit = '개';
       explanation = [
-        txt(`${formatKorean(total)} ÷ ${formatKorean(placeVal)} = ${ida(digit)}`),
+        txt(`${formatKorean(placeVal)}짜리로 ${formatKorean(total)}을 채우려면 ${formatKorean(total)} ÷ ${formatKorean(placeVal)} 을 구해요.`),
+        txt(`${formatKorean(total)}은 ${formatKorean(placeVal)}이 ${ida(digit)}개 모인 수예요.`),
       ];
     } else if (pat === 2) {
       // 큰 수 덧셈
@@ -406,19 +419,22 @@ const bigWord: SkillDef = {
       prompt = `왕국 A의 인구는 ${formatKorean(a)}명이고, 왕국 B의 인구는 ${formatKorean(b)}명이에요. 두 왕국의 인구를 합치면 몇 명인가요?`;
       unit = '명';
       explanation = [
-        txt(`${formatKorean(a)} + ${formatKorean(b)} = ${formatKorean(answer)}`),
+        txt(`두 왕국의 인구를 더해요.`),
+        txt(`${formatKorean(a)} + ${formatKorean(b)} = ${formatKorean(answer)}명.`),
       ];
     } else {
-      // 뛰어 세기 역산 (빼기)
+      // 뛰어 세기 역산 (과거값 = 지금보다 큼)
       const step = rng.pick([10000, 100000, 1000000]);
       const count = rng.int(3, 6);
       const endMultiple = rng.int(10, 50);
       const end = endMultiple * step;
-      answer = end - step * count;
+      answer = end + step * count;
       prompt = `마법사가 주문을 걸 때마다 마나가 ${formatKorean(step)}씩 줄어들어요. 지금 마나가 ${formatKorean(end)}이고, ${count}번 주문을 걸기 전에는 마나가 얼마였나요?`;
       unit = '';
       explanation = [
-        txt(`${formatKorean(end)} + ${formatKorean(step)} × ${count} = ${formatKorean(answer)}`),
+        txt(`주문을 걸수록 마나가 줄었으니, 걸기 전에는 지금보다 더 많았어요.`),
+        txt(`줄어든 양은 ${formatKorean(step)} × ${count} = ${formatKorean(step * count)}.`),
+        txt(`지금 마나에 도로 더하면 ${formatKorean(end)} + ${formatKorean(step * count)} = ${formatKorean(answer)}.`),
       ];
     }
 

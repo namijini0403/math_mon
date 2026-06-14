@@ -122,6 +122,8 @@ const barDiff: SkillDef = {
     const answer = Math.abs(data.values[i1] - data.values[i2]);
     const item1 = data.selectedItems[i1];
     const item2 = data.selectedItems[i2];
+    const bigVal = Math.max(data.values[i1], data.values[i2]);
+    const smallVal = Math.min(data.values[i1], data.values[i2]);
 
     const expr: MathExpr = [
       txt(`${item1}과 ${item2}의 차: `),
@@ -141,7 +143,7 @@ const barDiff: SkillDef = {
       blankAnswers: [answer],
       explanation: [
         txt(`${item1}: ${data.values[i1]}${data.topic.unit}, ${item2}: ${data.values[i2]}${data.topic.unit}`),
-        txt(`차: |${data.values[i1]} - ${data.values[i2]}| = ${answer}${data.topic.unit}`),
+        txt(`차는 큰 수에서 작은 수를 빼요. ${bigVal} - ${smallVal} = ${answer}${data.topic.unit}`),
       ],
     };
   },

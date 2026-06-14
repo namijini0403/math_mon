@@ -125,7 +125,7 @@ const ruleFormulaNth: SkillDef = {
       answer = n * n;
       prompt = `다음 계산식의 규칙을 찾아 ${n}번째 결과를 구하세요.\n1 = 1\n1 + 3 = 4\n1 + 3 + 5 = 9\n1 + 3 + 5 + 7 = 16\n...\n(${n}번째 홀수까지의 합) = □`;
       explanation = [
-        txt(`규칙: n번째 홀수까지의 합 = n²`),
+        txt(`규칙: n번째 홀수까지의 합 = n × n`),
         txt(`${n}번째: ${n} × ${n} = ${answer}`),
       ];
     }
@@ -248,9 +248,9 @@ const ruleInverse: SkillDef = {
       }
     }
 
-    // 표를 제시 (x: 1,2,3,□ 와 y 대응)
-    const tableRows = [1, 2, 3].map(i => `x=${i} → y=${a * i + b}`);
-    tableRows.push(`x=□ → y=${yVal}`);
+    // 마법 상자: 넣은 수 → 나온 수 (넣은 수 × a + b)
+    const tableRows = [1, 2, 3].map(i => `${i} → ${a * i + b}`);
+    tableRows.push(`□ → ${yVal}`);
     const tableText = tableRows.join(', ');
 
     const expr: MathExpr = [txt('□ = '), { kind: 'blank', slot: 0 }];
@@ -260,12 +260,12 @@ const ruleInverse: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음 표를 보고 □에 알맞은 수를 구하세요.\n${tableText}`,
+      prompt: `마법 상자에 수를 넣으면 규칙에 따라 새로운 수가 나옵니다. □에 알맞은 수를 구하세요.\n${tableText}`,
       expr,
       blankAnswers: [xVal],
       explanation: [
-        txt(`규칙: y = ${a} × x + ${b}`),
-        txt(`${yVal} = ${a} × □ + ${b} → □ = (${yVal} - ${b}) ÷ ${a} = ${xVal}`),
+        txt(`규칙: 넣은 수 × ${a} 에 ${b}을(를) 더하면 나오는 수예요.`),
+        txt(`${yVal} = □ × ${a} + ${b} 이므로, □ = (${yVal} - ${b}) ÷ ${a} = ${xVal}.`),
       ],
     };
   },

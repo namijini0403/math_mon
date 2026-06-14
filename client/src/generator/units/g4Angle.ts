@@ -99,6 +99,7 @@ const angAddSub: SkillDef = {
       expr,
       blankAnswers: [ans],
       explanation: [
+        txt(isAdd ? '두 각도를 더할 때는 도(°)끼리 더해요.' : '두 각도의 차는 큰 각에서 작은 각을 빼요.'),
         txt(`${a}° ${sym} ${b}° = ${ans}°`),
       ],
     };
@@ -198,7 +199,10 @@ const angRound: SkillDef = {
       prompt: '한 바퀴(360°)에서 나머지 각의 크기를 구하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(explStr)],
+      explanation: [
+        txt('한 바퀴는 360°예요. 주어진 각들을 빼면 나머지 각을 구할 수 있어요.'),
+        txt(explStr),
+      ],
     };
   },
 };
@@ -365,7 +369,10 @@ const angWord: SkillDef = {
       }
       answer = ans;
       prompt = `시계탑 꼭대기에서 두 방향으로 빛이 나와 각각 ${a}°, ${b}°를 이루어요. 나머지 방향의 각도는 몇 도인가요?`;
-      explanation = [txt(`360° − ${a}° − ${b}° = ${ans}°`)];
+      explanation = [
+        txt('한 바퀴는 360°예요.'),
+        txt(`360° − ${a}° − ${b}° = ${ans}°`),
+      ];
     } else {
       // 각도 합 문장제
       let a = 35, b = 55, ans = 90;
@@ -377,7 +384,10 @@ const angWord: SkillDef = {
       }
       answer = ans;
       prompt = `용사가 두 번 방향을 바꿨어요. 처음엔 ${a}°, 두 번째엔 ${b}° 돌았다면 모두 몇 도를 돌았나요?`;
-      explanation = [txt(`${a}° + ${b}° = ${ans}°`)];
+      explanation = [
+        txt('두 번 돈 각도를 더해요.'),
+        txt(`${a}° + ${b}° = ${ans}°`),
+      ];
     }
 
     const expr: MathExpr = [

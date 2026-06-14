@@ -66,7 +66,7 @@ const moveRotateBack: SkillDef = {
     const answer = 4 - done;
 
     const expr: MathExpr = [
-      txt(`${done}번 더 돌리면 원래 모양으로 돌아옵니다. 앞으로 몇 번 더 돌려야 하나요? `),
+      txt('앞으로 몇 번 더 돌려야 하나요? '),
       { kind: 'blank', slot: 0 },
       txt('번'),
     ];
@@ -321,15 +321,13 @@ const moveWord: SkillDef = {
         txt(`${fa} + ${fb} = ${answer}`),
       ];
     } else if (pat === 4) {
-      // 뒤집기 짝수 번 → 처음과 같음 (짝수 횟수 2~6)
-      const times = rng.pick([2, 4, 6] as const);
-      answer = times;
-      prompt = `${subject}는 나뭇잎 도형을 같은 방향으로 ${times}번 뒤집었습니다. 이때 도형은 처음 모양과 같은가요? 짝수 번 뒤집으면 같아지므로, 처음 모양과 같아지는 가장 작은 짝수 횟수를 구하세요.`;
-      explanation = [
-        txt(`같은 방향으로 2번 뒤집으면 처음 모양으로 돌아와요.`),
-        txt(`가장 작은 짝수 횟수 = 2번`),
-      ];
+      // 뒤집기: 같은 방향으로 몇 번 뒤집어야 처음 모양으로 돌아오는가 → 2번
       answer = 2;
+      prompt = `${subject}는 나뭇잎 도형을 같은 방향으로 뒤집고 있습니다. 처음 모양으로 돌아오려면 적어도 몇 번 뒤집어야 하나요?`;
+      explanation = [
+        txt(`한 번 뒤집으면 거울에 비친 듯 좌우(또는 위아래)가 바뀌어요.`),
+        txt(`같은 방향으로 한 번 더, 모두 2번 뒤집으면 처음 모양으로 돌아옵니다.`),
+      ];
     } else {
       // 여러 번 돌린 뒤 결과 각도 (누적 계산)
       const n1 = rng.int(1, 4);

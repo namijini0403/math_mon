@@ -57,6 +57,13 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unitFrac32', // ④ 분수
   'unitMeasure3', // ⑤ 들이와 무게
   'unitData3', // ⑥ 자료의 정리
+  // 4-1 (큰 수·각도(°)·곱셈나눗셈·도형이동·막대그래프·규칙. 학기 내 순서는 docs/curriculum/g4.md)
+  'unitBigNum', // ① 큰 수
+  'unitAngle', // ② 각도
+  'unitMulDiv', // ③ 곱셈과 나눗셈
+  'unitMove', // ④ 평면도형의 이동
+  'unitBarGraph', // ⑤ 막대그래프
+  'unitFindRule', // ⑥ 규칙 찾기
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {
