@@ -525,36 +525,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
           ✕
         </Link>
         {isBoss && stage.boss ? (
-          <div className="flex-1 flex items-center gap-2">
-            <motion.span
-              key={hitFx}
-              animate={hitFx > 0 ? { x: [0, -6, 6, -4, 0], rotate: [0, -8, 6, 0] } : { y: [0, -3, 0], rotate: [-2, 2, -2] }}
-              transition={hitFx > 0 ? { duration: 0.4 } : { repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
-              className="text-4xl flex-shrink-0"
-            >
-              {bossImgOk && stage.boss.image ? (
-                <img
-                  src={stage.boss.image}
-                  alt={stage.boss.name}
-                  onError={() => setBossImgOk(false)}
-                  className="w-14 h-14 object-contain drop-shadow-lg"
-                />
-              ) : (
-                stage.boss.emoji
-              )}
-            </motion.span>
-            <div className="flex-1">
-              <div className="text-xs text-hurt mb-1">
-                {stage.boss.name} {done === 0 && `· "${stage.boss.taunt}"`}
-              </div>
-              <div className="h-4 rounded-full bg-night-800 overflow-hidden border border-night-700">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-hurt to-rose-600"
-                  animate={{ width: `${((total - done) / total) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
+          <div className="flex-1 text-center text-sm text-mana">🔮 {stage.boss.name} 봉인 중</div>
         ) : (
           <div className="flex-1 h-4 rounded-full bg-night-800 overflow-hidden border border-night-700">
             <motion.div
@@ -579,6 +550,81 @@ function LessonRunner({ stageId }: { stageId: string }) {
           )
         )}
       </div>
+
+      {/* 보스전: 크게 보이는 보스 무대 + 봉인 기력 게이지 (정답마다 깎인다) */}
+      {isBoss && stage.boss && phase !== 'result' && (() => {
+        const sealRatio = Math.max(0, (total - done) / total); // 남은 봉인 기력
+        const weakened = sealRatio <= 0.34; // 거의 봉인됨 → 빛이 옅어짐
+        return (
+          <div className="px-4 pt-1 flex flex-col items-center gap-2">
+            <div className="relative flex items-center justify-center" style={{ width: 168, height: 150 }}>
+              {/* 봉인 오라 (은은한 맥동) */}
+              <motion.div
+                className="absolute rounded-full"
+                style={{ width: 150, height: 150, background: 'radial-gradient(circle, rgba(167,139,250,0.35) 0%, transparent 68%)' }}
+                animate={{ opacity: weakened ? [0.2, 0.4, 0.2] : [0.45, 0.8, 0.45], scale: [0.95, 1.05, 0.95] }}
+                transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut' }}
+              />
+              {/* 정답 시 수축하는 봉인 고리 */}
+              {hitFx > 0 && (
+                <motion.div
+                  key={hitFx}
+                  className="absolute rounded-full border-2 border-mana"
+                  initial={{ width: 150, height: 150, opacity: 0.9 }}
+                  animate={{ width: 70, height: 70, opacity: 0 }}
+                  transition={{ duration: 0.55, ease: 'easeOut' }}
+                />
+              )}
+              {/* 정답 시 별가루 버스트 */}
+              {hitFx > 0 && (
+                <motion.div key={`sp${hitFx}`} className="absolute text-2xl" initial={{ scale: 0.4, opacity: 1, y: 0 }} animate={{ scale: 1.4, opacity: 0, y: -26 }} transition={{ duration: 0.6 }}>
+                  ✨
+                </motion.div>
+              )}
+              {/* 보스 본체 (크게) — 떠다니다가 정답 시 움찔 */}
+              <motion.div
+                key={hitFx}
+                animate={hitFx > 0 ? { x: [0, -8, 8, -5, 0], rotate: [0, -7, 6, 0], scale: [1, 0.94, 1] } : { y: [0, -6, 0] }}
+                transition={hitFx > 0 ? { duration: 0.45 } : { repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+                className={`relative ${weakened ? 'opacity-80' : ''}`}
+                style={weakened ? { filter: 'saturate(0.7) brightness(1.1)' } : undefined}
+              >
+                {bossImgOk && stage.boss.image ? (
+                  <img
+                    src={stage.boss.image}
+                    alt={stage.boss.name}
+                    onError={() => setBossImgOk(false)}
+                    className="w-28 h-28 object-contain drop-shadow-[0_4px_16px_rgba(167,139,250,0.5)]"
+                  />
+                ) : (
+                  <span className="text-7xl drop-shadow-[0_4px_16px_rgba(167,139,250,0.5)]">{stage.boss.emoji}</span>
+                )}
+              </motion.div>
+            </div>
+
+            {/* 이름 + 도발(첫 문제만) */}
+            <div className="text-center -mt-1">
+              <div className="text-sm font-bold text-hurt">{stage.boss.name}</div>
+              {done === 0 && <div className="text-xs opacity-70 italic">“{stage.boss.taunt}”</div>}
+            </div>
+
+            {/* 봉인 기력 게이지 — 정답마다 줄어든다 */}
+            <div className="w-full max-w-xs">
+              <div className="flex justify-between text-[0.7rem] mb-0.5">
+                <span className="text-mana">🔮 봉인 기력</span>
+                <span className="opacity-60 tabular-nums">{total - done}/{total}</span>
+              </div>
+              <div className="h-3.5 rounded-full bg-night-800 overflow-hidden border border-night-700">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-fuchsia-500 to-violet-600"
+                  animate={{ width: `${sealRatio * 100}%` }}
+                  transition={{ type: 'spring', damping: 18, stiffness: 160 }}
+                />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 보스전: 스테이지 전체 제한시간 바 (문제별 아님 — 통째로 줄어든다) */}
       {isBoss && phase !== 'result' && (
@@ -642,7 +688,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
             animate={
               isBoss && phase === 'answering' && served.timeLimit
                 ? { y: [0, 110], opacity: 1, x: 0 }
-                : { x: 0, y: isBoss ? 110 : 0, opacity: 1 }
+                : { x: 0, y: 0, opacity: 1 }
             }
             exit={isBoss ? { y: 200, opacity: 0 } : { x: -60, opacity: 0 }}
             transition={
@@ -693,7 +739,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
         </AnimatePresence>
       </div>
 
-      {/* 보스전: 쌓인 블록 */}
+      {/* 보스전: 느슨해진 봉인(오답) 표시 — 3개 차면 봉인 실패 */}
       {isBoss && (
         <div className="fixed bottom-24 left-0 right-0 pointer-events-none">
           <div className="max-w-xl mx-auto px-5 flex gap-1.5 items-end">
@@ -702,9 +748,9 @@ function LessonRunner({ stageId }: { stageId: string }) {
                 key={i}
                 initial={{ y: -30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="flex-1 h-9 rounded-lg bg-gradient-to-b from-stone-500 to-stone-700 border-b-4 border-stone-800 flex items-center justify-center text-sm"
+                className="flex-1 h-9 rounded-lg bg-gradient-to-b from-slate-500 to-slate-700 border-b-4 border-slate-800 flex items-center justify-center text-sm"
               >
-                🧱
+                🌫️
               </motion.div>
             ))}
             {Array.from({ length: MAX_MISSES - misses }).map((_, i) => (
@@ -730,12 +776,12 @@ function LessonRunner({ stageId }: { stageId: string }) {
                 <div className={`text-2xl mb-1 ${lastCorrect ? 'text-glow' : 'text-hurt'}`}>
                   {lastCorrect
                     ? isBoss
-                      ? ['치명타! ⚔️', '명중! 🏹', '강력한 한 방! 💥'][done % 3]
+                      ? ['별빛 봉인! ✨', '기력을 거뒀어요! 🔮', '봉인이 깊어져요! 🌟'][done % 3]
                       : ['정답이에요! 🎉', '완벽해요! ✨', '대단해요! 💪'][done % 3]
                     : timedOut
-                      ? '💥 시간 초과! 문제가 쌓였어요!'
+                      ? '⏰ 시간 초과! 봉인이 느슨해졌어요!'
                       : isBoss
-                        ? '빗나갔어요! 문제가 쌓였어요! 🧱'
+                        ? '봉인이 느슨해졌어요! 🌫️'
                         : '아쉬워요! 😢'}
                 </div>
                 {!lastCorrect && (
