@@ -5,7 +5,7 @@
  */
 
 import { RNG } from '../rng';
-import { gcd, toMixed, fromMixed, simplify, type Frac, type Mixed } from '../fraction';
+import { gcd, fromMixed, type Frac, type Mixed } from '../fraction';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, MathToken, Problem, SkillDef } from '../types';
 
@@ -15,6 +15,16 @@ const mixT = (m: Mixed): MathToken =>
   m.whole === 0
     ? { kind: 'frac', n: m.n, d: m.d }
     : { kind: 'frac', whole: m.whole, n: m.n, d: m.d };
+
+/**
+ * 가분수 → 대분수 (약분하지 않음).
+ * ⚠️ 4학년은 '약분과 통분'(5학년) 미도입 — 분모는 그대로 두고 분자끼리만 계산한다.
+ * (공용 fraction.ts의 toMixed는 내부에서 simplify를 호출하므로 4학년에 쓰면 안 됨.)
+ */
+function toMixedRaw(f: Frac): Mixed {
+  const whole = Math.floor(f.n / f.d);
+  return { whole, n: f.n - whole * f.d, d: f.d };
+}
 
 /** 동분모 기약 진분수 (0 < n < d, gcd=1) */
 function randProperSameDenom(rng: RNG): [Frac, Frac, number] {
@@ -32,10 +42,9 @@ function randProperSameDenom(rng: RNG): [Frac, Frac, number] {
   }
 }
 
-/** 동분모에서 결과 토큰 (약분 후 대분수 가능) */
+/** 동분모에서 결과 토큰 (약분하지 않고 대분수로만 정리) */
 function resultToken(f: Frac): ChoiceValue {
-  const s = simplify(f);
-  const m = toMixed(s);
+  const m = toMixedRaw(f);
   if (m.n === 0) return { kind: 'decimal', v: m.whole }; // 정수 결과 (걸러져야 함)
   return m.whole === 0
     ? { kind: 'frac', n: m.n, d: m.d }
@@ -55,7 +64,7 @@ function sameDenomMisconceptions(a: Frac, b: Frac, op: '+' | '-'): ChoiceValue[]
     // 분모끼리 곱함
     { n: applyN(a.n, b.n), d: d * d > 60 ? d + 2 : d * d },
   ];
-  const result = simplify({ n: applyN(a.n, b.n), d });
+  const result: Frac = { n: applyN(a.n, b.n), d };
   // ±1 변형 오답 추가
   for (const delta of [2, -2, 3]) cands.push({ n: result.n + delta, d: d });
   return cands
@@ -63,10 +72,9 @@ function sameDenomMisconceptions(a: Frac, b: Frac, op: '+' | '-'): ChoiceValue[]
     .map(resultToken);
 }
 
-/** 분수 입력 정답 형태 생성 */
+/** 분수 입력 정답 형태 생성 (약분하지 않음 — 4학년) */
 function fracAnswer(f: Frac): { n: number; d: number; whole?: number } {
-  const s = simplify(f);
-  const m = toMixed(s);
+  const m = toMixedRaw(f);
   if (m.whole === 0) return { n: m.n, d: m.d };
   return { whole: m.whole, n: m.n, d: m.d };
 }
@@ -76,17 +84,17 @@ function explainSameDenom(a: Frac, b: Frac, op: '+' | '-'): MathExpr {
   const d = a.d;
   const resultN = op === '+' ? a.n + b.n : a.n - b.n;
   const raw: Frac = { n: resultN, d };
-  const s = simplify(raw);
-  const m = toMixed(s);
+  const m = toMixedRaw(raw);
   const tokens: MathToken[] = [
-    txt(`분모가 같으므로 분자끼리만 계산해요. `),
+    txt(`분모가 같으므로 분모는 그대로 두고 분자끼리만 계산해요. `),
     frT(a),
     { kind: 'op', op },
     frT(b),
     { kind: 'op', op: '=' },
     frT(raw),
   ];
-  if (s.n !== raw.n || s.d !== raw.d || m.whole > 0) {
+  // 가분수면 대분수로만 고친다 (약분은 5학년 — 분모 유지)
+  if (m.whole > 0) {
     tokens.push({ kind: 'op', op: '=' }, mixT(m));
   }
   return tokens;
@@ -103,8 +111,8 @@ function makeSameDenomProblem(
   bDisp?: MathToken,
 ): Problem {
   const rng = new RNG(seed ^ 0x4f7a3c21);
-  const result = simplify({ n: op === '+' ? a.n + b.n : a.n - b.n, d: a.d });
-  const m = toMixed(result);
+  const result: Frac = { n: op === '+' ? a.n + b.n : a.n - b.n, d: a.d };
+  const m = toMixedRaw(result);
   const aT = aDisp ?? frT(a);
   const bT = bDisp ?? frT(b);
   const expr: MathExpr = [aT, { kind: 'op', op }, bT];
@@ -117,7 +125,7 @@ function makeSameDenomProblem(
       format: 'fraction-input' as const,
       prompt: '계산하세요.' + (m.whole > 0 ? ' (대분수로 나타내세요)' : ''),
       mixed: m.whole > 0,
-      requireIrreducible: true,
+      requireIrreducible: false,
       answer: fracAnswer(result),
     };
   }
@@ -254,10 +262,10 @@ const f4SubMixed: SkillDef = {
       frT({ n: mb.n, d }),
       txt(`이므로 자연수 1에서 받아내립니다. `),
       txt(`${ma.whole}를 ${ma.whole - 1}로 줄이고 분자에 분모(${d})를 더해요. `),
-      txt(`분수 부분: ${ma.n + d} − ${mb.n} = ${borrowedN}. `),
+      txt(`분수 부분: ${ma.n + d} − ${mb.n} = ${borrowedN} (분모 ${d}는 그대로). `),
       txt(`자연수 부분: ${ma.whole - 1} − ${mb.whole} = ${borrowedResult.whole}.`),
     ];
-    const result = simplify({ n: borrowedResult.whole * d + borrowedResult.n, d });
+    const result: Frac = { n: borrowedResult.whole * d + borrowedResult.n, d };
     const expr: MathExpr = [mixT(ma), { kind: 'op', op: '-' }, mixT(mb)];
     return {
       id: `${this.id}:${seed}`,
@@ -267,7 +275,7 @@ const f4SubMixed: SkillDef = {
       prompt: '계산하세요. (대분수로 나타내세요)',
       expr,
       mixed: true,
-      requireIrreducible: true,
+      requireIrreducible: false,
       answer: fracAnswer(result),
       explanation,
     };
@@ -298,11 +306,11 @@ const f4NatSubFrac: SkillDef = {
         // 결과: d−n / d, 확인: gcd는 상관없음 (약분 가능할 수도 있음)
         f = { n, d }; break;
       }
-      const result = simplify({ n: f.d - f.n, d: f.d });
+      const result: Frac = { n: f.d - f.n, d: f.d };
       const explanation: MathExpr = [
-        txt(`1 = `),
+        txt(`1을 분모가 ${f.d}인 분수로 바꾸면 `),
         frT({ n: f.d, d: f.d }),
-        txt(`이에요. `),
+        txt(`예요. `),
         frT({ n: f.d, d: f.d }),
         { kind: 'op', op: '-' },
         frT(f),
@@ -317,7 +325,7 @@ const f4NatSubFrac: SkillDef = {
         prompt: '계산하세요.',
         expr: [txt('1'), { kind: 'op', op: '-' }, frT(f)],
         mixed: false,
-        requireIrreducible: true,
+        requireIrreducible: false,
         answer: fracAnswer(result),
         explanation,
       };
@@ -342,7 +350,7 @@ const f4NatSubFrac: SkillDef = {
       const d = mf.d;
       const resN = d - mf.n;
       const resWhole = whole - mf.whole - 1;
-      const result: Frac = simplify({ n: resWhole * d + resN, d });
+      const result: Frac = { n: resWhole * d + resN, d };
       const explanation: MathExpr = [
         txt(`${whole}에서 1을 받아내려 `),
         frT({ n: d, d }),
@@ -362,7 +370,7 @@ const f4NatSubFrac: SkillDef = {
         prompt: '계산하세요. (대분수로 나타내세요)',
         expr: [txt(String(whole)), { kind: 'op', op: '-' }, mixT(mf)],
         mixed: true,
-        requireIrreducible: true,
+        requireIrreducible: false,
         answer: fracAnswer(result),
         explanation,
       };
@@ -392,9 +400,8 @@ const f4Word: SkillDef = {
         let fa = ta, fb = tb;
         if (needOp === '-' && fa.n < fb.n) { fa = tb; fb = ta; }
         const resN = needOp === '+' ? fa.n + fb.n : fa.n - fb.n;
-        const res = simplify({ n: resN, d: fa.d });
-        // 결과 분수 부분이 0이면 안 됨 (정수 결과 제거)
-        const m = toMixed(res);
+        // 결과 분수 부분이 0이면 안 됨 (정수 결과 제거) — 약분 없이 판정
+        const m = toMixedRaw({ n: resN, d: fa.d });
         if (m.n === 0) continue;
         if (resN <= 0) continue;
         return [fa, fb];
@@ -432,8 +439,8 @@ const f4Word: SkillDef = {
     }
 
     const resultN = op === '+' ? a.n + b.n : a.n - b.n;
-    const result = simplify({ n: resultN, d: a.d });
-    const m = toMixed(result);
+    const result: Frac = { n: resultN, d: a.d };
+    const m = toMixedRaw(result);
 
     return {
       id: `${this.id}:${seed}`,
@@ -443,7 +450,7 @@ const f4Word: SkillDef = {
       prompt: `답을 구하세요. (단위: ${unit})`,
       expr: [txt(prompt)],
       mixed: m.whole > 0,
-      requireIrreducible: true,
+      requireIrreducible: false,
       answer: fracAnswer(result),
       explanation: explainSameDenom(a, b, op),
     };

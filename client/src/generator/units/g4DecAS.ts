@@ -71,7 +71,7 @@ const dec4PlaceValue: SkillDef = {
         blankAnswers: [placeDigit],
         explanation: [
           txt(`${displayStr}의 ${placeName} 자리 숫자는 ${placeDigit}이에요. `),
-          txt(`${placeDigit} × ${unitName} = ${(placeDigit * parseFloat(unitName)).toFixed(placeIdx + 1)}`),
+          txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${unitName}이 ${placeDigit}개를 나타내요.`),
         ],
       };
     } else {
@@ -106,7 +106,7 @@ const dec4PlaceValue: SkillDef = {
         blankAnswers: [placeDigit],
         explanation: [
           txt(`${displayStr}의 ${placeName} 자리 숫자는 ${placeDigit}이에요. `),
-          txt(`${placeDigit} × ${unitName} = ${(placeDigit * parseFloat(unitName)).toFixed(placeIdx + 1)}`),
+          txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${unitName}이 ${placeDigit}개를 나타내요.`),
         ],
       };
     }
@@ -359,7 +359,7 @@ const dec4Scale: SkillDef = {
         answerIndex,
         explanation: [
           txt(`소수를 1/10로 하면 소수점이 왼쪽으로 한 칸 이동해요. `),
-          txt(`${baseStr} × (1/10) = ${resultStr}`),
+          txt(`${baseStr}의 1/10은 ${resultStr}이에요.`),
         ],
       };
     } else {

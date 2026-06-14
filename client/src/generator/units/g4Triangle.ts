@@ -135,27 +135,34 @@ const triClassify: SkillDef = {
     let a: number, b: number, c: number;
     let label: string;
 
+    // 세 각을 모두 다르게(부등변) 만들어 '이등변삼각형' 보기와의 정답 모호성을 없앤다.
     if (pat === 0) {
-      // 예각삼각형: 세 각 모두 90° 미만
-      a = 60; b = 60; c = 60;
+      // 예각삼각형: 세 각 모두 90° 미만, 서로 다름
+      a = 50; b = 60; c = 70;
       for (let tries = 0; tries < 200; tries++) {
         const ta = rng.int(30, 89);
         const tb = rng.int(30, 89);
         const tc = 180 - ta - tb;
-        if (tc >= 1 && tc < 90) { a = ta; b = tb; c = tc; break; }
+        if (tc >= 1 && tc < 90 && ta !== tb && tb !== tc && ta !== tc) { a = ta; b = tb; c = tc; break; }
       }
       label = '예각삼각형';
     } else if (pat === 1) {
-      // 직각삼각형: 한 각이 정확히 90°
-      a = 90;
-      b = rng.int(10, 80);
-      c = 90 - b;
+      // 직각삼각형: 한 각이 정확히 90°, 나머지 두 각은 서로 다름(45°,45° 제외)
+      a = 90; b = 30; c = 60;
+      for (let tries = 0; tries < 50; tries++) {
+        const tb = rng.int(10, 80);
+        if (tb !== 45) { b = tb; c = 90 - tb; break; }
+      }
       label = '직각삼각형';
     } else {
-      // 둔각삼각형: 한 각이 90° 초과
-      a = rng.int(91, 150);
-      b = rng.int(10, 180 - a - 1);
-      c = 180 - a - b;
+      // 둔각삼각형: 한 각이 90° 초과, 나머지 두 각은 서로 다름
+      a = 100; b = 30; c = 50;
+      for (let tries = 0; tries < 200; tries++) {
+        const ta = rng.int(91, 150);
+        const tb = rng.int(10, 180 - ta - 1);
+        const tc = 180 - ta - tb;
+        if (tc >= 1 && tb !== tc) { a = ta; b = tb; c = tc; break; }
+      }
       label = '둔각삼각형';
     }
 

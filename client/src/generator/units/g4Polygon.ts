@@ -116,8 +116,8 @@ const pgonDiagonal: SkillDef = {
       expr: [txt(`${name}의 대각선 수: `), { kind: 'blank', slot: 0 }, txt('개')],
       blankAnswers: [diag],
       explanation: [
-        txt(`다각형의 대각선 수 = 변의 수 × (변의 수 − 3) ÷ 2`),
-        txt(`= ${n} × (${n} − 3) ÷ 2 = ${n} × ${n - 3} ÷ 2 = ${n * (n - 3)} ÷ 2 = ${diag}개`),
+        txt(`한 꼭짓점에서는 자기 자신과 양옆 꼭짓점을 뺀 ${n - 3}개에 대각선을 그을 수 있어요.`),
+        txt(`꼭짓점이 ${n}개이고 대각선 하나를 두 번씩 세므로, ${n} × ${n - 3} ÷ 2 = ${n * (n - 3)} ÷ 2 = ${diag}개.`),
       ],
     };
   },
@@ -219,7 +219,10 @@ const pgonWord: SkillDef = {
       const name = POLYGON_NAMES[n];
       answer = diag;
       prompt = `모험가가 그린 ${name} 도형에서 대각선은 모두 몇 개인가요?`;
-      explanation = [txt(`대각선 수 = ${n} × (${n} − 3) ÷ 2 = ${n * (n - 3)} ÷ 2 = ${diag}개`)];
+      explanation = [
+        txt(`한 꼭짓점에서 ${n - 3}개씩, 꼭짓점은 ${n}개, 대각선을 두 번씩 세므로 2로 나눠요.`),
+        txt(`${n} × (${n} − 3) ÷ 2 = ${n * (n - 3)} ÷ 2 = ${diag}개`),
+      ];
     } else {
       // 여러 정다각형의 둘레 합 비교
       const n1 = rng.pick([4, 5, 6] as const);

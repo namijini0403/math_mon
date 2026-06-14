@@ -64,6 +64,13 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unitMove', // ④ 평면도형의 이동
   'unitBarGraph', // ⑤ 막대그래프
   'unitFindRule', // ⑥ 규칙 찾기
+  // 4-2 (분수 덧뺄(분모 같은)·삼각형·소수 덧뺄(0.01/0.001)·사각형·꺾은선그래프·다각형)
+  'unitFracAS4', // ① 분수의 덧셈과 뺄셈 (약분 미도입 — 분모 유지)
+  'unitTriangle', // ② 삼각형
+  'unitDecAS', // ③ 소수의 덧셈과 뺄셈
+  'unitQuad', // ④ 사각형
+  'unitLineGraph', // ⑤ 꺾은선그래프
+  'unitPolygon', // ⑥ 다각형
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {

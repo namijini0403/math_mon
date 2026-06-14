@@ -120,6 +120,8 @@ const lineTwoDiff: SkillDef = {
     const answer = Math.abs(data.values[i1] - data.values[i2]);
     const t1 = data.times[i1];
     const t2 = data.times[i2];
+    const bigV = Math.max(data.values[i1], data.values[i2]);
+    const smallV = Math.min(data.values[i1], data.values[i2]);
 
     return {
       id: `${this.id}:${seed}`,
@@ -131,7 +133,7 @@ const lineTwoDiff: SkillDef = {
       blankAnswers: [answer],
       explanation: [
         txt(`${t1}: ${data.values[i1]}${data.topic.unit}, ${t2}: ${data.values[i2]}${data.topic.unit}`),
-        txt(`차: |${data.values[i1]} − ${data.values[i2]}| = ${answer}${data.topic.unit}`),
+        txt(`차는 큰 값에서 작은 값을 빼요. ${bigV} − ${smallV} = ${answer}${data.topic.unit}`),
       ],
     };
   },
@@ -232,8 +234,12 @@ const lineWord: SkillDef = {
         if (ch > maxCh) { maxCh = ch; maxChIdx = i; }
       }
       answer = maxCh;
-      prompt = `[탐험대 캠프의 ${data.topic.subject}]\n${data.dataText}\n\n변화가 가장 큰 구간(${data.times[maxChIdx]} ~ ${data.times[maxChIdx + 1]})의 변화량은 몇 ${data.topic.unit}인가요?`;
-      explanation = [txt(`|${data.values[maxChIdx + 1]} − ${data.values[maxChIdx]}| = ${answer}${data.topic.unit}`)];
+      {
+        const v0 = data.values[maxChIdx], v1 = data.values[maxChIdx + 1];
+        const big = Math.max(v0, v1), small = Math.min(v0, v1);
+        prompt = `[탐험대 캠프의 ${data.topic.subject}]\n${data.dataText}\n\n변화가 가장 큰 구간(${data.times[maxChIdx]} ~ ${data.times[maxChIdx + 1]})의 변화량은 몇 ${data.topic.unit}인가요?`;
+        explanation = [txt(`두 값의 차로 구해요. ${big} − ${small} = ${answer}${data.topic.unit}`)];
+      }
     } else if (pat === 1) {
       // 두 시점 차 (차가 0이 되지 않도록 재시도)
       let data = generateLineData(rng, 5, 30);
@@ -246,8 +252,12 @@ const lineWord: SkillDef = {
         }
       }
       answer = Math.abs(data.values[i1] - data.values[i2]);
-      prompt = `[마법사 탑의 ${data.topic.subject}]\n${data.dataText}\n\n${data.times[i1]}와 ${data.times[i2]}의 차는 몇 ${data.topic.unit}인가요?`;
-      explanation = [txt(`|${data.values[i1]} − ${data.values[i2]}| = ${answer}${data.topic.unit}`)];
+      {
+        const big = Math.max(data.values[i1], data.values[i2]);
+        const small = Math.min(data.values[i1], data.values[i2]);
+        prompt = `[마법사 탑의 ${data.topic.subject}]\n${data.dataText}\n\n${data.times[i1]}와 ${data.times[i2]}의 차는 몇 ${data.topic.unit}인가요?`;
+        explanation = [txt(`큰 값에서 작은 값을 빼요. ${big} − ${small} = ${answer}${data.topic.unit}`)];
+      }
     } else if (pat === 2) {
       // 합계에서 한 시점 역산
       const data = generateLineData(rng, 4, 20);
