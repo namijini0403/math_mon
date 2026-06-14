@@ -41,7 +41,11 @@ export type FigureSpec =
       max: number;
       lo?: { v: number; closed: boolean };
       hi?: { v: number; closed: boolean };
-    };
+    }
+  /** 막대그래프 — 항목별 세로 막대. values는 문제 수치와 같은 배열. highlight 인덱스는 강조색 */
+  | { kind: 'bar-graph'; labels: string[]; values: number[]; unit: string; highlight?: number[] }
+  /** 꺾은선그래프 — 시점별 점을 선으로 이음. values는 문제 수치와 같은 배열 */
+  | { kind: 'line-graph'; labels: string[]; values: number[]; unit: string };
 
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =

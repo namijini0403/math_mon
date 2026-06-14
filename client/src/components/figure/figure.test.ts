@@ -89,6 +89,27 @@ describe('FigureView 렌더 스모크', () => {
     expect(html).toContain('미만');
     expect(html.toLowerCase()).toContain('#1e1b4b'); // 열린 점 = 배경색 fill
   });
+
+  it('bar-graph: svg와 aria-label(항목·값)을 그린다', () => {
+    const html = renderFigure({ kind: 'bar-graph', labels: ['사과', '바나나', '포도'], values: [7, 4, 6], unit: '명' });
+    expect(html).toContain('<svg');
+    expect(html).toContain('막대그래프');
+    expect(html).toContain('사과');
+    expect(html).toContain('<rect');
+  });
+
+  it('bar-graph: highlight 인덱스는 강조색(amber)으로 칠한다', () => {
+    const html = renderFigure({ kind: 'bar-graph', labels: ['가', '나'], values: [5, 8], unit: '개', highlight: [1] });
+    expect(html.toLowerCase()).toContain('#f59e0b');
+  });
+
+  it('line-graph: svg·polyline·점·라벨을 그린다', () => {
+    const html = renderFigure({ kind: 'line-graph', labels: ['9시', '10시', '11시'], values: [5, 12, 8], unit: '도' });
+    expect(html).toContain('<svg');
+    expect(html).toContain('꺾은선그래프');
+    expect(html).toContain('<polyline');
+    expect(html).toContain('9시');
+  });
 });
 
 describe('그림 연결 스킬의 figure 스펙 일관성', () => {
@@ -234,6 +255,63 @@ describe('그림 연결 스킬의 figure 스펙 일관성', () => {
       expect(f.hi).toBeDefined();
       expect(f.lo!.closed).toBe(p.prompt.includes(`${f.lo!.v} 이상`));
       expect(f.hi!.closed).toBe(p.prompt.includes(`${f.hi!.v} 이하`));
+    }
+  });
+
+  it('막대그래프 합계 스킬(bar-total·data3-table-sum·tbg2-total): figure.values 합 = 정답', () => {
+    for (const id of ['bar-total', 'data3-table-sum', 'tbg2-total']) {
+      const skill = SKILLS.find((s) => s.id === id);
+      expect(skill, id).toBeDefined();
+      for (let seed = 0; seed < 120; seed++) {
+        const p = skill!.generate(seed);
+        if (p.format !== 'fill-blanks') continue;
+        const f = p.figure as Extract<FigureSpec, { kind: 'bar-graph' }>;
+        expect(f.kind, id).toBe('bar-graph');
+        expect(f.labels.length).toBe(f.values.length);
+        expect(f.values.every((v) => Number.isInteger(v) && v > 0)).toBe(true);
+        expect(f.values.reduce((a, b) => a + b, 0)).toBe(p.blankAnswers[0]);
+      }
+    }
+  });
+
+  it('꺾은선 합계(line-total): figure.values 합 = 정답, 막대 합계와 동일 구조', () => {
+    const skill = SKILLS.find((s) => s.id === 'line-total');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 120; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'fill-blanks') continue;
+      const f = p.figure as Extract<FigureSpec, { kind: 'line-graph' }>;
+      expect(f.kind).toBe('line-graph');
+      expect(f.labels.length).toBe(f.values.length);
+      expect(f.values.reduce((a, b) => a + b, 0)).toBe(p.blankAnswers[0]);
+    }
+  });
+
+  it('line-max-change: figure 점들의 최대 변화 구간이 정답 구간과 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'line-max-change');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 120; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'choice') continue;
+      const f = p.figure as Extract<FigureSpec, { kind: 'line-graph' }>;
+      let maxIdx = 0, maxCh = -1;
+      for (let i = 0; i < f.values.length - 1; i++) {
+        const c = Math.abs(f.values[i + 1] - f.values[i]);
+        if (c > maxCh) { maxCh = c; maxIdx = i; }
+      }
+      const answerLabel = `${f.labels[maxIdx]} ~ ${f.labels[maxIdx + 1]}`;
+      const chosen = p.choices[p.answerIndex];
+      expect(chosen.kind === 'text' && chosen.text).toBe(answerLabel);
+    }
+  });
+
+  it('line-word: 값을 가리는 패턴(?)에는 꺾은선 그림을 붙이지 않는다', () => {
+    const skill = SKILLS.find((s) => s.id === 'line-word');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      // 값을 가린 자료는 "9시: ?도"처럼 ': ?' 패턴을 포함(문장 끝 '인가요?'와 구별)
+      if (p.prompt.includes(': ?')) expect(p.figure).toBeUndefined();
     }
   });
 });

@@ -7,7 +7,7 @@
 import { RNG } from '../rng';
 import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
-import type { ChoiceValue, MathExpr, SkillDef } from '../types';
+import type { ChoiceValue, FigureSpec, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
 const txc = (text: string): ChoiceValue => ({ kind: 'text', text });
@@ -78,6 +78,7 @@ const data3TableSum: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt: `[${data.topic.title}]\n${data.dataText}\n\n모든 항목의 합계는 몇 ${data.topic.unit}인가요?`,
+      figure: { kind: 'bar-graph', labels: data.items, values: data.values, unit: data.topic.unit },
       expr,
       blankAnswers: [ans],
       explanation: [txt(`합계: ${data.values.join(' + ')} = ${ans}${data.topic.unit}`)],
@@ -120,6 +121,7 @@ const data3TableDiff: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt: `[${data.topic.title}]\n${data.dataText}\n\n${nj(item1, '과/와')} ${item2}의 차는 몇 ${data.topic.unit}인가요?`,
+      figure: { kind: 'bar-graph', labels: data.items, values: data.values, unit: data.topic.unit },
       expr,
       blankAnswers: [ans],
       explanation: [
@@ -247,6 +249,7 @@ const data3MostLeast: SkillDef = {
       seed,
       format: 'choice',
       prompt: `[${data.topic.title}]\n${data.dataText}\n\n가장 ${isMax ? '많은' : '적은'} 항목은 무엇인가요?`,
+      figure: { kind: 'bar-graph', labels: data.items, values: data.values, unit: data.topic.unit },
       choices,
       answerIndex,
       explanation: [
@@ -273,6 +276,8 @@ const data3Word: SkillDef = {
     let ans: number;
     let unit: string;
     let expl: string;
+    // 표 자료가 전부 보이는 패턴(0·1)에만 막대그래프 부착(그림그래프 pat 2는 제외)
+    let figureSpec: FigureSpec | undefined;
 
     if (pat === 0) {
       // 합계에서 한 항목 뺀 나머지
@@ -284,6 +289,7 @@ const data3Word: SkillDef = {
       unit = data.topic.unit;
       prompt = `[${data.topic.title}]\n${data.dataText}\n\n전체는 ${total}${unit}이고 ${nj(data.items[idx], '이/가')} ${known}${unit}이라면, 나머지 항목의 합은 몇 ${unit}인가요?`;
       expl = `전체에서 ${nj(data.items[idx], '을/를')} 빼면 나머지의 합이에요. ${total} - ${known} = ${ans}${ida(unit)}.`;
+      figureSpec = { kind: 'bar-graph', labels: data.items, values: data.values, unit: data.topic.unit };
     } else if (pat === 1) {
       // 가장 많은 것과 가장 적은 것의 차
       const data = generateTableData(rng);
@@ -295,6 +301,7 @@ const data3Word: SkillDef = {
       unit = data.topic.unit;
       prompt = `[${data.topic.title}]\n${data.dataText}\n\n가장 많은 ${nj(maxItem, '은/는')} 가장 적은 ${minItem}보다 몇 ${unit} 더 많은가요?`;
       expl = `가장 많은 ${maxItem}(${maxVal})에서 가장 적은 ${minItem}(${minVal})을 빼요. ${maxVal} - ${minVal} = ${ans}${ida(unit)}.`;
+      figureSpec = { kind: 'bar-graph', labels: data.items, values: data.values, unit: data.topic.unit };
     } else {
       // 그림그래프 문장제: 두 항목 합
       const topic = rng.pick(DATA_TOPICS);
@@ -325,6 +332,7 @@ const data3Word: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt,
+      ...(figureSpec ? { figure: figureSpec } : {}),
       expr,
       blankAnswers: [ans],
       explanation: [txt(expl)],

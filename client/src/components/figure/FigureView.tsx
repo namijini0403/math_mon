@@ -63,6 +63,12 @@ export function FigureView({ spec }: { spec: FigureSpec }) {
     case 'number-line':
       svg = <NumberLine min={spec.min} max={spec.max} lo={spec.lo} hi={spec.hi} />;
       break;
+    case 'bar-graph':
+      svg = <BarGraph labels={spec.labels} values={spec.values} unit={spec.unit} highlight={spec.highlight} />;
+      break;
+    case 'line-graph':
+      svg = <LineGraph labels={spec.labels} values={spec.values} unit={spec.unit} />;
+      break;
     default:
       // 미구현 kind 폴백 (타입상 도달 불가지만 방어적으로)
       svg = (
@@ -527,6 +533,107 @@ function NumberLine({
       {ticks}
       {lo && circle(lo, 'lo')}
       {hi && circle(hi, 'hi')}
+    </svg>
+  );
+}
+
+/** 항목별 눈금 최대값·간격을 정수로 잡는다(가로 격자선 4칸) */
+function axisTop(maxV: number) {
+  const step = Math.max(1, Math.ceil(maxV / 4));
+  return { step, top: step * 4 };
+}
+
+// ── 막대그래프: 항목별 세로 막대 + 값 라벨 + 가로 격자선 ──
+function BarGraph({ labels, values, unit, highlight }: {
+  labels: string[]; values: number[]; unit: string; highlight?: number[];
+}) {
+  const n = values.length;
+  const maxV = Math.max(...values, 1);
+  const { step, top } = axisTop(maxV);
+  const barW = n <= 4 ? 30 : 24;
+  const gap = n <= 4 ? 22 : 14;
+  const padL = 28, padR = 14, padT = 16, padB = 30;
+  const chartH = 116;
+  const plotW = n * barW + (n - 1) * gap;
+  const W = padL + plotW + padR;
+  const H = padT + chartH + padB;
+  const baseY = padT + chartH;
+  const yOf = (v: number) => baseY - (v / top) * chartH;
+  const isHi = (i: number) => highlight?.includes(i) ?? false;
+
+  // 가로 격자선 (0, step, 2step, 3step, 4step)
+  const grid = [];
+  for (let g = 0; g <= 4; g++) {
+    const v = g * step;
+    const y = yOf(v);
+    grid.push(<line key={`g${g}`} x1={padL} y1={y} x2={padL + plotW} y2={y} stroke={STROKE} strokeWidth={g === 0 ? 1.5 : 0.7} opacity={g === 0 ? 1 : 0.3} />);
+    grid.push(<text key={`gl${g}`} x={padL - 5} y={y + 3} textAnchor="end" fontSize="9" fill={LABEL}>{v}</text>);
+  }
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      width={Math.min(W, 280)}
+      role="img"
+      aria-label={`막대그래프. ${labels.map((l, i) => `${l} ${values[i]}${unit}`).join(', ')}`}
+    >
+      {grid}
+      {values.map((v, i) => {
+        const x = padL + i * (barW + gap);
+        const y = yOf(v);
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width={barW} height={baseY - y} fill={isHi(i) ? HILITE : FILL2} stroke={STROKE} strokeWidth={1.5} />
+            <text x={x + barW / 2} y={y - 4} textAnchor="middle" fontSize="9.5" fill={LABEL}>{v}</text>
+            <text x={x + barW / 2} y={baseY + 13} textAnchor="middle" fontSize="9" fill={LABEL}>{labels[i]}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── 꺾은선그래프: 시점별 점을 선으로 이음 + 값 라벨 + 가로 격자선 ──
+function LineGraph({ labels, values, unit }: { labels: string[]; values: number[]; unit: string }) {
+  const n = values.length;
+  const maxV = Math.max(...values, 1);
+  const { step, top } = axisTop(maxV);
+  const colW = n <= 5 ? 44 : 36;
+  const padL = 28, padR = 18, padT = 16, padB = 30;
+  const chartH = 116;
+  const plotW = (n - 1) * colW;
+  const W = padL + plotW + padR;
+  const H = padT + chartH + padB;
+  const baseY = padT + chartH;
+  const xOf = (i: number) => padL + i * colW;
+  const yOf = (v: number) => baseY - (v / top) * chartH;
+
+  const grid = [];
+  for (let g = 0; g <= 4; g++) {
+    const v = g * step;
+    const y = yOf(v);
+    grid.push(<line key={`g${g}`} x1={padL} y1={y} x2={padL + plotW} y2={y} stroke={STROKE} strokeWidth={g === 0 ? 1.5 : 0.7} opacity={g === 0 ? 1 : 0.3} />);
+    grid.push(<text key={`gl${g}`} x={padL - 5} y={y + 3} textAnchor="end" fontSize="9" fill={LABEL}>{v}</text>);
+  }
+
+  const poly = values.map((v, i) => `${xOf(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
+
+  return (
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      width={Math.min(W, 280)}
+      role="img"
+      aria-label={`꺾은선그래프. ${labels.map((l, i) => `${l} ${values[i]}${unit}`).join(', ')}`}
+    >
+      {grid}
+      <polyline points={poly} fill="none" stroke={TARGET} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+      {values.map((v, i) => (
+        <g key={i}>
+          <circle cx={xOf(i)} cy={yOf(v)} r={3.5} fill={HILITE} stroke={TARGET} strokeWidth={1.5} />
+          <text x={xOf(i)} y={yOf(v) - 7} textAnchor="middle" fontSize="9.5" fill={LABEL}>{v}</text>
+          <text x={xOf(i)} y={baseY + 13} textAnchor="middle" fontSize="9" fill={LABEL}>{labels[i]}</text>
+        </g>
+      ))}
     </svg>
   );
 }

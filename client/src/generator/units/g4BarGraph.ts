@@ -90,6 +90,7 @@ const barMost: SkillDef = {
       seed,
       format: 'choice',
       prompt,
+      figure: { kind: 'bar-graph', labels: data.selectedItems, values: data.values, unit: data.topic.unit },
       choices,
       answerIndex,
       explanation: [
@@ -140,6 +141,7 @@ const barDiff: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt,
+      figure: { kind: 'bar-graph', labels: data.selectedItems, values: data.values, unit: data.topic.unit },
       expr,
       blankAnswers: [answer],
       explanation: [
@@ -177,6 +179,7 @@ const barTotal: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt,
+      figure: { kind: 'bar-graph', labels: data.selectedItems, values: data.values, unit: data.topic.unit },
       expr,
       blankAnswers: [answer],
       explanation: [
@@ -239,6 +242,7 @@ const barScale: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt,
+      figure: { kind: 'bar-graph', labels: data.selectedItems, values: adjustedValues, unit: data.topic.unit, highlight: [itemIdx] },
       expr,
       blankAnswers: [answer],
       explanation: [
@@ -309,6 +313,7 @@ const barWord: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt,
+      figure: { kind: 'bar-graph', labels: data.selectedItems, values: data.values, unit: data.topic.unit },
       expr,
       blankAnswers: [answer],
       explanation,

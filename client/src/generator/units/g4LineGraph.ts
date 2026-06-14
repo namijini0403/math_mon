@@ -7,7 +7,7 @@
 import { RNG } from '../rng';
 import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
-import type { ChoiceValue, MathExpr, SkillDef } from '../types';
+import type { ChoiceValue, FigureSpec, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
 const txc = (text: string): ChoiceValue => ({ kind: 'text', text });
@@ -87,6 +87,7 @@ const lineMaxChange: SkillDef = {
       seed,
       format: 'choice',
       prompt: `[${data.topic.subject}]\n${data.dataText}\n\n변화가 가장 큰 구간은 어느 것인가요?`,
+      figure: { kind: 'line-graph', labels: data.times, values: data.values, unit: data.topic.unit },
       expr: [txt(data.dataText)],
       choices,
       answerIndex,
@@ -130,6 +131,7 @@ const lineTwoDiff: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt: `[${data.topic.subject}]\n${data.dataText}\n\n${nj(t1, '과/와')} ${t2}의 차는 몇 ${data.topic.unit}인가요?`,
+      figure: { kind: 'line-graph', labels: data.times, values: data.values, unit: data.topic.unit },
       expr: [txt(`${nj(t1, '과/와')} ${t2}의 차: `), { kind: 'blank', slot: 0 }, txt(` ${data.topic.unit}`)],
       blankAnswers: [answer],
       explanation: [
@@ -158,6 +160,7 @@ const lineTotal: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt: `[${data.topic.subject}]\n${data.dataText}\n\n전체 합계는 몇 ${data.topic.unit}인가요?`,
+      figure: { kind: 'line-graph', labels: data.times, values: data.values, unit: data.topic.unit },
       expr: [txt('전체 합계: '), { kind: 'blank', slot: 0 }, txt(` ${data.topic.unit}`)],
       blankAnswers: [answer],
       explanation: [
@@ -225,6 +228,8 @@ const lineWord: SkillDef = {
     let prompt: string;
     let answer: number;
     let explanation: MathExpr;
+    // 자료 전체가 보이는 패턴에만 꺾은선 그림 부착(값 일부를 ?로 가리는 pat 2는 제외)
+    let figureSpec: FigureSpec | undefined;
 
     if (pat === 0) {
       // 변화가 가장 큰 구간 → 변화량
@@ -241,6 +246,7 @@ const lineWord: SkillDef = {
         prompt = `[탐험대 캠프의 ${data.topic.subject}]\n${data.dataText}\n\n변화가 가장 큰 구간(${data.times[maxChIdx]} ~ ${data.times[maxChIdx + 1]})의 변화량은 몇 ${data.topic.unit}인가요?`;
         explanation = [txt(`두 값의 차로 구해요. ${big} − ${small} = ${answer}${data.topic.unit}`)];
       }
+      figureSpec = { kind: 'line-graph', labels: data.times, values: data.values, unit: data.topic.unit };
     } else if (pat === 1) {
       // 두 시점 차 (차가 0이 되지 않도록 재시도)
       let data = generateLineData(rng, 5, 30);
@@ -259,6 +265,7 @@ const lineWord: SkillDef = {
         prompt = `[마법사 탑의 ${data.topic.subject}]\n${data.dataText}\n\n${nj(data.times[i1], '과/와')} ${data.times[i2]}의 차는 몇 ${data.topic.unit}인가요?`;
         explanation = [txt(`큰 값에서 작은 값을 빼요. ${big} − ${small} = ${answer}${data.topic.unit}`)];
       }
+      figureSpec = { kind: 'line-graph', labels: data.times, values: data.values, unit: data.topic.unit };
     } else if (pat === 2) {
       // 합계에서 한 시점 역산
       const data = generateLineData(rng, 4, 20);
@@ -278,6 +285,7 @@ const lineWord: SkillDef = {
       answer = data.values.reduce((a, b) => a + b, 0);
       prompt = `[모험 마을의 ${data.topic.subject}]\n${data.dataText}\n\n전체 합계는 몇 ${data.topic.unit}인가요?`;
       explanation = [txt(`${data.values.join(' + ')} = ${answer}${data.topic.unit}`)];
+      figureSpec = { kind: 'line-graph', labels: data.times, values: data.values, unit: data.topic.unit };
     }
 
     return {
@@ -286,6 +294,7 @@ const lineWord: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt,
+      ...(figureSpec ? { figure: figureSpec } : {}),
       expr: [txt('답: '), { kind: 'blank', slot: 0 }],
       blankAnswers: [answer],
       explanation,
