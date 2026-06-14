@@ -62,6 +62,7 @@ const corrSide: SkillDef = {
       expr,
       blankAnswers: [len],
       explanation,
+      figure: { kind: 'congruent-triangle-pair' },
     };
   },
 };
@@ -100,6 +101,7 @@ const corrAngle: SkillDef = {
       expr,
       blankAnswers: [deg],
       explanation,
+      figure: { kind: 'congruent-triangle-pair' },
     };
   },
 };

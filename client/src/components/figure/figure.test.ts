@@ -62,6 +62,20 @@ describe('FigureView 렌더 스모크', () => {
     expect(html).toContain('정사각형');
     expect(html.toLowerCase()).toContain('#f59e0b'); // 교집합 음영
   });
+
+  it('cuboid: 치수 라벨과 겨냥도(숨은 모서리 점선)', () => {
+    const html = renderFigure({ kind: 'cuboid', w: 8, h: 3, d: 5, dims: { w: '8', h: '3', d: '5' } });
+    expect(html).toContain('<svg');
+    expect(html).toContain('dasharray'); // 숨은 모서리 3개 점선
+    expect(html).toContain('가로 8'); // aria-label에 치수
+  });
+
+  it('congruent-triangle-pair: 두 삼각형과 ㄱ·ㄹ 라벨', () => {
+    const html = renderFigure({ kind: 'congruent-triangle-pair' });
+    expect(html).toContain('<svg');
+    expect(html).toContain('ㄱ');
+    expect(html).toContain('ㄹ');
+  });
 });
 
 describe('그림 연결 스킬의 figure 스펙 일관성', () => {
@@ -145,6 +159,39 @@ describe('그림 연결 스킬의 figure 스펙 일관성', () => {
       expect(p.figure!.kind).toBe('overlap-rect-square');
       const f = p.figure as Extract<FigureSpec, { kind: 'overlap-rect-square' }>;
       expect(p.blankAnswers[0]).toBe(f.w * f.h + f.s * f.s - (f.s * f.s) / f.k);
+    }
+  });
+
+  it('cub-edge-sum: cuboid 치수 합×4가 모서리 합(정답)과 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'cub-edge-sum');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'fill-blanks') continue;
+      expect(p.figure!.kind).toBe('cuboid');
+      const f = p.figure as Extract<FigureSpec, { kind: 'cuboid' }>;
+      expect(p.blankAnswers[0]).toBe(4 * (f.w + f.h + f.d));
+    }
+  });
+
+  it('cub-edge-missing: cuboid 높이(figure.h)가 정답과 일치, 높이 라벨은 ?', () => {
+    const skill = SKILLS.find((s) => s.id === 'cub-edge-missing');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'fill-blanks') continue;
+      const f = p.figure as Extract<FigureSpec, { kind: 'cuboid' }>;
+      expect(f.h).toBe(p.blankAnswers[0]);
+      expect(f.dims?.h).toBe('?');
+    }
+  });
+
+  it('sym-corr-side/angle: 합동 삼각형 그림이 부착됨', () => {
+    for (const id of ['sym-corr-side', 'sym-corr-angle']) {
+      const skill = SKILLS.find((s) => s.id === id);
+      expect(skill).toBeDefined();
+      const p = skill!.generate(7);
+      expect(p.figure!.kind).toBe('congruent-triangle-pair');
     }
   });
 });

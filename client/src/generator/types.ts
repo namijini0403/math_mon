@@ -29,7 +29,11 @@ export type FigureSpec =
   /** 선대칭 마름모 — 한 각 given, 이웃각 ⓐ=180−given. 세로 대칭축 점선 */
   | { kind: 'rhombus-symmetry'; given: number }
   /** 직사각형(w×h)과 정사각형(s)이 일부 겹친 그림 — 교집합 음영 */
-  | { kind: 'overlap-rect-square'; w: number; h: number; s: number; k: number };
+  | { kind: 'overlap-rect-square'; w: number; h: number; s: number; k: number }
+  /** 직육면체/정육면체 겨냥도 — 보이는 모서리 실선·숨은 모서리 3개 점선. dims 있으면 가로/세로/높이 라벨 */
+  | { kind: 'cuboid'; w: number; h: number; d: number; dims?: { w: string; h: string; d: string } }
+  /** 두 합동 삼각형 ㄱㄴㄷ·ㄹㅁㅂ (대응 꼭짓점 같은 위치) — 합동 대응변·대응각 학습용 */
+  | { kind: 'congruent-triangle-pair' };
 
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =

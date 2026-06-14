@@ -56,6 +56,7 @@ const cubCount: SkillDef = {
       expr,
       blankAnswers: [part.count],
       explanation,
+      figure: { kind: 'cuboid', w: 4, h: 3, d: 3 },
     };
   },
 };
@@ -114,6 +115,7 @@ const cubFacePair: SkillDef = {
       expr,
       blankAnswers: [q.answer],
       explanation,
+      figure: { kind: 'cuboid', w: 4, h: 3, d: 3 },
     };
   },
 };
@@ -156,6 +158,7 @@ const cubEdgeSum: SkillDef = {
       expr,
       blankAnswers: [total],
       explanation,
+      figure: { kind: 'cuboid', w: a, h: c, d: b, dims: { w: `${a}`, h: `${c}`, d: `${b}` } },
     };
   },
 };
@@ -242,6 +245,7 @@ const cubEdgeMissing: SkillDef = {
       expr,
       blankAnswers: [height],
       explanation,
+      figure: { kind: 'cuboid', w: a, h: c, d: b, dims: { w: `${a}`, h: '?', d: `${b}` } },
     };
   },
 };
@@ -302,6 +306,7 @@ const cubWord: SkillDef = {
           expr,
           blankAnswers: [leftover],
           explanation,
+          figure: { kind: 'cuboid', w: e, h: e, d: e, dims: { w: `${e}`, h: `${e}`, d: `${e}` } },
         };
       }
 
@@ -337,6 +342,7 @@ const cubWord: SkillDef = {
           expr,
           blankAnswers: [total],
           explanation,
+          figure: { kind: 'cuboid', w: a, h: c, d: b, dims: { w: `${a}`, h: `${c}`, d: `${b}` } },
         };
       }
 
@@ -365,6 +371,7 @@ const cubWord: SkillDef = {
           expr,
           blankAnswers: [total],
           explanation,
+          figure: { kind: 'cuboid', w: e, h: e, d: e, dims: { w: `${e}`, h: `${e}`, d: `${e}` } },
         };
       }
 
@@ -394,6 +401,7 @@ const cubWord: SkillDef = {
           expr,
           blankAnswers: [total],
           explanation,
+          figure: { kind: 'cuboid', w: a, h: c, d: b, dims: { w: `${a}`, h: `${c}`, d: `${b}` } },
         };
       }
 
@@ -425,6 +433,7 @@ const cubWord: SkillDef = {
           expr,
           blankAnswers: [needed],
           explanation,
+          figure: { kind: 'cuboid', w: e, h: e, d: e, dims: { w: `${e}`, h: `${e}`, d: `${e}` } },
         };
       }
     }

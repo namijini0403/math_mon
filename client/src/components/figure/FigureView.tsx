@@ -54,6 +54,12 @@ export function FigureView({ spec }: { spec: FigureSpec }) {
     case 'overlap-rect-square':
       svg = <OverlapRectSquare w={spec.w} h={spec.h} s={spec.s} k={spec.k} />;
       break;
+    case 'cuboid':
+      svg = <Cuboid w={spec.w} h={spec.h} d={spec.d} dims={spec.dims} />;
+      break;
+    case 'congruent-triangle-pair':
+      svg = <CongruentTrianglePair />;
+      break;
     default:
       // 미구현 kind 폴백 (타입상 도달 불가지만 방어적으로)
       svg = (
@@ -351,6 +357,108 @@ function OverlapRectSquare({ w, h, s, k }: { w: number; h: number; s: number; k:
       )}
       <text x={rectX + RW / 2} y={rectY + RH - 5} textAnchor="middle" fontSize="10" fill={LABEL}>직사각형</text>
       <text x={sqX + SQ / 2} y={sqY + 12} textAnchor="middle" fontSize="10" fill={LABEL}>정사각형</text>
+    </svg>
+  );
+}
+
+// ── 직육면체 겨냥도: 보이는 모서리 실선·숨은 모서리 3개 점선 ──
+function Cuboid({ w, h, d, dims }: { w: number; h: number; d: number; dims?: { w: string; h: string; d: string } }) {
+  const maxDim = Math.max(w, h, d);
+  const per = 80 / maxDim;
+  const W = Math.max(30, w * per); // 앞면 가로
+  const H = Math.max(24, h * per); // 앞면 높이
+  const D = Math.max(24, d * per) * 0.5; // 깊이(캐비닛 투상: 0.5배, 45°)
+  const dx = D * 0.82;
+  const dyv = -D * 0.82; // 위로
+  const padL = 22, padT = 22 - dyv, padR = 30, padB = 26;
+  const ox = padL, oy = padT;
+  // 앞면: D좌상 C우상 A좌하 B우하
+  const Dp = { x: ox, y: oy }; // top-left front
+  const C = { x: ox + W, y: oy };
+  const A = { x: ox, y: oy + H }; // bottom-left front
+  const B = { x: ox + W, y: oy + H };
+  // 뒷면 (+깊이)
+  const Db = { x: Dp.x + dx, y: Dp.y + dyv };
+  const Cb = { x: C.x + dx, y: C.y + dyv };
+  const Ab = { x: A.x + dx, y: A.y + dyv }; // 숨은 꼭짓점
+  const Bb = { x: B.x + dx, y: B.y + dyv };
+  const totW = ox + W + dx + padR;
+  const totH = oy + H + padB;
+
+  const E = (p1: { x: number; y: number }, p2: { x: number; y: number }, hidden = false) => (
+    <line
+      x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+      stroke={STROKE} strokeWidth={2} strokeLinecap="round"
+      strokeDasharray={hidden ? '4 4' : undefined as unknown as string}
+      opacity={hidden ? 0.6 : 1}
+    />
+  );
+
+  return (
+    <svg
+      viewBox={`0 0 ${totW.toFixed(1)} ${totH.toFixed(1)}`}
+      width={Math.min(totW, 230)}
+      role="img"
+      aria-label={dims
+        ? `직육면체 겨냥도. 가로 ${dims.w}, 세로 ${dims.d}, 높이 ${dims.h}`
+        : '직육면체 겨냥도. 보이는 모서리는 실선, 숨은 모서리 3개는 점선'}
+    >
+      {/* 뒷면 채움(옅게) */}
+      <polygon points={`${Db.x},${Db.y} ${Cb.x},${Cb.y} ${Bb.x},${Bb.y} ${Ab.x},${Ab.y}`} fill={FILL} opacity={0.35} />
+      {/* 앞면 채움 */}
+      <polygon points={`${Dp.x},${Dp.y} ${C.x},${C.y} ${B.x},${B.y} ${A.x},${A.y}`} fill={FILL} opacity={0.7} />
+      {/* 숨은 모서리(점선): 숨은 꼭짓점 Ab의 세 모서리 */}
+      {E(A, Ab, true)}
+      {E(Ab, Bb, true)}
+      {E(Ab, Db, true)}
+      {/* 보이는 모서리(실선) 9개 */}
+      {E(Dp, C)}{E(C, B)}{E(B, A)}{E(A, Dp)}
+      {E(Db, Cb)}{E(Cb, Bb)}
+      {E(Dp, Db)}{E(C, Cb)}{E(B, Bb)}
+      {dims && (
+        <>
+          <text x={(A.x + B.x) / 2} y={A.y + 14} textAnchor="middle" fontSize="11" fill={LABEL}>{dims.w}</text>
+          <text x={A.x - 6} y={(A.y + Dp.y) / 2} textAnchor="end" dominantBaseline="middle" fontSize="11" fill={LABEL}>{dims.h}</text>
+          <text x={(B.x + Bb.x) / 2 + 6} y={(B.y + Bb.y) / 2 - 2} textAnchor="start" dominantBaseline="middle" fontSize="11" fill={LABEL}>{dims.d}</text>
+        </>
+      )}
+    </svg>
+  );
+}
+
+// ── 두 합동 삼각형 ㄱㄴㄷ·ㄹㅁㅂ (대응 꼭짓점 같은 배치) ──
+function CongruentTrianglePair() {
+  const TW = 76, TH = 64, gap = 40, pad = 20;
+  // 삼각형 한 개의 꼭짓점(좌하·우하·apex). apex는 왼쪽으로 치우친 부등변
+  const tri = (ox: number) => ({
+    bl: { x: ox, y: pad + TH }, // 좌하
+    br: { x: ox + TW, y: pad + TH }, // 우하
+    ap: { x: ox + TW * 0.3, y: pad }, // apex
+  });
+  const t1 = tri(pad);
+  const t2 = tri(pad + TW + gap);
+  const totW = pad + TW + gap + TW + pad;
+  const totH = pad + TH + 22;
+  const poly = (t: ReturnType<typeof tri>) => `${t.ap.x},${t.ap.y} ${t.bl.x},${t.bl.y} ${t.br.x},${t.br.y}`;
+
+  return (
+    <svg
+      viewBox={`0 0 ${totW} ${totH}`}
+      width={Math.min(totW, 250)}
+      role="img"
+      aria-label="서로 합동인 두 삼각형 ㄱㄴㄷ과 ㄹㅁㅂ. ㄱ-ㄹ, ㄴ-ㅁ, ㄷ-ㅂ이 대응"
+    >
+      <polygon points={poly(t1)} fill={FILL} stroke={STROKE} strokeWidth={2.5} strokeLinejoin="round" />
+      <polygon points={poly(t2)} fill={FILL} stroke={STROKE} strokeWidth={2.5} strokeLinejoin="round" />
+      {/* 합동 기호 */}
+      <text x={pad + TW + gap / 2} y={pad + TH * 0.62} textAnchor="middle" dominantBaseline="middle" fontSize="16" fill={TARGET}>≅</text>
+      {/* 꼭짓점 라벨 (ㄱㄴㄷ / ㄹㅁㅂ) */}
+      <text x={t1.ap.x} y={t1.ap.y - 6} textAnchor="middle" fontSize="13" fill={LABEL}>ㄱ</text>
+      <text x={t1.bl.x - 4} y={t1.bl.y + 13} textAnchor="middle" fontSize="13" fill={LABEL}>ㄴ</text>
+      <text x={t1.br.x + 4} y={t1.br.y + 13} textAnchor="middle" fontSize="13" fill={LABEL}>ㄷ</text>
+      <text x={t2.ap.x} y={t2.ap.y - 6} textAnchor="middle" fontSize="13" fill={LABEL}>ㄹ</text>
+      <text x={t2.bl.x - 4} y={t2.bl.y + 13} textAnchor="middle" fontSize="13" fill={LABEL}>ㅁ</text>
+      <text x={t2.br.x + 4} y={t2.br.y + 13} textAnchor="middle" fontSize="13" fill={LABEL}>ㅂ</text>
     </svg>
   );
 }
