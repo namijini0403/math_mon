@@ -5,6 +5,7 @@
  * 미구현 kind는 빈 폴백 박스 → 앱 안 깨짐. 접근성: 모든 svg에 한국어 aria-label.
  */
 
+import type { ReactNode } from 'react';
 import type { FigureSpec } from '../../generator/types';
 
 // 앱 다크 인디고 톤
@@ -71,6 +72,12 @@ export function FigureView({ spec }: { spec: FigureSpec }) {
       break;
     case 'ratio-graph':
       svg = <RatioGraph variant={spec.variant} labels={spec.labels} percents={spec.percents} />;
+      break;
+    case 'solid-gon':
+      svg = <SolidGon shape={spec.shape} n={spec.n} />;
+      break;
+    case 'cube-stack':
+      svg = <CubeStack w={spec.w} d={spec.d} h={spec.h} />;
       break;
     default:
       // 미구현 kind 폴백 (타입상 도달 불가지만 방어적으로)
@@ -722,6 +729,171 @@ function RatioGraph({ variant, labels, percents }: {
     <svg viewBox={`0 0 200 ${H}`} width={Math.min(200, 200)} role="img" aria-label={ariaLabel}>
       {sectors}
       {legend}
+    </svg>
+  );
+}
+
+// ── n각기둥·n각뿔 겨냥도 — 보이는 모서리 실선·숨은 모서리 점선 ──
+// 밑면을 세로로 납작하게(등각 비슷) 그려 위·옆에서 본 입체로 표현. 구성 요소 세기용.
+function SolidGon({ shape, n }: { shape: 'prism' | 'pyramid'; n: number }) {
+  const N = Math.max(3, Math.min(10, n));
+  const R = 46;       // 밑면 가로 반지름
+  const Ry = 15;      // 세로 납작(원근) — 위에서 비스듬히 본 효과
+  const H = 76;       // 기둥 높이 / 뿔 높이
+  const phase = Math.PI / 2 + Math.PI / N; // 앞쪽에 한 모서리가 오도록
+  const ang = (i: number) => (2 * Math.PI * i) / N + phase;
+  const co = (i: number) => Math.cos(ang(i));
+  const si = (i: number) => Math.sin(ang(i)); // si>0 = 앞(화면 아래), si<0 = 뒤
+
+  // 면 가시성으로 숨은 모서리 판정(볼록 입체를 위·앞에서 봄):
+  // 옆면 i(꼭짓점 i~i+1)의 바깥 법선 앞뒤 = si(i)+si(i+1) 부호. 정면 옆에서 봐
+  // 법선이 화면과 평행(합≈0)한 면은 윤곽선(실루엣)이라 그 모서리는 항상 보인다(EPS로 처리).
+  const EPS = 1e-6;
+  const faceFront = (i: number) => si(i) + si((i + 1) % N) > EPS;  // 앞면(옆면 칠하기)
+  const faceBack = (i: number) => si(i) + si((i + 1) % N) < -EPS;  // 확실히 뒤면
+  const rimHidden = (i: number) => faceBack(i); // 밑면 모서리: 옆면이 확실히 뒤면일 때만 숨음
+  const vertHidden = (i: number) => faceBack((i - 1 + N) % N) && faceBack(i); // 세로/옆 모서리: 양옆 면 모두 뒤면
+
+  // 좌표 (밑면 중심 y=0 기준). 기둥은 윗면 y=-H, 뿔은 꼭대기 y=-H.
+  const baseV = (i: number) => ({ x: R * co(i), y: Ry * si(i) });
+  const topV = (i: number) => ({ x: R * co(i), y: -H + Ry * si(i) }); // 기둥 윗면
+  const apex = { x: 0, y: -H };
+
+  // bbox
+  const pts: { x: number; y: number }[] = [];
+  for (let i = 0; i < N; i++) { pts.push(baseV(i)); pts.push(shape === 'prism' ? topV(i) : apex); }
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const p of pts) {
+    minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x);
+    minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+  }
+  const pad = 16;
+  const ox = pad - minX, oy = pad - minY;
+  const totW = maxX - minX + pad * 2;
+  const totH = maxY - minY + pad * 2;
+  const P = (p: { x: number; y: number }) => ({ x: p.x + ox, y: p.y + oy });
+  const xy = (p: { x: number; y: number }) => `${(p.x + ox).toFixed(1)},${(p.y + oy).toFixed(1)}`;
+
+  const edge = (a: { x: number; y: number }, b: { x: number; y: number }, hidden: boolean, key: string) => {
+    const pa = P(a), pb = P(b);
+    return (
+      <line key={key} x1={pa.x} y1={pa.y} x2={pb.x} y2={pb.y}
+        stroke={STROKE} strokeWidth={2} strokeLinecap="round"
+        strokeDasharray={hidden ? '4 4' : undefined as unknown as string}
+        opacity={hidden ? 0.55 : 1} />
+    );
+  };
+  const fills: ReactNode[] = [];
+  const hidden: ReactNode[] = [];
+  const solid: ReactNode[] = [];
+
+  if (shape === 'prism') {
+    // 앞쪽 옆면 채움(반투명)
+    for (let i = 0; i < N; i++) {
+      if (faceFront(i)) {
+        const j = (i + 1) % N;
+        fills.push(<polygon key={`sf${i}`}
+          points={`${xy(topV(i))} ${xy(topV(j))} ${xy(baseV(j))} ${xy(baseV(i))}`}
+          fill={FILL2} opacity={0.5} />);
+      }
+    }
+    // 윗면 채움
+    fills.push(<polygon key="top" points={Array.from({ length: N }, (_, i) => xy(topV(i))).join(' ')}
+      fill={FILL3} opacity={0.85} />);
+    for (let i = 0; i < N; i++) {
+      const j = (i + 1) % N;
+      // 윗면 모서리: 항상 보임
+      solid.push(edge(topV(i), topV(j), false, `te${i}`));
+      // 밑면 모서리: 인접 옆면이 뒤면 숨음
+      (rimHidden(i) ? hidden : solid).push(edge(baseV(i), baseV(j), rimHidden(i), `be${i}`));
+      // 세로 모서리: 양옆 면 모두 뒤면 숨음
+      (vertHidden(i) ? hidden : solid).push(edge(topV(i), baseV(i), vertHidden(i), `ve${i}`));
+    }
+  } else {
+    // 뿔: 밑면 채움(반투명) + 앞쪽 옆삼각형 채움
+    fills.push(<polygon key="base" points={Array.from({ length: N }, (_, i) => xy(baseV(i))).join(' ')}
+      fill={FILL} opacity={0.3} />);
+    for (let i = 0; i < N; i++) {
+      if (faceFront(i)) {
+        const j = (i + 1) % N;
+        fills.push(<polygon key={`lf${i}`}
+          points={`${xy(apex)} ${xy(baseV(j))} ${xy(baseV(i))}`}
+          fill={FILL2} opacity={0.5} />);
+      }
+    }
+    for (let i = 0; i < N; i++) {
+      const j = (i + 1) % N;
+      // 밑면 모서리: 인접 옆면이 뒤면 숨음
+      (rimHidden(i) ? hidden : solid).push(edge(baseV(i), baseV(j), rimHidden(i), `be${i}`));
+      // 옆(빗) 모서리: 양옆 면 모두 뒤면 숨음
+      (vertHidden(i) ? hidden : solid).push(edge(apex, baseV(i), vertHidden(i), `le${i}`));
+    }
+  }
+
+  return (
+    <svg viewBox={`0 0 ${totW.toFixed(1)} ${totH.toFixed(1)}`} width={Math.min(totW, 200)}
+      role="img"
+      aria-label={`${POLYGON_NAME[N]}${shape === 'prism' ? '기둥' : '뿔'}의 겨냥도. 보이는 모서리는 실선, 숨은 모서리는 점선`}>
+      {fills}
+      {hidden}
+      {solid}
+    </svg>
+  );
+}
+
+const POLYGON_NAME: Record<number, string> = {
+  3: '삼각', 4: '사각', 5: '오각', 6: '육각', 7: '칠각', 8: '팔각', 9: '구각', 10: '십각',
+};
+
+// ── 쌓기나무 직육면체 블록(등각 투상) — 가로 w·세로 d·높이 h개 단위 정육면체 ──
+function CubeStack({ w, d, h }: { w: number; d: number; h: number }) {
+  const maxDim = Math.max(w, d, h);
+  const c = Math.max(12, Math.min(30, Math.floor(150 / maxDim))); // 단위칸 크기(px)
+  const ax = { x: c, y: c * 0.5 };   // 가로(오른쪽-아래)
+  const ay = { x: -c, y: c * 0.5 };  // 세로/깊이(왼쪽-아래)
+  const az = { x: 0, y: -c };        // 높이(위)
+  const proj = (x: number, y: number, z: number) => ({
+    X: x * ax.x + y * ay.x + z * az.x,
+    Y: x * ax.y + y * ay.y + z * az.y,
+  });
+
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const x of [0, w]) for (const y of [0, d]) for (const z of [0, h]) {
+    const p = proj(x, y, z);
+    minX = Math.min(minX, p.X); maxX = Math.max(maxX, p.X);
+    minY = Math.min(minY, p.Y); maxY = Math.max(maxY, p.Y);
+  }
+  const pad = 10;
+  const off = { x: pad - minX, y: pad - minY };
+  const W = maxX - minX + pad * 2;
+  const Hh = maxY - minY + pad * 2;
+  const pt = (x: number, y: number, z: number) => {
+    const p = proj(x, y, z);
+    return `${(p.X + off.x).toFixed(1)},${(p.Y + off.y).toFixed(1)}`;
+  };
+
+  type Cell = { pts: string; fill: string };
+  const cells: Cell[] = [];
+  // 윗면 (z=h): x,y 격자
+  for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) {
+    cells.push({ pts: `${pt(i, j, h)} ${pt(i + 1, j, h)} ${pt(i + 1, j + 1, h)} ${pt(i, j + 1, h)}`, fill: FILL3 });
+  }
+  // 앞-오른쪽 면 (y=0): x,z 격자
+  for (let i = 0; i < w; i++) for (let k = 0; k < h; k++) {
+    cells.push({ pts: `${pt(i, 0, k)} ${pt(i + 1, 0, k)} ${pt(i + 1, 0, k + 1)} ${pt(i, 0, k + 1)}`, fill: FILL2 });
+  }
+  // 앞-왼쪽 면 (x=0): y,z 격자
+  for (let j = 0; j < d; j++) for (let k = 0; k < h; k++) {
+    cells.push({ pts: `${pt(0, j, k)} ${pt(0, j + 1, k)} ${pt(0, j + 1, k + 1)} ${pt(0, j, k + 1)}`, fill: FILL });
+  }
+
+  return (
+    <svg viewBox={`0 0 ${W.toFixed(1)} ${Hh.toFixed(1)}`} width={Math.min(W, 230)}
+      role="img"
+      aria-label={`쌓기나무를 가로 ${w}개, 세로 ${d}개, 높이 ${h}개로 쌓은 직육면체 모양`}>
+      {cells.map((cell, idx) => (
+        <polygon key={idx} points={cell.pts} fill={cell.fill} stroke={EDGE} strokeWidth={1} strokeLinejoin="round" />
+      ))}
     </svg>
   );
 }

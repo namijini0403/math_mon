@@ -125,6 +125,37 @@ describe('FigureView 렌더 스모크', () => {
     expect(html).toContain('<path');
     expect(html).toContain('겨울 15%');
   });
+
+  it('solid-gon 각기둥: 겨냥도(숨은 모서리 점선)와 aria-label', () => {
+    const html = renderFigure({ kind: 'solid-gon', shape: 'prism', n: 5 });
+    expect(html).toContain('<svg');
+    expect(html).toContain('오각기둥');
+    expect(html).toContain('dasharray'); // 숨은 모서리 점선
+  });
+
+  it('solid-gon 각뿔: 겨냥도와 aria-label(n각뿔)', () => {
+    const html = renderFigure({ kind: 'solid-gon', shape: 'pyramid', n: 6 });
+    expect(html).toContain('육각뿔');
+    expect(html).toContain('dasharray');
+  });
+
+  it('solid-gon: n=3~10 전부 렌더 오류 없이 그려진다', () => {
+    for (let n = 3; n <= 10; n++) {
+      for (const shape of ['prism', 'pyramid'] as const) {
+        const html = renderFigure({ kind: 'solid-gon', shape, n });
+        expect(html).toContain('<svg');
+        expect(html).not.toContain('NaN');
+      }
+    }
+  });
+
+  it('cube-stack: 세 면(윗·앞오른쪽·앞왼쪽) 칸 격자와 aria-label', () => {
+    const html = renderFigure({ kind: 'cube-stack', w: 3, d: 2, h: 4 });
+    expect(html).toContain('<svg');
+    expect(html).toContain('가로 3개, 세로 2개, 높이 4개');
+    expect(html).toContain('<polygon');
+    expect(html).not.toContain('NaN');
+  });
 });
 
 describe('그림 연결 스킬의 figure 스펙 일관성', () => {
@@ -327,6 +358,49 @@ describe('그림 연결 스킬의 figure 스펙 일관성', () => {
       const p = skill!.generate(seed);
       // 값을 가린 자료는 "9시: ?도"처럼 ': ?' 패턴을 포함(문장 끝 '인가요?'와 구별)
       if (p.prompt.includes(': ?')) expect(p.figure).toBeUndefined();
+    }
+  });
+
+  it('prism-count/pyramid-count: solid-gon 그림의 shape·n이 문제와 일치', () => {
+    for (const [id, shape] of [['prism-count', 'prism'], ['pyramid-count', 'pyramid']] as const) {
+      const skill = SKILLS.find((s) => s.id === id);
+      expect(skill, id).toBeDefined();
+      for (let seed = 0; seed < 200; seed++) {
+        const p = skill!.generate(seed);
+        const f = p.figure as Extract<FigureSpec, { kind: 'solid-gon' }>;
+        expect(f.kind, id).toBe('solid-gon');
+        expect(f.shape).toBe(shape);
+        expect(f.n).toBeGreaterThanOrEqual(3);
+        expect(f.n).toBeLessThanOrEqual(10);
+        // 문제 prompt가 n각형 이름을 포함(예: 오각기둥/오각뿔)
+        const name = { 3: '삼각', 4: '사각', 5: '오각', 6: '육각', 7: '칠각', 8: '팔각', 9: '구각', 10: '십각' }[f.n];
+        expect(p.prompt).toContain(name!);
+      }
+    }
+  });
+
+  it('prism-inverse/pyramid-inverse: 답(n)을 노출하지 않도록 그림을 붙이지 않는다', () => {
+    for (const id of ['prism-inverse', 'pyramid-inverse']) {
+      const skill = SKILLS.find((s) => s.id === id);
+      expect(skill, id).toBeDefined();
+      for (let seed = 0; seed < 60; seed++) {
+        expect(skill!.generate(seed).figure, id).toBeUndefined();
+      }
+    }
+  });
+
+  it('space-cube/space-hidden: cube-stack의 w·d·h 곱이 정답(쌓기나무 개수)과 일치', () => {
+    for (const id of ['space-cube', 'space-hidden']) {
+      const skill = SKILLS.find((s) => s.id === id);
+      expect(skill, id).toBeDefined();
+      for (let seed = 0; seed < 200; seed++) {
+        const p = skill!.generate(seed);
+        if (p.format !== 'fill-blanks') continue;
+        const f = p.figure as Extract<FigureSpec, { kind: 'cube-stack' }>;
+        expect(f.kind, id).toBe('cube-stack');
+        expect(f.w * f.d * f.h).toBe(p.blankAnswers[0]);
+        expect(Math.min(f.w, f.d, f.h)).toBeGreaterThanOrEqual(2);
+      }
     }
   });
 

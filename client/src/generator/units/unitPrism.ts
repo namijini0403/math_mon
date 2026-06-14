@@ -70,6 +70,7 @@ const prismCount: SkillDef = {
       expr,
       blankAnswers: [part.answer],
       explanation,
+      figure: { kind: 'solid-gon', shape: 'prism', n },
     };
   },
 };
@@ -118,6 +119,7 @@ const pyramidCount: SkillDef = {
       expr,
       blankAnswers: [part.answer],
       explanation,
+      figure: { kind: 'solid-gon', shape: 'pyramid', n },
     };
   },
 };

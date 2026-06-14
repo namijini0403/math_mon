@@ -47,7 +47,11 @@ export type FigureSpec =
   /** 꺾은선그래프 — 시점별 점을 선으로 이음. values는 문제 수치와 같은 배열 */
   | { kind: 'line-graph'; labels: string[]; values: number[]; unit: string }
   /** 띠그래프(band)·원그래프(pie) — 항목별 백분율(합 100). percents는 문제 수치와 같은 배열 */
-  | { kind: 'ratio-graph'; variant: 'band' | 'pie'; labels: string[]; percents: number[] };
+  | { kind: 'ratio-graph'; variant: 'band' | 'pie'; labels: string[]; percents: number[] }
+  /** n각기둥·n각뿔 겨냥도 — 보이는 모서리 실선·숨은 모서리 점선. 구성 요소(면·모서리·꼭짓점) 세기용 */
+  | { kind: 'solid-gon'; shape: 'prism' | 'pyramid'; n: number }
+  /** 쌓기나무 직육면체 블록(등각 투상) — 가로 w·세로 d·높이 h개의 단위 정육면체. 보이는 세 면에 칸 격자 */
+  | { kind: 'cube-stack'; w: number; d: number; h: number };
 
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =

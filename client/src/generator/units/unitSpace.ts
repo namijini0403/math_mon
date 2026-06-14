@@ -113,6 +113,7 @@ const spaceCube: SkillDef = {
       expr,
       blankAnswers: [total],
       explanation,
+      figure: { kind: 'cube-stack', w: n, d: n, h: n },
     };
   },
 };
@@ -200,6 +201,7 @@ const spaceHidden: SkillDef = {
       expr,
       blankAnswers: [total],
       explanation,
+      figure: { kind: 'cube-stack', w: a, d: b, h: c },
     };
   },
 };
