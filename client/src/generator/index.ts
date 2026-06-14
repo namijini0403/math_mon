@@ -255,6 +255,11 @@ export function generateProblem(skillId: string, seed: number = randomSeed()): P
   return getSkill(skillId).generate(seed);
 }
 
+/** 단원에 실제 심화(challenge) 스킬이 1개 이상 있는지 — 심화 UI 노출 게이트 */
+export function unitHasChallenge(unitId: string): boolean {
+  return SKILLS.some((s) => s.unitId === unitId && s.challenge === true);
+}
+
 export * from './types';
 export * from './fraction';
 export { RNG, randomSeed } from './rng';

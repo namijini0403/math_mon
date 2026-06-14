@@ -8,6 +8,7 @@ import DragonWidget from '../components/DragonWidget';
 import { AssignmentInbox } from '../components/AssignmentInbox';
 import { DragonAvatar } from '../components/DragonAvatar';
 import { SEMESTERS, STAGES, UNIT_TITLES, type StageDef } from '../game/stages';
+import { unitHasChallenge } from '../generator';
 import { parseGradeSemester, accessZoneForSemester, type AccessZone } from '../game/gradeAccess';
 import { useGame } from '../game/store';
 import { levelFromXp } from '../game/xp';
@@ -143,14 +144,17 @@ export default function UnitMapPage() {
   // 단원별 잠금: 각 단원의 첫 스테이지는 항상 열려 있고, 단원 안에서는 순차 해제
   // (교사가 진도에 맞는 단원부터 시작하게 할 수 있음)
   const clearedByUnit = new Map<string, boolean>();
-  const nodes = STAGES.map((stage, i) => {
-    const stars = stages[stage.id]?.stars ?? 0;
-    // 심화 탐험은 선택 트랙 — 항상 열려 있고 잠금 체인에도 영향 없음
-    if (stage.type === 'challenge') return { stage, i, unlocked: true, stars };
-    const unlocked = clearedByUnit.get(stage.unitId) ?? true;
-    clearedByUnit.set(stage.unitId, stars > 0);
-    return { stage, i, unlocked, stars };
-  });
+  const nodes = STAGES
+    // 실제 심화 스킬이 없는 단원(예: 1학년)은 심화 탐험 노드를 숨긴다
+    .filter((stage) => stage.type !== 'challenge' || unitHasChallenge(stage.unitId))
+    .map((stage, i) => {
+      const stars = stages[stage.id]?.stars ?? 0;
+      // 심화 탐험은 선택 트랙 — 항상 열려 있고 잠금 체인에도 영향 없음
+      if (stage.type === 'challenge') return { stage, i, unlocked: true, stars };
+      const unlocked = clearedByUnit.get(stage.unitId) ?? true;
+      clearedByUnit.set(stage.unitId, stars > 0);
+      return { stage, i, unlocked, stars };
+    });
 
   return (
     <div className="max-w-xl mx-auto px-5 pb-16">

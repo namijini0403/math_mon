@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SEMESTERS, STAGES, UNIT_TITLES } from '../game/stages';
+import { unitHasChallenge } from '../generator';
 import { useGame } from '../game/store';
 import { wrongCountFor } from '../game/wrongLog';
 
@@ -126,7 +127,7 @@ export default function PracticeHubPage() {
               {/* ── 모드 패널 (선택된 단원만) ── */}
               {isSelected && (
                 <div className="mt-2 flex flex-col gap-2 pl-2">
-                  {MODES.map((m) => (
+                  {MODES.filter((m) => m.key !== 'challenge' || unitHasChallenge(uid)).map((m) => (
                     <button
                       key={m.key}
                       onClick={() => navigate(`/practice/${m.key}/${uid}`)}
