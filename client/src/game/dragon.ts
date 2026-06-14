@@ -162,6 +162,40 @@ export function rollGachaItems(
   return picked;
 }
 
+/**
+ * 성체(완전체) 자격 — GP만으로는 부족하고 실제 학습이 한 학기 분량에 이르러야 한다.
+ * 출석·먹이 같은 반복 활동만 쌓으면 GP는 차도 성체가 되지 못하고 청소년기에서 머문다
+ * ("열심히 안 하면 중간 단계에서 끝남, 억지 보상 없음"). 숫자는 docs 설계의 '한 학기' 기준.
+ */
+export const ADULT_REQ = { lessons: 18, basicSets: 6, wordSets: 6, bosses: 3 } as const;
+
+export interface AdultEffortStats {
+  lessonsCompleted: number;
+  basicSets: number;
+  wordSets: number;
+  bossesCleared: number;
+}
+
+export function qualifiesForAdult(s: AdultEffortStats): boolean {
+  return (
+    s.lessonsCompleted >= ADULT_REQ.lessons &&
+    s.basicSets >= ADULT_REQ.basicSets &&
+    s.wordSets >= ADULT_REQ.wordSets &&
+    s.bossesCleared >= ADULT_REQ.bosses
+  );
+}
+
+/** 졸업생(이전에 성체까지 키운 드래곤) — 새 알을 키워도 미니미로 곁에 남는다 */
+export interface GraduateRecord {
+  /** 미니미 에셋 키 (진화 id 또는 common '{affinity}-{form}') */
+  id: string;
+  name: string;
+  tier: 'common' | 'rare' | 'superrare';
+  affinity: Affinity;
+  form: 'human' | 'dragon';
+  emoji: string;
+}
+
 /** 드래곤 저장 상태 */
 export interface DragonState {
   gp: number;
@@ -185,6 +219,8 @@ export interface DragonState {
   };
   /** 방에 배치한 장식 id 목록 */
   placedDecor?: string[];
+  /** 졸업생 미니미 목록 (이전에 성체까지 키운 드래곤들) — 새 알로 다시 시작해도 곁에 남음 */
+  graduates?: GraduateRecord[];
 }
 
 export function emptyDragon(): DragonState {
@@ -197,7 +233,28 @@ export function emptyDragon(): DragonState {
     fullnessAtFed: 70,
     feedCount: 0,
     placedDecor: [],
+    graduates: [],
   };
+}
+
+/** 성체(adult) → 졸업생 미니미 기록으로 변환 */
+export function adultToGraduate(adult: NonNullable<DragonState['adult']>): GraduateRecord {
+  const ev = adult.evolution;
+  return {
+    id: ev?.id ?? `${adult.affinity}-${adult.form}`,
+    name: ev?.name ?? adultTitle(adult),
+    tier: ev?.tier ?? 'common',
+    affinity: adult.affinity,
+    form: adult.form,
+    emoji: ev?.emoji ?? AFFINITY_INFO[adult.affinity].emoji,
+  };
+}
+
+/** 졸업생 미니미 이미지 경로 (티어별 폴더, common은 mini/adult-*) */
+export function graduateMiniSrc(g: GraduateRecord): string {
+  if (g.tier === 'rare') return `assets/dragon/rare/${g.id}.png`;
+  if (g.tier === 'superrare') return `assets/dragon/super/${g.id}.png`;
+  return `assets/dragon/mini/adult-${g.affinity}-${g.form}.png`;
 }
 
 // ── 방 꾸미기: 배치 장식 ─────────────────────────────────────────────

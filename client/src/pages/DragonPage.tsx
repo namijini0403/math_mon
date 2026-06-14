@@ -22,8 +22,11 @@ import {
   dragonMood,
   stageForGp,
   topAffinity,
+  graduateMiniSrc,
+  ADULT_REQ,
   type Affinity,
   type RoomDecorDef,
+  type GraduateRecord,
 } from '../game/dragon';
 import { dragonArt } from '../game/dragonArt';
 import { activityWeightedHumanEndingVariant, frontAscendHumanEndingSrc, type HumanEndingVariant } from '../game/dragonEnding';
@@ -198,6 +201,50 @@ function DragonStage({ dragon, fullness, mood }: {
           </motion.span>
         )}
       </motion.div>
+    </div>
+  );
+}
+
+// ── 졸업생 미니미 (이전에 키운 성체들이 곁에 따라다닌다) ──────────────────────
+
+function CompanionAvatar({ g, idx }: { g: GraduateRecord; idx: number }) {
+  const [err, setErr] = useState(false);
+  const src = graduateMiniSrc(g);
+  return (
+    <motion.div
+      className="relative flex items-end justify-center"
+      style={{ width: 38, height: 38 }}
+      title={g.name}
+      animate={{ y: [0, -4, 0] }}
+      transition={{ repeat: Infinity, duration: 2.2 + (idx % 3) * 0.4, delay: idx * 0.25, ease: 'easeInOut' }}
+    >
+      {!err ? (
+        <img
+          src={src}
+          alt={g.name}
+          className="w-full h-full object-contain"
+          style={{ filter: `drop-shadow(0 0 6px ${AFFINITY_INFO[g.affinity].color}aa)` }}
+          onError={() => setErr(true)}
+        />
+      ) : (
+        <span className="text-2xl select-none">{g.emoji}</span>
+      )}
+    </motion.div>
+  );
+}
+
+function GraduateCompanions({ graduates }: { graduates: GraduateRecord[] }) {
+  if (graduates.length === 0) return null;
+  const shown = graduates.slice(-6); // 최근 6마리까지 곁에
+  const extra = graduates.length - shown.length;
+  return (
+    <div className="absolute left-2 bottom-2 z-[6] flex items-end gap-0.5 pointer-events-none">
+      {shown.map((g, i) => (
+        <CompanionAvatar key={`${g.id}-${i}`} g={g} idx={i} />
+      ))}
+      {extra > 0 && (
+        <span className="text-[0.6rem] font-bold text-night-300 self-center ml-0.5">+{extra}</span>
+      )}
     </div>
   );
 }
@@ -583,6 +630,9 @@ export default function DragonPage() {
         {/* 방 배경 (집 단계별) — 드래곤 뒤에 깔린다 */}
         <DragonRoom tier={tier} className="absolute inset-x-0 bottom-0 w-full h-[70%] pointer-events-none" />
 
+        {/* 졸업생 미니미 — 이전에 키운 성체들이 곁에 따라다닌다 */}
+        <GraduateCompanions graduates={dragon.graduates ?? []} />
+
         {/* 배치한 장식 — 슬롯 위치에 (드래곤보다 뒤, 배경보다 앞) */}
         {(dragon.placedDecor ?? []).map((id) => {
           const d = getDecor(id);
@@ -863,6 +913,31 @@ export default function DragonPage() {
           })}
         </div>
       </div>
+
+      {/* ── 성체 자격 안내 (청소년기에서 머문 경우) ── */}
+      {stage >= 4 && !dragon.adult && (
+        <div className="mt-4 rounded-3xl bg-night-900 border border-night-700 p-4">
+          <div className="text-sm font-bold text-center mb-2">
+            🐲 거의 다 자랐어요! 꾸준히 공부하면 <span className="text-coin">완전한 성체</span>로 깨어나요
+          </div>
+          <div className="grid grid-cols-2 gap-1.5 text-xs">
+            {([
+              ['레슨 완료', records.lessonsCompleted, ADULT_REQ.lessons],
+              ['연산 연습 세트', practice.basicSets, ADULT_REQ.basicSets],
+              ['문장제 연습 세트', practice.wordSets, ADULT_REQ.wordSets],
+              ['보스 봉인', sealedBosses, ADULT_REQ.bosses],
+            ] as const).map(([label, cur, need]) => {
+              const done = cur >= need;
+              return (
+                <div key={label} className={`flex items-center justify-between rounded-lg px-2.5 py-1 ${done ? 'bg-emerald-500/15 text-emerald-300' : 'bg-night-800 text-night-300'}`}>
+                  <span>{done ? '✓ ' : ''}{label}</span>
+                  <span className="font-bold">{Math.min(cur, need)}/{need}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── 엔딩 배너 ── */}
       <div className="mt-4 rounded-3xl bg-night-900 border border-night-700 p-5 text-center">

@@ -23,6 +23,8 @@ import {
   GP_REWARDS,
   currentFullness,
   stageForGp,
+  qualifiesForAdult,
+  adultToGraduate,
   earnedDecor,
   type Affinity,
   type DragonItemDef,
@@ -425,11 +427,20 @@ export const useGame = create<GameState>()(
           }
           const gpTotal = d.gp + gp;
           let adult = d.adult;
-          // 성체 도달 후, 봉인 점수로 캐릭터 결정. 더 높은 티어에 도달하면 '성장'(갱신).
-          if (stageForGp(gpTotal) >= 4) {
-            const sealedCount = Object.keys(s.stages).filter(
-              (id) => id.endsWith('-boss') && (s.stages[id]?.stars ?? 0) > 0,
-            ).length;
+          // 성체 도달: GP 4단계 + 실제 학습이 한 학기 분량(qualifiesForAdult)일 때만.
+          // 출석·먹이만 쌓아 GP가 차도 자격 미달이면 성체가 되지 않고 청소년기에 머문다.
+          const sealedCount = Object.keys(s.stages).filter(
+            (id) => id.endsWith('-boss') && (s.stages[id]?.stars ?? 0) > 0,
+          ).length;
+          const adultReady =
+            stageForGp(gpTotal) >= 4 &&
+            qualifiesForAdult({
+              lessonsCompleted: s.records.lessonsCompleted,
+              basicSets: s.practice.basicSets,
+              wordSets: s.practice.wordSets,
+              bossesCleared: sealedCount,
+            });
+          if (adultReady) {
             const ev = decideEvolution({
               affinities,
               sealedCount,
@@ -628,7 +639,14 @@ export const useGame = create<GameState>()(
         return get().addXp(XP_MISSION_REWARD);
       },
 
-      resetDragon: () => set({ dragon: emptyDragon() }),
+      // 새 알로 다시 시작 — 성체까지 키웠다면 그 미니미를 졸업생으로 곁에 남긴다.
+      resetDragon: () =>
+        set((s) => {
+          const prev = s.dragon;
+          const graduates = [...(prev.graduates ?? [])];
+          if (prev.adult) graduates.push(adultToGraduate(prev.adult));
+          return { dragon: { ...emptyDragon(), graduates } };
+        }),
 
       resetAll: () =>
         set({
