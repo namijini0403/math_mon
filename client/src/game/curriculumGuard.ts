@@ -71,6 +71,15 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unitQuad', // ④ 사각형
   'unitLineGraph', // ⑤ 꺾은선그래프
   'unitPolygon', // ⑥ 다각형
+  // 5-1 (혼합계산·약수와 배수·규칙과 대응·약분과 통분(약분/통분/기약분수 도입)·분모 다른 분수 덧뺄·다각형의 둘레와 넓이)
+  // 단원 순서 = 2022 개정: 혼합계산 → 약수와 배수 → 규칙과 대응 → 약분과 통분 → 분수 덧뺄 → 둘레와 넓이.
+  // 계열 검증 완료: 혼합계산엔 분수·약수배수 개념 없음, 약분/통분은 약수배수 뒤, 분수 덧뺄은 약분통분 뒤.
+  'unitMix', // ① 자연수의 혼합 계산
+  'unitDiv', // ② 약수와 배수
+  'unitPattern', // ③ 규칙과 대응
+  'unit1', // ④ 약분과 통분
+  'unit2', // ⑤ 분수의 덧셈과 뺄셈
+  'unitPoly', // ⑥ 다각형의 둘레와 넓이
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {
