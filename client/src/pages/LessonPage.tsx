@@ -568,7 +568,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
               {/* 정답 시 수축하는 봉인 고리 */}
               {hitFx > 0 && (
                 <motion.div
-                  key={hitFx}
+                  key={`ring${hitFx}`}
                   className="absolute rounded-full border-2 border-mana"
                   initial={{ width: 150, height: 150, opacity: 0.9 }}
                   animate={{ width: 70, height: 70, opacity: 0 }}
@@ -583,7 +583,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
               )}
               {/* 보스 본체 (크게) — 떠다니다가 정답 시 움찔 */}
               <motion.div
-                key={hitFx}
+                key={`boss${hitFx}`}
                 animate={hitFx > 0 ? { x: [0, -8, 8, -5, 0], rotate: [0, -7, 6, 0], scale: [1, 0.94, 1] } : { y: [0, -6, 0] }}
                 transition={hitFx > 0 ? { duration: 0.45 } : { repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
                 className={`relative ${weakened ? 'opacity-80' : ''}`}
