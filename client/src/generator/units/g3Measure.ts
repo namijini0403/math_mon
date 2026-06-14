@@ -11,6 +11,31 @@ import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 const txt = (text: string) => ({ kind: 'text' as const, text });
 const txc = (text: string): ChoiceValue => ({ kind: 'text', text });
 
+/**
+ * 복합 단위(큰 단위 1000 = 작은 단위)의 덧셈·뺄셈을 작은 단위끼리·큰 단위끼리 단계로 설명한다.
+ * carry: 덧셈이면 받아올림, 뺄셈이면 받아내림 발생 여부. bigU/smallU: 단위 라벨(L/mL, kg/g).
+ */
+function compoundAddSubExplain(o: {
+  big1: number; small1: number; big2: number; small2: number;
+  rBig: number; rSmall: number; isAdd: boolean; carry: boolean;
+  bigU: string; smallU: string;
+}): string {
+  const { big1, small1, big2, small2, rBig, rSmall, isAdd, carry, bigU, smallU } = o;
+  if (isAdd) {
+    const sum = small1 + small2;
+    const smallStep = carry
+      ? `${smallU}끼리 더하면 ${small1} + ${small2} = ${sum} ${smallU}이에요. 1000 ${smallU}는 1 ${bigU}니 1 ${bigU}로 받아올림하고 ${sum - 1000} ${smallU}가 남아요.`
+      : `${smallU}끼리 더하면 ${small1} + ${small2} = ${rSmall} ${smallU}이에요.`;
+    const bigStep = `${bigU}끼리 더하면 ${big1} + ${big2}${carry ? ' + 1(받아올림)' : ''} = ${rBig} ${bigU}이에요.`;
+    return `${smallStep} ${bigStep} 그래서 ${rBig} ${bigU} ${rSmall} ${smallU}이에요.`;
+  }
+  const smallStep = carry
+    ? `${smallU}끼리 빼요. ${small1} ${smallU}에서 ${small2} ${smallU}를 뺄 수 없으니 1 ${bigU}(1000 ${smallU})를 받아내림해서 ${small1} + 1000 - ${small2} = ${rSmall} ${smallU}예요.`
+    : `${smallU}끼리 빼면 ${small1} - ${small2} = ${rSmall} ${smallU}이에요.`;
+  const bigStep = `${bigU}끼리 빼면 ${big1}${carry ? ' - 1(받아내림)' : ''} - ${big2} = ${rBig} ${bigU}이에요.`;
+  return `${smallStep} ${bigStep} 그래서 ${rBig} ${bigU} ${rSmall} ${smallU}이에요.`;
+}
+
 // ── 1. meas3-liquid-conv  L↔mL 변환 (fill-blanks) ──────────────────
 const meas3LiquidConv: SkillDef = {
   id: 'meas3-liquid-conv',
@@ -191,8 +216,6 @@ const meas3LiquidAdd: SkillDef = {
       txt(' mL'),
     ];
 
-    const carryNote = carry ? ' mL가 1000 이상이므로 1 L를 받아올림해요.' : '';
-
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -201,7 +224,10 @@ const meas3LiquidAdd: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [rl, rml],
-      explanation: [txt(`${l1} L ${ml1} mL + ${l2} L ${ml2} mL = ${rl} L ${rml} mL.${carryNote}`)],
+      explanation: [txt(compoundAddSubExplain({
+        big1: l1, small1: ml1, big2: l2, small2: ml2,
+        rBig: rl, rSmall: rml, isAdd: true, carry, bigU: 'L', smallU: 'mL',
+      }))],
     };
   },
 };
@@ -245,8 +271,6 @@ const meas3LiquidSub: SkillDef = {
       txt(' mL'),
     ];
 
-    const borrowNote = borrow ? ' mL가 부족하므로 1 L = 1000 mL를 받아내림해요.' : '';
-
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -255,7 +279,10 @@ const meas3LiquidSub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [rl, rml],
-      explanation: [txt(`${l1} L ${ml1} mL - ${l2} L ${ml2} mL = ${rl} L ${rml} mL.${borrowNote}`)],
+      explanation: [txt(compoundAddSubExplain({
+        big1: l1, small1: ml1, big2: l2, small2: ml2,
+        rBig: rl, rSmall: rml, isAdd: false, carry: borrow, bigU: 'L', smallU: 'mL',
+      }))],
     };
   },
 };
@@ -319,10 +346,6 @@ const meas3WeightAdd: SkillDef = {
       txt(' g'),
     ];
 
-    const note = isAdd
-      ? (carry ? ' g가 1000 이상이므로 1 kg를 받아올림해요.' : '')
-      : (carry ? ' g가 부족하므로 1 kg = 1000 g를 받아내림해요.' : '');
-
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
@@ -331,7 +354,10 @@ const meas3WeightAdd: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [rkg, rg],
-      explanation: [txt(`${kg1} kg ${g1} g ${op} ${kg2} kg ${g2} g = ${rkg} kg ${rg} g.${note}`)],
+      explanation: [txt(compoundAddSubExplain({
+        big1: kg1, small1: g1, big2: kg2, small2: g2,
+        rBig: rkg, rSmall: rg, isAdd, carry, bigU: 'kg', smallU: 'g',
+      }))],
     };
   },
 };
@@ -426,7 +452,7 @@ const meas3Word: SkillDef = {
       ans = rml;
       unit = 'mL';
       prompt = `드래곤이 물통에 ${l1} L ${ml1} mL를 담고 요정이 ${l2} L ${ml2} mL를 더 넣었어요. 전체는 ${rl} L 몇 mL인가요?`;
-      expl = `${ml1} + ${ml2} = ${totalMl} mL → ${rl} L ${rml} mL. 답: ${ans} mL`;
+      expl = `mL끼리 더하면 ${ml1} + ${ml2} = ${totalMl} mL예요.${totalMl >= 1000 ? ` 1000 mL는 1 L로 받아올림해서 ${rml} mL가 남아요.` : ''} 그래서 ${rl} L ${rml} mL, 답은 ${ans} mL예요.`;
     } else if (pat === 1) {
       // 무게 뺄셈 문장제
       const kg1 = rng.int(3, 8);
@@ -438,7 +464,7 @@ const meas3Word: SkillDef = {
       ans = rg;
       unit = 'g';
       prompt = `보물 상자의 무게가 ${kg1} kg ${g1} g이고, 보물만 꺼냈더니 ${kg2} kg ${g2} g가 되었어요. 꺼낸 보물의 무게는 ${rkg} kg 몇 g인가요?`;
-      expl = `${g1} - ${g2} = ${rg} g. 답: ${ans} g`;
+      expl = `g끼리 빼면 ${g1} - ${g2} = ${rg} g, kg끼리 빼면 ${kg1} - ${kg2} = ${rkg} kg이에요. 꺼낸 보물은 ${rkg} kg ${rg} g, 답은 ${ans} g예요.`;
     } else {
       // 단위 변환 문장제
       const l = rng.int(2, 5);
@@ -447,7 +473,7 @@ const meas3Word: SkillDef = {
       ans = totalMl;
       unit = 'mL';
       prompt = `마법사가 물약을 ${l} L ${ml} mL 만들었어요. 이것은 모두 몇 mL인가요?`;
-      expl = `${l} L = ${l * 1000} mL, ${l * 1000} + ${ml} = ${totalMl} mL`;
+      expl = `1 L = 1000 mL이니 ${l} L = ${l * 1000} mL예요. 여기에 ${ml} mL를 더하면 ${l * 1000} + ${ml} = ${totalMl} mL예요.`;
     }
 
     if (ans <= 0) { ans = 100; }

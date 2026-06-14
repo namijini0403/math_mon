@@ -236,7 +236,7 @@ const circ3Word: SkillDef = {
       unit = 'cm';
       prompt = `마법사가 원형 방패를 만들었어요. 방패의 반지름이 ${r} cm라면, 지름은 몇 cm인가요?`;
       answer = d;
-      explanation = `지름 = ${r} × 2 = ${d} cm`;
+      explanation = `지름은 반지름의 2배예요. ${r} × 2 = ${d}이라 지름은 ${d} cm예요.`;
     } else if (pat === 1) {
       // 지름으로 반지름 계산
       const r = rng.int(2, 9);
@@ -244,7 +244,7 @@ const circ3Word: SkillDef = {
       unit = 'cm';
       prompt = `용사의 둥근 방어막의 지름이 ${d} cm예요. 중심에서 방어막까지의 거리(반지름)는 몇 cm인가요?`;
       answer = r;
-      explanation = `반지름 = ${d} ÷ 2 = ${r} cm`;
+      explanation = `반지름은 지름의 절반이에요. ${d} ÷ 2 = ${r}이라 반지름은 ${r} cm예요.`;
     } else {
       // 원 여러 개 이어붙인 길이
       const r = rng.int(2, 6);

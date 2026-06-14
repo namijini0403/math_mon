@@ -52,7 +52,7 @@ const frac32OfWhole: SkillDef = {
       expr,
       blankAnswers: [ans],
       explanation: [
-        txt(`${total} ÷ ${d} × ${n} = ${k} × ${n} = ${ans}개`),
+        txt(`전체 ${total}개를 ${d}묶음으로 똑같이 나누면 한 묶음은 ${total} ÷ ${d} = ${k}개예요. ${n}/${d}은 ${n}묶음이니 ${k} × ${n} = ${ans}개예요.`),
       ],
     };
   },
@@ -131,6 +131,7 @@ const frac32Convert: SkillDef = {
     let ansD: number;
     let ansWhole: number | undefined;
     let mixed: boolean;
+    let explanation: MathExpr;
 
     if (dir === 0) {
       // 대분수 → 가분수
@@ -142,6 +143,11 @@ const frac32Convert: SkillDef = {
       ansD = d;
       ansWhole = undefined;
       mixed = false;
+      explanation = [
+        txt(`자연수 ${whole}은 ${d}분의 ${d}이 ${whole}개라 ${whole * d}/${d}이에요. 여기에 ${n}/${d}을 더하면 ${whole} × ${d} + ${n} = ${impN}, 그래서 `),
+        { kind: 'frac', n: impN, d },
+        txt(`이에요.`),
+      ];
     } else {
       // 가분수 → 대분수 (whole >= 1 보장: impN >= d + 1)
       const whole = rng.int(1, 5);
@@ -152,6 +158,11 @@ const frac32Convert: SkillDef = {
       ansD = d;
       ansWhole = whole;
       mixed = true;
+      explanation = [
+        txt(`${impN} ÷ ${d} = ${whole} 나머지 ${remN}이에요. 몫 ${whole}이 자연수, 나머지 ${remN}이 분자가 되어 `),
+        { kind: 'frac', n: remN, d, whole },
+        txt(`이에요.`),
+      ];
     }
 
     return {
@@ -163,15 +174,7 @@ const frac32Convert: SkillDef = {
       mixed,
       answer: { n: ansN, d: ansD, whole: ansWhole },
       requireIrreducible: false,
-      explanation: dir === 0
-        ? [
-            txt(`${ansWhole === undefined ? '' : ''}분자 = 자연수 × 분모 + 분자. `),
-            { kind: 'frac', n: ansN, d: ansD },
-          ]
-        : [
-            txt(`${ansN + (ansWhole ?? 0) * ansD}/${ansD} = ${ansWhole}과 `),
-            { kind: 'frac', n: ansN, d: ansD, whole: ansWhole },
-          ],
+      explanation,
     };
   },
 };
@@ -257,7 +260,7 @@ const frac32Word: SkillDef = {
       ans = whole;
       unit = '';
       prompt = `${impN}/${d}을 대분수로 나타낼 때, 자연수 부분은 얼마인가요?`;
-      expl = `${impN} ÷ ${d} = ${whole} 나머지 ${remN} → ${whole}과 ${remN}/${d}. 자연수 부분: ${whole}`;
+      expl = `${impN} ÷ ${d} = ${whole} 나머지 ${remN}이라 ${whole}과 ${remN}/${d}이에요. 자연수 부분은 ${whole}이에요.`;
     } else {
       // 분수 크기 비교: 더 큰 쪽의 분자
       const d = rng.int(3, 10);

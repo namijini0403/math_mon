@@ -50,6 +50,13 @@ export const AUDITED_UNITS: ReadonlySet<string> = new Set<string>([
   'unitMul31', // ④ 곱셈
   'unitTime3', // ⑤ 길이와 시간
   'unitFrac3', // ⑥ 분수와 소수
+  // 3-2
+  'unitMul32', // ① 곱셈
+  'unitDiv32', // ② 나눗셈
+  'unitCircle3', // ③ 원
+  'unitFrac32', // ④ 분수
+  'unitMeasure3', // ⑤ 들이와 무게
+  'unitData3', // ⑥ 자료의 정리
 ]);
 
 export function isAuditedUnit(unitId: string): boolean {

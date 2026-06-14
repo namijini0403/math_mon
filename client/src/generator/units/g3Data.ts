@@ -122,7 +122,7 @@ const data3TableDiff: SkillDef = {
       expr,
       blankAnswers: [ans],
       explanation: [
-        txt(`|${data.values[i1]} - ${data.values[i2]}| = ${ans}${data.topic.unit}`),
+        txt(`차는 큰 수에서 작은 수를 빼요. ${Math.max(data.values[i1], data.values[i2])} - ${Math.min(data.values[i1], data.values[i2])} = ${ans}${data.topic.unit}이에요.`),
       ],
     };
   },
@@ -213,7 +213,7 @@ const data3PictoInv: SkillDef = {
       expr,
       blankAnswers: [big, small],
       explanation: [
-        txt(`${val} ÷ 10 = ${big} 나머지 ${small}. 큰 그림 ${big}개, 작은 그림 ${small}개`),
+        txt(`큰 그림은 10씩이라 ${val} ÷ 10 = ${big} 나머지 ${small}이에요. 십의 자리만큼 큰 그림 ${big}개, 일의 자리만큼 작은 그림 ${small}개를 그려요.`),
       ],
     };
   },
@@ -282,7 +282,7 @@ const data3Word: SkillDef = {
       ans = total - known;
       unit = data.topic.unit;
       prompt = `[${data.topic.title}]\n${data.dataText}\n\n전체는 ${total}${unit}이고 ${data.items[idx]}이 ${known}${unit}이라면, 나머지 항목의 합은 몇 ${unit}인가요?`;
-      expl = `${total} - ${known} = ${ans}${unit}`;
+      expl = `전체에서 ${data.items[idx]}을 빼면 나머지의 합이에요. ${total} - ${known} = ${ans}${unit}이에요.`;
     } else if (pat === 1) {
       // 가장 많은 것과 가장 적은 것의 차
       const data = generateTableData(rng);
@@ -293,7 +293,7 @@ const data3Word: SkillDef = {
       ans = maxVal - minVal;
       unit = data.topic.unit;
       prompt = `[${data.topic.title}]\n${data.dataText}\n\n가장 많은 ${maxItem}은 가장 적은 ${minItem}보다 몇 ${unit} 더 많은가요?`;
-      expl = `${maxVal} - ${minVal} = ${ans}${unit}`;
+      expl = `가장 많은 ${maxItem}(${maxVal})에서 가장 적은 ${minItem}(${minVal})을 빼요. ${maxVal} - ${minVal} = ${ans}${unit}이에요.`;
     } else {
       // 그림그래프 문장제: 두 항목 합
       const topic = rng.pick(DATA_TOPICS);
@@ -307,7 +307,7 @@ const data3Word: SkillDef = {
       ans = v1 + v2;
       unit = topic.unit;
       prompt = `[${topic.title}] 그림그래프 (🔵=10${unit}, 🔹=1${unit})\n${items[0]}: 🔵${big1}개 🔹${small1}개 (${v1}${unit})\n${items[1]}: 🔵${big2}개 🔹${small2}개 (${v2}${unit})\n\n${items[0]}과 ${items[1]}을 합치면 모두 몇 ${unit}인가요?`;
-      expl = `${v1} + ${v2} = ${ans}${unit}`;
+      expl = `두 항목의 값을 더해요. ${v1} + ${v2} = ${ans}${unit}이에요.`;
     }
 
     if (ans <= 0) { ans = 1; }

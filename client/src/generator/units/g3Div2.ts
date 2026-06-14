@@ -37,7 +37,7 @@ const div32Tens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [q * 10],
-      explanation: [txt(`${a} ÷ ${b} = ${a / b}. ${b} × ${q} = ${b * q}이므로 ${a} ÷ ${b} = ${q * 10}이에요.`)],
+      explanation: [txt(`${a}는 십이 ${a / 10}개예요. ${a / 10} ÷ ${b} = ${q}이니 ${a} ÷ ${b}는 그 10배인 ${q * 10}이에요.`)],
     };
   },
 };
@@ -77,7 +77,7 @@ const div32NoRem: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [q],
-      explanation: [txt(`${a} ÷ ${b} = ${q}. 나머지 없이 나누어떨어져요.`)],
+      explanation: [txt(`${b}에 어떤 수를 곱하면 ${a}가 되는지 찾아요. ${b} × ${q} = ${a}이니 ${a} ÷ ${b} = ${q}예요. 나머지 없이 나누어떨어져요.`)],
     };
   },
 };
@@ -119,7 +119,7 @@ const div32Rem: SkillDef = {
       prompt: '몫과 나머지를 구하세요.',
       expr,
       blankAnswers: [q, r],
-      explanation: [txt(`${a} ÷ ${b} = ${q} … ${r}. ${b} × ${q} + ${r} = ${b * q + r} = ${a}로 검산할 수 있어요.`)],
+      explanation: [txt(`${b}단에서 ${a}를 넘지 않는 가장 큰 곱은 ${b} × ${q} = ${b * q}예요. 남은 ${a} - ${b * q} = ${r}이 나머지예요. ${a} ÷ ${b} = ${q} … ${r}. 검산하면 ${b} × ${q} + ${r} = ${a}로 맞아요.`)],
     };
   },
 };
@@ -216,13 +216,13 @@ const div32Word: SkillDef = {
 
     if (pat === 0) {
       prompt = `마법사 ${a}명이 ${b}명씩 모둠을 만들어요. 모둠이 몇 개 만들어지고, 몇 명이 남나요?`;
-      explanation = `${a} ÷ ${b} = ${q} … ${r}`;
+      explanation = `${a}명을 ${b}명씩 묶으면 ${a} ÷ ${b} = ${q} … ${r}이에요. 모둠 ${q}개가 생기고 ${r}명이 남아요.`;
     } else if (pat === 1) {
       prompt = `보석 ${a}개를 상자 ${b}개에 똑같이 나누면, 한 상자에 몇 개씩 담기고 몇 개가 남나요?`;
-      explanation = `${a} ÷ ${b} = ${q} … ${r}`;
+      explanation = `${a}개를 ${b}상자에 똑같이 나누면 ${a} ÷ ${b} = ${q} … ${r}이에요. 한 상자에 ${q}개씩 담기고 ${r}개가 남아요.`;
     } else {
       prompt = `별 스티커 ${a}장을 ${b}장씩 봉투에 담으면, 봉투가 몇 개 필요하고 몇 장이 남나요?`;
-      explanation = `${a} ÷ ${b} = ${q} … ${r}`;
+      explanation = `${a}장을 ${b}장씩 담으면 ${a} ÷ ${b} = ${q} … ${r}이에요. 봉투 ${q}개가 필요하고 ${r}장이 남아요.`;
     }
 
     const expr: MathExpr = [
