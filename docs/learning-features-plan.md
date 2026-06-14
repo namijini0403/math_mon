@@ -100,7 +100,7 @@
 1. ✅ **Phase A 완료(2026-06-14)**: wrongLog 모델(game/wrongLog.ts, 10테스트) + 「흐려진 별의 회랑」(CorridorPage) + 「수련의 첨탑」(TowerPage) + 단원평가 「약점 봉인 모드」(ExamPage ?focus=weak). recordAnswer에 seed 추가, 공통 ProblemBody 추출, 허브 진입점. tsc·vitest 1472·build·Playwright 검수 통과.
 2. 🔄 **Phase B (기능4 풀이) 진행 중**: 인프라 완료(2026-06-14) — SolutionReveal(정답에도 💡풀이 보기, 5화면) + curriculumGuard(학년별 금지표기 스캔, AUDITED_UNITS 게이트) + docs/curriculum/g{N}.md 누적기준 + notation-violations.md 추적. **단원 audit 순차 진행: 1학년 전체 11단원 완료(1-1 5 + 1-2 6).** 다음 = 2학년… 차례로. 각 단원: 풀이를 학년 단계풀이로 정비 → 표기위반0 확인 → AUDITED_UNITS 추가. 교육과정 의심 시 검색.
 3. **Phase C (기능2 힌트)**: hintTokens + 힌트 단계(풀이 공유) + 보스 힌트 연출.
-4. **Phase D (기능3+5 교사·단원평가)**: 서버 assignments/results + 교사 작성·배포·레포트 + 학생 수신/응시 + 누적 추이 + 인쇄. (가장 큼, 서버 중심)
+4. ✅ **Phase D 완료(2026-06-14, 커밋 4edb34d)**: 서버 assignments/assignment_results 테이블·라우트(교사 발행/목록·결과/마감, 학생 도착시험/제출) + 출제 엔진 game/assignmentGen.ts(난이도=스킬메타 매핑 하/중/상, allocate 최대잔여법, buildAssignment 결정적·폴백·약점가중·studentSeed, 테스트 13) + 학생 응시 AssignmentPage(/assignment/:id, ProblemBody 재사용, 문항별 정오 제출, 보상 소액 XP·카드없음) + 홈 AssignmentInbox 배너 + 교사 '📜 단원평가' 탭(작성기·결과보드 강약레포트·점수추이 스파크라인·인쇄 학습지 문제/정답분리). tsc·vitest 1907·build 통과. **서버측은 Railway 배포 + TEACHER_KEY 필요(Pages에선 graceful no-op).**
 
 각 Phase: tsc(client+server)→vitest(신규 순수테스트 포함)→build→Playwright 시각 검수→커밋·푸시. 교육과정 의심 시 검색·사용자 확인.
 
