@@ -225,7 +225,7 @@ const as12cWord: SkillDef = {
         if (result >= 1) { a = ta; b = tb; break; }
       }
       answer = a - b;
-      promptStr = `${item}가 ${a}개 있어요. ${b}개를 나누어 주면 몇 개가 남나요?`;
+      promptStr = `${item}가 ${a}개 있어요. ${b}개를 친구에게 주면 몇 개가 남나요?`;
       explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} - ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
     }
 

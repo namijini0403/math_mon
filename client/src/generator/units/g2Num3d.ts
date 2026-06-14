@@ -52,7 +52,7 @@ const num3dCompose: SkillDef = {
         prompt: `${num}은 백 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [h],
-        explanation: [txt(`${num}을 백·십·일로 나누면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
+        explanation: [txt(`${num}을 백·십·일로 가르면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
       };
     } else {
       // 수 → 십 자리 숫자
@@ -69,7 +69,7 @@ const num3dCompose: SkillDef = {
         prompt: `${num}은 십 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [t],
-        explanation: [txt(`${num}을 백·십·일로 나누면 십의 자리 숫자가 ${t}이에요. 그래서 십 모형은 ${t}개예요.`)],
+        explanation: [txt(`${num}을 백·십·일로 가르면 십의 자리 숫자가 ${t}이에요. 그래서 십 모형은 ${t}개예요.`)],
       };
     }
   },

@@ -91,7 +91,7 @@ const chPromise: SkillDef = {
     ];
 
     const explanation: MathExpr = [
-      txt(`약속한 연산 정의에 따라 가★나 = ${def.label('가', '나')}${ida('예요')}. `),
+      txt(`약속한 연산 정의에 따라 가★나 = ${def.label('가', '나')}예요. `),
       txt(`먼저 안쪽을 계산해요. `),
       txt(`${a}★${b} = ${def.label(String(a), String(b))} = ${mid}. `),
       txt(`이제 바깥쪽을 계산해요. `),
@@ -197,7 +197,7 @@ const chOpPlace: SkillDef = {
       txt('+, −, ×를 한 번씩 넣는 방법은 6가지예요. ×는 +, −보다 먼저 계산해요. '),
       txt('모든 경우: '),
       txt(allResults.join(' / ')),
-      txt(`  가장 큰 값은 ${best}${ida(best)}예요.`),
+      txt(`  가장 큰 값은 ${ida(best)}.`),
     ];
 
     return {
@@ -249,7 +249,7 @@ const chIneq: SkillDef = {
       txt(`(${A}−${B})÷${C}×${D} = ${A - B}÷${C}×${D} = ${(A - B) / C}×${D} = ${lhs}. `),
       txt(`부등식은 ${lhs} > ${E}×□가 돼요. ${E}×□가 ${lhs}보다 작아야 해요. `),
       txt(`${E}×${ans} = ${E * ans}(은)는 ${lhs}보다 작고, ${E}×${ans + 1} = ${E * (ans + 1)}(은)는 ${lhs}보다 작지 않아요. `),
-      txt(`따라서 □에 들어갈 수 있는 가장 큰 자연수는 ${ans}${ida(ans)}예요.`),
+      txt(`따라서 □에 들어갈 수 있는 가장 큰 자연수는 ${ida(ans)}.`),
     ];
 
     return {
@@ -286,7 +286,9 @@ const chGcdLcm: SkillDef = {
     // 소수 목록 (작은 것부터)
     const primes = [2, 3, 5, 7, 11, 13];
 
-    let G: number, p: number, q: number, small: number, large: number;
+    // 두 수를 모두 '두 자리 수'로 제약 → (G×1, G×p×q) 대안 쌍은 큰 수가 세 자리(=L≥100)라
+    // 제외되어 (G×p, G×q)가 유일한 답이 된다.
+    let G: number, p: number, q: number, small: number, large: number, L: number;
     let tries = 0;
     do {
       G = rng.int(2, 12);
@@ -296,19 +298,18 @@ const chGcdLcm: SkillDef = {
       q = primes[rng.int(pi + 1, primes.length - 1)];
       small = G * p;
       large = G * q;
+      L = G * p * q;
       tries++;
-      if (tries > 1000) { G = 6; p = 2; q = 3; small = 12; large = 18; break; }
-    } while (small === large || small > 100 || large > 200);
-
-    const L = G * p * q;
+      if (tries > 2000) { G = 3; p = 5; q = 7; small = 15; large = 21; L = 105; break; }
+    } while (small < 10 || large > 99 || L < 100 || small === large);
 
     const explanation: MathExpr = [
-      txt(`두 수는 모두 최대공약수 ${G}의 배수예요. `),
-      txt(`두 수를 ${G}×㉮, ${G}×㉯ (㉮<㉯, 서로소)라 하면 `),
-      txt(`최소공배수 = ${G}×㉮×㉯ = ${L}이에요. `),
-      txt(`㉮×㉯ = ${L}÷${G} = ${p * q}이고, `),
-      txt(`서로소인 쌍 (㉮,㉯) = (${p}, ${q})가 유일해요. `),
-      txt(`따라서 두 수는 ${G}×${p} = ${small}, ${G}×${q} = ${large}${ida(large)}예요.`),
+      txt(`두 수는 모두 최대공약수 ${G}의 배수이고, ${G}×㉮, ${G}×㉯ (㉮<㉯, ㉮와 ㉯는 서로소)로 나타낼 수 있어요. `),
+      txt(`최소공배수 = ${G}×㉮×㉯ = ${L}이므로 ㉮×㉯ = ${L}÷${G} = ${p * q}이에요. `),
+      txt(`㉮×㉯ = ${p * q}이 되는 서로소인 쌍은 (1, ${p * q})와 (${p}, ${q})가 있어요. `),
+      txt(`(1, ${p * q})이면 두 수가 ${G}와 ${L}인데 ${L}은 두 자리 수가 아니라서 제외돼요. `),
+      txt(`두 수가 모두 두 자리 수인 (${p}, ${q})를 골라요. `),
+      txt(`따라서 두 수는 ${G}×${p} = ${small}, ${G}×${q} = ${ida(large)}.`),
     ];
 
     return {
@@ -316,7 +317,7 @@ const chGcdLcm: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `두 자연수의 최대공약수가 ${G}, 최소공배수가 ${L}일 때, 두 수를 작은 수부터 차례로 구하세요.`,
+      prompt: `두 자리 수인 두 자연수의 최대공약수가 ${G}, 최소공배수가 ${L}일 때, 두 수를 작은 수부터 차례로 구하세요.`,
       expr: [txt('작은 수: '), blank(0), txt('  큰 수: '), blank(1)],
       blankAnswers: [small, large],
       explanation,
@@ -366,9 +367,9 @@ const chRemainder: SkillDef = {
     const explanation: MathExpr = [
       txt(`어떤 수를 □라 하면, □를 ${A}로 나누면 ${A - k}가 남고, ${B}로 나누면 ${B - k}가 남아요. `),
       txt(`즉, □+${k}는 ${A}의 배수이기도 하고 ${B}의 배수이기도 해요. `),
-      txt(`${A}와 ${B}의 최소공배수는 ${L}이므로, □+${k} = ${L}×(자연수)${ida(L)}에요. `),
+      txt(`${A}와 ${B}의 최소공배수는 ${L}이므로, □+${k} = ${L}×(자연수)예요. `),
       txt(`조건을 만족하는 수: ${L}-${k}=${L - k}, ${2 * L}-${k}=${2 * L - k}, … `),
-      txt(`이 중 ${N}에 가장 가까운 수는 ${ans}${ida(ans)}예요.`),
+      txt(`이 중 ${N}에 가장 가까운 수는 ${ida(ans)}.`),
     ];
 
     return {
@@ -460,8 +461,8 @@ const chCompose: SkillDef = {
       prompt = `○=□+${a}, ◎=○×${b}일 때, □=${x}이면 ◎는 얼마인가요?`;
       expr = [txt(`□=${x} → ◎ = `), blank(0)];
       explanation = [
-        txt(`○=□+${a}에 □=${x}을 대입하면 ○=${x}+${a}=${circle}${ida(circle)}에요. `),
-        txt(`◎=○×${b}에 ○=${circle}을 대입하면 ◎=${circle}×${b}=${ans}${ida(ans)}에요.`),
+        txt(`○=□+${a}에 □=${x}을 대입하면 ○=${x}+${a}=${ida(circle)}. `),
+        txt(`◎=○×${b}에 ○=${circle}을 대입하면 ◎=${circle}×${b}=${ida(ans)}.`),
       ];
     } else {
       // 역방향: ◎ 주고 □ 구하기
@@ -479,8 +480,8 @@ const chCompose: SkillDef = {
       prompt = `○=□+${a}, ◎=○×${b}일 때, ◎=${result}이면 □는 얼마인가요?`;
       expr = [txt(`◎=${result} → □ = `), blank(0)];
       explanation = [
-        txt(`◎=○×${b}에서 ○=${result}÷${b}=${circle}${ida(circle)}에요. `),
-        txt(`○=□+${a}에서 □=${circle}−${a}=${x}${ida(x)}에요.`),
+        txt(`◎=○×${b}에서 ○=${result}÷${b}=${ida(circle)}. `),
+        txt(`○=□+${a}에서 □=${circle}−${a}=${ida(x)}.`),
       ];
     }
 
@@ -574,7 +575,7 @@ const chArith: SkillDef = {
       txt(`수열: ${f}, ${f + d}, ${f + 2 * d}, … (첫째 항 ${f}, 일정하게 ${d}씩 커져요). `),
       txt(`□번째 항 = ${f}+(□−1)×${d}예요. 이 값이 ${X}보다 처음 커지는 □를 찾아요. `),
       txt(`${ans - 1}번째 항은 ${prevVal}(으)로 아직 ${X}보다 크지 않고, ${ans}번째 항은 ${ansVal}(으)로 ${X}보다 커요. `),
-      txt(`따라서 처음으로 ${X}보다 커지는 수는 ${ans}번째${ida(ans)}예요.`),
+      txt(`따라서 처음으로 ${X}보다 커지는 수는 ${ans}번째예요.`),
     ];
 
     return {
@@ -626,11 +627,13 @@ const chFracRange: SkillDef = {
       break;
     }
 
+    const kMin = (P + 1) / b; // P = b·kMin − 1 이므로 정수
+    const kMax = (Q - 1) / b; // Q = b·kMax + 1 이므로 정수
     const explanation: MathExpr = [
-      txt(`기약분수 ${a}/${b}와 크기가 같은 분수는 ${a}×k / ${b}×k (k=1,2,3,…)${ida('예요')}에요. `),
-      txt(`분모 ${b}×k가 ${P} 초과 ${Q} 미만이 되려면 `),
-      txt(`${P}÷${b} < k < ${Q}÷${b}, 즉 ${P / b} < k < ${Q / b}. `),
-      txt(`이를 만족하는 자연수 k는 ${count}개${ida(count)}예요.`),
+      txt(`기약분수 ${a}/${b}와 크기가 같은 분수는 ${a}×□ / ${b}×□ (□=1,2,3,…)로 만들 수 있어요. `),
+      txt(`분모 ${b}×□가 ${P} 초과 ${Q} 미만이 되려면, `),
+      txt(`□=${kMin}이면 분모 ${b * kMin}, □=${kMax}이면 분모 ${b * kMax}로 모두 범위 안이에요. `),
+      txt(`따라서 □는 ${kMin}부터 ${kMax}까지 ${count}개예요.`),
     ];
 
     return {
@@ -680,10 +683,10 @@ const chFracAddSame: SkillDef = {
     }
 
     const explanation: MathExpr = [
-      txt(`${a}/${b}의 분모·분자에 같은 수 □를 더하면 (${a}+□)/(${b}+□)${ida('예요')} = ${c}/${d}. `),
+      txt(`${a}/${b}의 분모·분자에 같은 수 □를 더하면 (${a}+□)/(${b}+□) = ${c}/${d}. `),
       txt(`(${a}+□)×${d} = ${c}×(${b}+□). `),
       txt(`${a * d}+${d}□ = ${b * c}+${c}□ → (${d}−${c})□ = ${b * c}−${a * d} → ${d - c}□ = ${b * c - a * d}. `),
-      txt(`□ = ${b * c - a * d}÷${d - c} = ${box}${ida(box)}예요.`),
+      txt(`□ = ${b * c - a * d}÷${d - c} = ${ida(box)}.`),
     ];
 
     return {
@@ -751,7 +754,7 @@ const chFracIneq: SkillDef = {
       txt(`${a}/${b} < □/${N} < ${c}/${d}를 ${N}을 분모로 통분해요. `),
       txt(`${a}/${b} = ${a * (N / b)}/${N},  ${c}/${d} = ${c * (N / d)}/${N}. `),
       txt(`따라서 ${a * (N / b)} < □ < ${c * (N / d)}. `),
-      txt(`이를 만족하는 자연수 □: ${loInt}~${hiInt}, 총 ${count}개${ida(count)}예요.`),
+      txt(`이를 만족하는 자연수 □: ${loInt}~${hiInt}, 총 ${count}개예요.`),
     ];
 
     return {
@@ -984,12 +987,12 @@ const chTelescope: SkillDef = {
     if (n > 4) telescopeSteps.push(txt(` + … + `), frT({ n: 1, d: n * (n + 1) }));
 
     const explanation: MathExpr = [
-      txt(`1/(k×(k+1)) = 1/k − 1/(k+1) 성질을 이용해요. `),
+      txt(`1/(□×(□+1)) = 1/□ − 1/(□+1) 성질을 이용해요. `),
       txt(`각 항을 분해하면: (1/1−1/2)+(1/2−1/3)+…+(1/${n}−1/${n + 1}). `),
       txt(`앞뒤 항이 소거되어(망원 소거) 1 − 1/${n + 1} = ${n}/${n + 1}만 남아요. `),
       txt(`따라서 합 = `),
       frT(ans),
-      txt(`${ida(ans.n + '/' + ans.d)}예요.`),
+      txt(`예요.`),
     ];
 
     const termTokens: MathToken[] = [...telescopeSteps];
@@ -1035,7 +1038,7 @@ const chStairs: SkillDef = {
     const explanation: MathExpr = [
       txt(`한 변이 ${a} cm인 정사각형 ${n}개를 계단 모양으로 쌓은 도형을 생각해요. `),
       txt(`가로 방향 선분을 합치면 ${n}×${a}×2 = ${2 * n * a} cm, `),
-      txt(`세로 방향 선분을 합치면 ${n}×${a}×2 = ${2 * n * a} cm${ida(2 * n * a)}에요. `),
+      txt(`세로 방향 선분을 합치면 ${n}×${a}×2 = ${2 * n * a} cm예요. `),
       txt(`이것은 계단 형태를 외접 직사각형(가로 ${n * a} cm, 세로 ${n * a} cm)의 둘레와 같아요. `),
       txt(`둘레 = 4×${n}×${a} = ${ans} cm.`),
     ];
@@ -1171,7 +1174,7 @@ const chRhombusScale: SkillDef = {
     const kSq = k * k;
 
     const explanation: MathExpr = [
-      txt(`마름모의 넓이 = (대각선1 × 대각선2) ÷ 2${ida('에요')}. `),
+      txt(`마름모의 넓이 = (대각선1 × 대각선2) ÷ 2예요. `),
       txt(`두 대각선을 각각 ${k}배로 늘리면 `),
       txt(`넓이 = (${k}×대각선1) × (${k}×대각선2) ÷ 2 `),
       txt(`= ${k}×${k} × (대각선1 × 대각선2 ÷ 2) `),

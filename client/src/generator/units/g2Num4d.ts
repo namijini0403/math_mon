@@ -54,7 +54,7 @@ const num4dCompose: SkillDef = {
         prompt: `${num}은 천 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [th],
-        explanation: [txt(`${num}을 천·백·십·일로 나누면 천의 자리 숫자가 ${th}이에요. 그래서 천 모형은 ${th}개예요.`)],
+        explanation: [txt(`${num}을 천·백·십·일로 가르면 천의 자리 숫자가 ${th}이에요. 그래서 천 모형은 ${th}개예요.`)],
       };
     } else {
       // 수 → 백 자리 숫자
@@ -72,7 +72,7 @@ const num4dCompose: SkillDef = {
         prompt: `${num}은 백 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [h],
-        explanation: [txt(`${num}을 천·백·십·일로 나누면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
+        explanation: [txt(`${num}을 천·백·십·일로 가르면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
       };
     }
   },

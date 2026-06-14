@@ -282,7 +282,7 @@ const chFracIneqNat: SkillDef = {
       txt(`${lowerN}/${lowerD} × ${q}/${p} = ${lowerN * q}/${lowerD * p},  ${upperN}/${upperD} × ${q}/${p} = ${upperN * q}/${upperD * p}이에요. `),
       txt(`따라서 □는 ${lowerN * q}/${lowerD * p}보다 크고 ${upperN * q}/${upperD * p}보다 작은 자연수예요. `),
       txt(`만족하는 자연수는 ${minAns}부터 ${maxAns}까지예요. `),
-      txt(`가장 작은 자연수는 ${minAns}, 가장 큰 자연수는 ${maxAns}${ida(maxAns)}에요.`),
+      txt(`가장 작은 자연수는 ${minAns}, 가장 큰 자연수는 ${ida(maxAns)}.`),
     ];
 
     return {
@@ -476,7 +476,7 @@ const chAreaScale: SkillDef = {
       frT({ n: hN, d: hD }),
       txt(` = `),
       frT({ n: resN, d: resD }),
-      txt(`${ida(`${resN}/${resD}`)}예요.`),
+      txt(`예요.`),
     ];
 
     return {
@@ -553,7 +553,7 @@ const chCongTriangle: SkillDef = {
       txt(`두 삼각형은 합동이므로 대응각이 같아요. `),
       txt(`삼각형의 세 내각: ${angA}°, ${angB}°, ${angC}° (합 = 180°). `),
       txt(`두 삼각형을 이어 붙인 도형에서 `),
-      txt(`${targetLabel}(ⓐ)는 두 각도의 합 ${angA}° + ${angB}° = ${targetAng}°${ida(targetAng)}예요.`),
+      txt(`${targetLabel}(ⓐ)는 두 각도의 합 ${angA}° + ${angB}° = ${targetAng}°예요.`),
     ];
 
     return {
@@ -608,9 +608,9 @@ const chPaperFold: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`정사각형 종이를 접으면 합동 삼각형이 생겨요. `),
-      txt(`접힌 각도 ① = ${ang1}°${ida(ang1)}예요. `),
-      txt(`정사각형의 꼭짓점 각도는 90°이므로 ② = 90° − ${ang1}° = ${ang2}°${ida(ang2)}예요. `),
-      txt(`두 각도의 차 ② − ① = ${ang2}° − ${ang1}° = ${diff}°${ida(diff)}예요.`),
+      txt(`접힌 각도 ① = ${ang1}°예요. `),
+      txt(`정사각형의 꼭짓점 각도는 90°이므로 ② = 90° − ${ang1}° = ${ang2}°예요. `),
+      txt(`두 각도의 차 ② − ① = ${ang2}° − ${ang1}° = ${diff}°예요.`),
     ];
 
     return {
@@ -665,7 +665,7 @@ const chSymAxis: SkillDef = {
       txt(`마름모 모양의 선대칭 도형에서 마주 보는 각도는 서로 같고, `),
       txt(`이웃한 두 각도의 합은 180°예요. `),
       txt(`주어진 각도가 ${givenAngle}°이므로, `),
-      txt(`구하는 각도 ⓐ = 180° − ${givenAngle}° = ${targetAngle}°${ida(targetAngle)}예요.`),
+      txt(`구하는 각도 ⓐ = 180° − ${givenAngle}° = ${targetAngle}°예요.`),
     ];
 
     return {
@@ -741,7 +741,7 @@ const chDecIneqSum: SkillDef = {
       txt(`${rhsStr} = ${rhsVal}... `),
       txt(`${lhsVal} < □ < ${rhsVal}에서 `),
       txt(`가장 작은 자연수: ${minBox}, 가장 큰 자연수: ${maxBox}. `),
-      txt(`합 = ${minBox} + ${maxBox} = ${ans}${ida(ans)}에요.`),
+      txt(`합 = ${minBox} + ${maxBox} = ${ida(ans)}.`),
     ];
 
     return {
@@ -966,7 +966,7 @@ const chDoubleBox: SkillDef = {
     const explanation: MathExpr = [
       txt(`두 직육면체를 ${axisNames[axis]} 방향으로 이어 붙이면 `),
       txt(`새 직육면체의 세 변은 `),
-      txt(`가로 ${newDims[0]} cm, 세로 ${newDims[1]} cm, 높이 ${newDims[2]} cm${ida(`${newDims[2]}cm`)}에요. `),
+      txt(`가로 ${newDims[0]} cm, 세로 ${newDims[1]} cm, 높이 ${newDims[2]} cm예요. `),
       txt(`모든 모서리 합 = 4 × (${newDims[0]} + ${newDims[1]} + ${newDims[2]}) `),
       txt(`= 4 × ${newDims[0] + newDims[1] + newDims[2]} = ${ans} cm.`),
     ];
