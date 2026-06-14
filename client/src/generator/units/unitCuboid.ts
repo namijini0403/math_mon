@@ -6,6 +6,7 @@
 
 import { RNG } from '../rng';
 import { nj, ida } from '../josa';
+import { pickCubeNetChoices } from '../cubeNet';
 import type { MathExpr, SkillDef } from '../types';
 
 // ── 공통 헬퍼 ──────────────────────────────────────────────
@@ -441,6 +442,43 @@ const cubWord: SkillDef = {
   },
 };
 
+// ── 7. 정육면체 전개도 고르기 ─────────────────────────────────
+// 보기 4개(①②③④) 중 접으면 정육면체가 되는 전개도를 고른다.
+// 정답·오답은 "주사위 굴리기" 판정(cubeNet.ts)으로 보장한다.
+
+const cubNet: SkillDef = {
+  id: 'cub-net',
+  unitId: 'unitCuboid',
+  difficulty: 2,
+  title: '정육면체의 전개도 고르기',
+  note: '보기 4개 중 접으면 정육면체가 되는 전개도. cubeNet 판정으로 정답 보장',
+  generate(seed) {
+    const rng = new RNG(seed);
+    const { nets, answerIndex } = pickCubeNetChoices(rng);
+    const marks = ['①', '②', '③', '④'];
+
+    const explanation: MathExpr = [
+      txt(
+        `정답은 ${marks[answerIndex]}번이에요. 정육면체의 전개도는 정사각형 6개로 이루어지고, ` +
+        `접었을 때 6개의 면이 겹치지 않고 빈 곳도 없이 딱 맞아야 해요. ` +
+        `나머지 보기는 접으면 면이 서로 겹치거나 한 면이 비어요.`,
+      ),
+    ];
+
+    return {
+      id: `${this.id}:${seed}`,
+      skillId: this.id,
+      seed,
+      format: 'choice',
+      prompt: '접으면 정육면체가 되는 전개도를 고르세요.',
+      choices: marks.map((m) => ({ kind: 'text' as const, text: m })),
+      answerIndex,
+      explanation,
+      figure: { kind: 'cube-net-choice', nets: nets.map((cells) => ({ cells })) },
+    };
+  },
+};
+
 // ── export ──────────────────────────────────────────────────
 
 export const unitCuboidSkills: SkillDef[] = [
@@ -450,4 +488,5 @@ export const unitCuboidSkills: SkillDef[] = [
   cubCubeEdge,
   cubEdgeMissing,
   cubWord,
+  cubNet,
 ];

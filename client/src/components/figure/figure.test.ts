@@ -156,6 +156,31 @@ describe('FigureView 렌더 스모크', () => {
     expect(html).toContain('<polygon');
     expect(html).not.toContain('NaN');
   });
+
+  it('cylinder-net: 직사각형 옆면·원 2개·높이/반지름 라벨', () => {
+    const html = renderFigure({ kind: 'cylinder-net', r: 5, h: 12 });
+    expect(html).toContain('<svg');
+    expect(html).toContain('<rect');
+    expect(html).toContain('<circle');
+    expect(html).toContain('밑면 둘레');
+    expect(html).toContain('반지름 5 cm'); // aria-label
+    expect(html).not.toContain('NaN');
+  });
+
+  it('cube-net-choice: 보기 4개(①②③④)와 정사각형 칸들', () => {
+    const nets = [
+      { cells: [[0, 1], [1, 1], [2, 1], [3, 1], [1, 0], [1, 2]] as [number, number][] },
+      { cells: [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]] as [number, number][] },
+      { cells: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0]] as [number, number][] },
+      { cells: [[0, 0], [1, 0], [1, 1], [2, 1], [2, 2], [3, 2]] as [number, number][] },
+    ];
+    const html = renderFigure({ kind: 'cube-net-choice', nets });
+    expect(html).toContain('<svg');
+    expect(html).toContain('①');
+    expect(html).toContain('④');
+    expect(html).toContain('<rect');
+    expect(html).not.toContain('NaN');
+  });
 });
 
 describe('그림 연결 스킬의 figure 스펙 일관성', () => {
@@ -418,6 +443,33 @@ describe('그림 연결 스킬의 figure 스펙 일관성', () => {
         const wantPie = p.prompt.includes('원그래프');
         expect(f.variant).toBe(wantPie ? 'pie' : 'band');
       }
+    }
+  });
+
+  it('ch62-cylinder-net: figure.r/h가 문제 prompt 수치와 일치', () => {
+    const skill = SKILLS.find((s) => s.id === 'ch62-cylinder-net');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      expect(p.figure!.kind).toBe('cylinder-net');
+      const f = p.figure as Extract<FigureSpec, { kind: 'cylinder-net' }>;
+      expect(p.prompt).toContain(`반지름이 ${f.r} cm`);
+      expect(p.prompt).toContain(`높이가 ${f.h} cm`);
+    }
+  });
+
+  it('cub-net: 보기 4개, 정답(answerIndex)의 전개도만 실제로 접힌다', async () => {
+    const { isValidCubeNet } = await import('../../generator/cubeNet');
+    const skill = SKILLS.find((s) => s.id === 'cub-net');
+    expect(skill).toBeDefined();
+    for (let seed = 0; seed < 200; seed++) {
+      const p = skill!.generate(seed);
+      if (p.format !== 'choice') continue;
+      const f = p.figure as Extract<FigureSpec, { kind: 'cube-net-choice' }>;
+      expect(f.nets).toHaveLength(4);
+      const valids = f.nets.map((n) => isValidCubeNet(n.cells));
+      expect(valids.filter(Boolean)).toHaveLength(1);
+      expect(valids[p.answerIndex]).toBe(true);
     }
   });
 });

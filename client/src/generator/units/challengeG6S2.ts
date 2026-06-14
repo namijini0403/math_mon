@@ -1148,6 +1148,7 @@ const chCylinderNet: SkillDef = {
       answer: totalArea,
       unit: 'cm²',
       explanation,
+      figure: { kind: 'cylinder-net', r, h },
     };
   },
   minVariety: 48, // r 8가지 × h 16가지

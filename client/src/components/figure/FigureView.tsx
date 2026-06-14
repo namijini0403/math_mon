@@ -79,6 +79,12 @@ export function FigureView({ spec }: { spec: FigureSpec }) {
     case 'cube-stack':
       svg = <CubeStack w={spec.w} d={spec.d} h={spec.h} />;
       break;
+    case 'cylinder-net':
+      svg = <CylinderNet r={spec.r} h={spec.h} />;
+      break;
+    case 'cube-net-choice':
+      svg = <CubeNetChoice nets={spec.nets} />;
+      break;
     default:
       // 미구현 kind 폴백 (타입상 도달 불가지만 방어적으로)
       svg = (
@@ -894,6 +900,83 @@ function CubeStack({ w, d, h }: { w: number; d: number; h: number }) {
       {cells.map((cell, idx) => (
         <polygon key={idx} points={cell.pts} fill={cell.fill} stroke={EDGE} strokeWidth={1} strokeLinejoin="round" />
       ))}
+    </svg>
+  );
+}
+
+// ── 원기둥 전개도: 옆면 직사각형(가로=둘레) + 밑면 원 2개(반지름 r) ──────────
+function CylinderNet({ r, h }: { r: number; h: number }) {
+  const circ = Math.max(8, 2 * 3.14 * r);
+  const rectW = Math.min(150, Math.max(70, circ * 3));
+  const rectH = Math.min(110, Math.max(40, h * 5));
+  const rPx = Math.min(30, Math.max(14, r * 3));
+  const pad = 14;
+  const gap = 8;
+  const W = pad * 2 + rectW;
+  const H = pad * 2 + rPx * 2 + gap + rectH + gap + rPx * 2;
+  const cx = pad + rectW / 2;
+  const topCy = pad + rPx;
+  const rectY = pad + rPx * 2 + gap;
+  const botCy = rectY + rectH + gap + rPx;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width={Math.min(W, 220)} role="img"
+      aria-label={`원기둥 전개도. 밑면 반지름 ${r} cm 원 2개와 가로가 밑면 둘레, 세로가 높이 ${h} cm인 직사각형 옆면`}>
+      <circle cx={cx} cy={topCy} r={rPx} fill={FILL3} stroke={STROKE} strokeWidth={2} />
+      <line x1={cx} y1={topCy} x2={cx + rPx} y2={topCy} stroke={ANG} strokeWidth={1.5} />
+      <text x={cx + rPx / 2} y={topCy - 3} textAnchor="middle" fontSize="10" fill={ANG}>{r}</text>
+      <rect x={pad} y={rectY} width={rectW} height={rectH} fill={FILL} stroke={STROKE} strokeWidth={2} />
+      <text x={cx} y={rectY + rectH / 2 + 4} textAnchor="middle" fontSize="10" fill={LABEL}>밑면 둘레</text>
+      <text x={pad - 4} y={rectY + rectH / 2 + 4} textAnchor="end" fontSize="10" fill={LABEL}>{h}</text>
+      <circle cx={cx} cy={botCy} r={rPx} fill={FILL3} stroke={STROKE} strokeWidth={2} />
+    </svg>
+  );
+}
+
+// ── 정육면체 전개도 고르기: 보기 4개(①②③④)의 6칸 폴리오미노 ──────────────
+function CubeNetMini({ cells, cell }: { cells: [number, number][]; cell: number }) {
+  return (
+    <g>
+      {cells.map(([c, r], i) => (
+        <rect key={i} x={c * cell} y={r * cell} width={cell} height={cell}
+          fill={FILL2} stroke={STROKE} strokeWidth={1.5} strokeLinejoin="round" />
+      ))}
+    </g>
+  );
+}
+
+function CubeNetChoice({ nets }: { nets: { cells: [number, number][] }[] }) {
+  const marks = ['①', '②', '③', '④'];
+  const cell = 13;
+  const tileW = 92;
+  const tileH = 88;
+  const cols = 2;
+  const W = cols * tileW;
+  const rows = Math.ceil(nets.length / cols);
+  const H = rows * tileH;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} width={Math.min(W, 260)} role="img"
+      aria-label={`정육면체 전개도 보기 ${nets.length}개 중 접으면 정육면체가 되는 것 고르기`}>
+      {nets.map((net, idx) => {
+        const tx = (idx % cols) * tileW;
+        const ty = Math.floor(idx / cols) * tileH;
+        const c = net.cells;
+        const cols2 = Math.max(...c.map((p) => p[0])) + 1;
+        const rows2 = Math.max(...c.map((p) => p[1])) + 1;
+        const gw = cols2 * cell;
+        const gh = rows2 * cell;
+        const ox = tx + (tileW - gw) / 2;
+        const oy = ty + 18 + (tileH - 18 - gh) / 2;
+        return (
+          <g key={idx}>
+            <text x={tx + tileW / 2} y={ty + 14} textAnchor="middle" fontSize="13" fill={LABEL}>{marks[idx]}</text>
+            <g transform={`translate(${ox.toFixed(1)},${oy.toFixed(1)})`}>
+              <CubeNetMini cells={c} cell={cell} />
+            </g>
+          </g>
+        );
+      })}
     </svg>
   );
 }

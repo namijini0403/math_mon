@@ -51,7 +51,11 @@ export type FigureSpec =
   /** n각기둥·n각뿔 겨냥도 — 보이는 모서리 실선·숨은 모서리 점선. 구성 요소(면·모서리·꼭짓점) 세기용 */
   | { kind: 'solid-gon'; shape: 'prism' | 'pyramid'; n: number }
   /** 쌓기나무 직육면체 블록(등각 투상) — 가로 w·세로 d·높이 h개의 단위 정육면체. 보이는 세 면에 칸 격자 */
-  | { kind: 'cube-stack'; w: number; d: number; h: number };
+  | { kind: 'cube-stack'; w: number; d: number; h: number }
+  /** 원기둥 전개도 — 옆면 직사각형(가로=밑면 둘레, 세로=높이 h) + 밑면 원 2개(반지름 r). 계산형 라벨 */
+  | { kind: 'cylinder-net'; r: number; h: number }
+  /** 정육면체 전개도 고르기 — 보기 4개(①②③④)의 6칸 폴리오미노. cells=[col,row][] (정답은 generator가 answerIndex로) */
+  | { kind: 'cube-net-choice'; nets: { cells: [number, number][] }[] };
 
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =
