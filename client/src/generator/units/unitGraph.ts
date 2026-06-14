@@ -155,7 +155,7 @@ const graphRead: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음은 ${d.topic.title}를 나타낸 ${d.graphName}예요. [${d.dataText}] ${nj(targetItem, '을/를')} 좋아하는 학생은 몇 ${d.topic.unit}인가요?`,
+      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${d.graphName}예요. [${d.dataText}] ${nj(targetItem, '을/를')} 좋아하는 학생은 몇 ${d.topic.unit}인가요?`,
       expr,
       blankAnswers: [answer],
       explanation,
@@ -209,7 +209,7 @@ const graphMost: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `다음은 ${d.topic.title}를 나타낸 ${d.graphName}예요. [${d.dataText}] ${isMost ? '가장 많은' : '가장 적은'} 학생이 좋아하는 것은 무엇인가요?`,
+      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${d.graphName}예요. [${d.dataText}] ${isMost ? '가장 많은' : '가장 적은'} 학생이 좋아하는 것은 무엇인가요?`,
       choices: shuffled,
       answerIndex,
       explanation,
@@ -324,7 +324,7 @@ const graphMissing: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음은 ${d.topic.title}를 나타낸 ${d.graphName}예요. ${knownStr}이고, ${missingItem}의 백분율이 빠져 있어요. ${nj(missingItem, '은/는')} 몇 %인가요?`,
+      prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${d.graphName}예요. ${knownStr}이고, ${missingItem}의 백분율이 빠져 있어요. ${nj(missingItem, '은/는')} 몇 %인가요?`,
       expr,
       blankAnswers: [missingPct],
       explanation,
@@ -408,7 +408,7 @@ const graphTimes: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음은 ${topic.title}를 나타낸 ${graphName}예요. [${dataText}] ${nj(largerItem, '을/를')} 좋아하는 학생 수는 ${nj(smallerItem, '을/를')} 좋아하는 학생 수의 몇 배인가요?`,
+      prompt: `다음은 ${nj(topic.title, '을/를')} 나타낸 ${graphName}예요. [${dataText}] ${nj(largerItem, '을/를')} 좋아하는 학생 수는 ${nj(smallerItem, '을/를')} 좋아하는 학생 수의 몇 배인가요?`,
       expr,
       blankAnswers: [k],
       explanation,
@@ -440,7 +440,7 @@ const graphWord: SkillDef = {
     const scenarios: Scenario[] = [
       {
         question: (total, area, pct, subPct, sub) =>
-          `전체 ${total}명 중 ${area}이 ${pct}%이고, 그 중 ${subPct}%가 ${sub}이라면 ${area}의 ${nj(sub, '은/는')} 몇 명인가요?`,
+          `전체 ${total}명 중 ${nj(area, '이/가')} ${pct}%이고, 그 중 ${subPct}%가 ${sub}이라면 ${area}의 ${nj(sub, '은/는')} 몇 명인가요?`,
         areaLabel: '마을별 학생',
         subLabel: '성별',
         areas: ['가 마을', '나 마을', '다 마을', '라 마을'],
@@ -467,7 +467,7 @@ const graphWord: SkillDef = {
       },
       {
         question: (total, area, pct, subPct, sub) =>
-          `전체 ${total}명의 학생 중 ${area}이 ${pct}%이고, 그 중 ${subPct}%가 ${sub}이라면 ${area}의 ${nj(sub, '은/는')} 몇 명인가요?`,
+          `전체 ${total}명의 학생 중 ${nj(area, '이/가')} ${pct}%이고, 그 중 ${subPct}%가 ${sub}이라면 ${area}의 ${nj(sub, '은/는')} 몇 명인가요?`,
         areaLabel: '혈액형별 학생',
         subLabel: '성별',
         areas: ['A형', 'B형', 'O형', 'AB형'],

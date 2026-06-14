@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, SkillDef } from '../types';
 
@@ -62,7 +63,7 @@ const dec4PlaceValue: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${displayStr}에서 ${placeName} 자리 숫자가 나타내는 값은 ${unitName}이 몇 개인가요?`,
+        prompt: `${displayStr}에서 ${placeName} 자리 숫자가 나타내는 값은 ${nj(unitName, '이/가')} 몇 개인가요?`,
         expr: [
           txt(`${displayStr}의 ${placeName} 자리 숫자가 나타내는 값: `),
           { kind: 'blank', slot: 0 },
@@ -71,7 +72,7 @@ const dec4PlaceValue: SkillDef = {
         blankAnswers: [placeDigit],
         explanation: [
           txt(`${displayStr}의 ${placeName} 자리 숫자는 ${placeDigit}이에요. `),
-          txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${unitName}이 ${placeDigit}개를 나타내요.`),
+          txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${nj(unitName, '이/가')} ${placeDigit}개를 나타내요.`),
         ],
       };
     } else {
@@ -97,7 +98,7 @@ const dec4PlaceValue: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${displayStr}에서 ${placeName} 자리 숫자가 나타내는 값은 ${unitName}이 몇 개인가요?`,
+        prompt: `${displayStr}에서 ${placeName} 자리 숫자가 나타내는 값은 ${nj(unitName, '이/가')} 몇 개인가요?`,
         expr: [
           txt(`${displayStr}의 ${placeName} 자리 숫자가 나타내는 값: `),
           { kind: 'blank', slot: 0 },
@@ -106,7 +107,7 @@ const dec4PlaceValue: SkillDef = {
         blankAnswers: [placeDigit],
         explanation: [
           txt(`${displayStr}의 ${placeName} 자리 숫자는 ${placeDigit}이에요. `),
-          txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${unitName}이 ${placeDigit}개를 나타내요.`),
+          txt(`${placeName} 자리는 ${unitName}의 자리이므로 ${nj(unitName, '이/가')} ${placeDigit}개를 나타내요.`),
         ],
       };
     }

@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -56,10 +57,10 @@ const num50Compose: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${total}은 10개씩 묶음 ${bundles}개와 낱개 몇 개인가요?`,
+        prompt: `${nj(total, '은/는')} 10개씩 묶음 ${bundles}개와 낱개 몇 개인가요?`,
         expr,
         blankAnswers: [singles],
-        explanation: [txt(`${total}은 10개씩 ${bundles}묶음(${bundles * 10}개)과 낱개로 이루어져요. 그래서 낱개는 ${singles}개예요.`)],
+        explanation: [txt(`${nj(total, '은/는')} 10개씩 ${bundles}묶음(${bundles * 10}개)과 낱개로 이루어져요. 그래서 낱개는 ${singles}개예요.`)],
       };
     }
   },
@@ -81,7 +82,7 @@ const num50Split: SkillDef = {
     // 빈칸: 낱개 수
 
     const expr: MathExpr = [
-      txt(`${total}은 10과 `),
+      txt(`${nj(total, '은/는')} 10과 `),
       { kind: 'blank', slot: 0 },
       txt('으로 가를 수 있어요.'),
     ];
@@ -91,7 +92,7 @@ const num50Split: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${total}을 10과 얼마로 가를 수 있나요?`,
+      prompt: `${nj(total, '을/를')} 10과 얼마로 가를 수 있나요?`,
       expr,
       blankAnswers: [singles],
       explanation: [txt(`${total} = 10 + ${singles}이에요.`)],
@@ -132,8 +133,8 @@ const num50Order: SkillDef = {
       // 사이 수: a, ?, a+2
       const a = rng.int(10, 48);
       answer = a + 1;
-      promptStr = `${a}과(와) ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${a + 2}을(를) 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      promptStr = `${nj(a, '과/와')} ${a + 2} 사이에 있는 수는 얼마인가요?`;
+      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
     }
 
     return {
@@ -180,7 +181,7 @@ const num50Compare: SkillDef = {
       answer,
       // 부등호는 클릭 선택(ComparisonView). 풀이는 어느 수가 큰지 말로 짚고 기호도 함께.
       explanation: [
-        txt(`${a}와(과) ${b} 중에서 ${Math.max(a, b)}이(가) 더 커요. 그래서 ${a} ${answer} ${b}예요.`),
+        txt(`${nj(a, '과/와')} ${b} 중에서 ${nj(Math.max(a, b), '이/가')} 더 커요. 그래서 ${a} ${answer} ${b}예요.`),
       ],
     };
   },
@@ -211,7 +212,7 @@ const num50Word: SkillDef = {
       const bundles = rng.int(1, 4);
       const singles = rng.int(1, 9);
       answer = bundles * 10 + singles;
-      promptStr = `${item}이 10개씩 ${bundles}묶음과 낱개 ${singles}개 있어요. 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} 10개씩 ${bundles}묶음과 낱개 ${singles}개 있어요. 모두 몇 개인가요?`;
       explanation = [txt(`10개씩 ${bundles}묶음은 ${bundles * 10}개예요. 낱개 ${singles}개와 합치면 ${answer}개예요.`)];
     } else {
       // 두 묶음 합산
@@ -227,7 +228,7 @@ const num50Word: SkillDef = {
       }
       answer = a + b;
       const item2 = rng.pick(BUNDLE_ITEMS.filter(i => i !== item));
-      promptStr = `${item}이 ${a}개, ${item2}이 ${b}개 있어요. 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개, ${nj(item2, '이/가')} ${b}개 있어요. 모두 몇 개인가요?`;
       explanation = [txt(`${a}개와 ${b}개를 더하면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
     }
 

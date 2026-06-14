@@ -30,7 +30,7 @@ import {
   toMixed,
   type Frac,
 } from '../fraction';
-import { ida } from '../josa';
+import { nj, ida } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, MathToken, Problem, SkillDef } from '../types';
 
@@ -126,7 +126,7 @@ const chTriAreaSide: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `삼각형의 넓이가 ${aMixed.whole}과 ${aMixed.n}/${aMixed.d} cm²이고 높이가 ${hMixed.whole}과 ${hMixed.n}/${hMixed.d} cm일 때, 밑변의 길이는 몇 cm입니까?`,
+      prompt: `삼각형의 넓이가 ${nj(aMixed.whole, '과/와')} ${aMixed.n}/${aMixed.d} cm²이고 높이가 ${nj(hMixed.whole, '과/와')} ${hMixed.n}/${hMixed.d} cm일 때, 밑변의 길이는 몇 cm입니까?`,
       expr: [txt('밑변 = '), blank(0), txt(' cm')],
       blankAnswers: [base],
       explanation,
@@ -181,9 +181,9 @@ const chFracPartInv: SkillDef = {
     const remainN = pD - pN;
 
     const explanation: MathExpr = [
-      txt(`${ctx.item2}를 심은 부분은 전체의 1 − ${pN}/${pD} = ${remainN}/${pD}${ida(`${remainN}/${pD}`)}에요. `),
+      txt(`${nj(ctx.item2, '을/를')} 심은 부분은 전체의 1 − ${pN}/${pD} = ${remainN}/${pD}${ida(`${remainN}/${pD}`)}에요. `),
       txt(`전체 = ${M} ÷ ${remainN}/${pD} = ${M} × ${pD}/${remainN} = ${total} ${ctx.unit}. `),
-      txt(`${ctx.item1}를 심은 부분 = ${total} − ${M} = ${part1} ${ctx.unit}.`),
+      txt(`${nj(ctx.item1, '을/를')} 심은 부분 = ${total} − ${M} = ${part1} ${ctx.unit}.`),
     ];
 
     return {
@@ -191,7 +191,7 @@ const chFracPartInv: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${ctx.place} 전체의 ${pN}/${pD}에 ${ctx.item1}를 심고 나머지에 ${ctx.item2}를 심었습니다. ${ctx.item2}를 심은 부분이 ${M} ${ctx.unit}일 때, ${ctx.item1}를 심은 부분의 넓이는 몇 ${ctx.unit}입니까?`,
+      prompt: `${ctx.place} 전체의 ${pN}/${pD}에 ${nj(ctx.item1, '을/를')} 심고 나머지에 ${nj(ctx.item2, '을/를')} 심었습니다. ${nj(ctx.item2, '을/를')} 심은 부분이 ${M} ${ctx.unit}일 때, ${nj(ctx.item1, '을/를')} 심은 부분의 넓이는 몇 ${ctx.unit}입니까?`,
       expr: [txt(`${ctx.item1} 넓이 = `), blank(0), txt(` ${ctx.unit}`)],
       blankAnswers: [part1],
       explanation,
@@ -269,7 +269,7 @@ const chWorkRate: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `어떤 ${ctx.work}을 ${N}명이 ${T}시간 동안 함께 하여 전체의 ${fN}/${fD}를 끝냈습니다. 한 명이 남은 일을 혼자 끝내는 데 몇 ${ctx.unit}이 걸립니까?`,
+      prompt: `어떤 ${nj(ctx.work, '을/를')} ${N}명이 ${T}시간 동안 함께 하여 전체의 ${fN}/${nj(fD, '을/를')} 끝냈습니다. 한 명이 남은 일을 혼자 끝내는 데 몇 ${nj(ctx.unit, '이/가')} 걸립니까?`,
       expr: [txt('걸리는 시간 = '), blank(0), txt(` ${ctx.unit}`)],
       blankAnswers: [ansHours],
       explanation,

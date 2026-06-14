@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -41,10 +42,10 @@ const fig2Sides: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${shape.emoji} ${shape.name}의 ${thing}은 몇 개인가요?`,
+      prompt: `${shape.emoji} ${shape.name}의 ${nj(thing, '은/는')} 몇 개인가요?`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${shape.name}의 ${thing}은 ${ans}개예요.`)],
+      explanation: [txt(`${shape.name}의 ${nj(thing, '은/는')} ${ans}개예요.`)],
     };
   },
 };
@@ -74,10 +75,10 @@ const fig2Name: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${thing}이 ${num}개인 도형의 이름은 무엇인가요?`,
+      prompt: `${nj(thing, '이/가')} ${num}개인 도형의 이름은 무엇인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${thing}이 ${num}개인 도형은 ${shape.name}이에요.`)],
+      explanation: [txt(`${nj(thing, '이/가')} ${num}개인 도형은 ${shape.name}이에요.`)],
     };
   },
 };
@@ -120,7 +121,7 @@ const fig2Classify: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `다음 도형들 중에서 ${targetName}은 몇 개인가요?\n${shuffled.join(' ')}`,
+      prompt: `다음 도형들 중에서 ${nj(targetName, '은/는')} 몇 개인가요?\n${shuffled.join(' ')}`,
       expr,
       blankAnswers: [count],
       explanation: [txt(`${targetName} 모양을 하나씩 찾아 세어 보면 ${count}개예요.`)],
@@ -189,10 +190,10 @@ const fig2Word: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${shape.name} ${count}개의 ${thing}은 모두 몇 개인가요?`,
+        prompt: `${shape.name} ${count}개의 ${nj(thing, '은/는')} 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${shape.name} 1개에 ${thing}이 ${perShape}개예요. ${count}개면 ${perShape}을 ${count}번 더해요: ${Array(count).fill(String(perShape)).join(' + ')} = ${ans}개예요.`)],
+        explanation: [txt(`${shape.name} 1개에 ${nj(thing, '이/가')} ${perShape}개예요. ${count}개면 ${nj(perShape, '을/를')} ${count}번 더해요: ${Array(count).fill(String(perShape)).join(' + ')} = ${ans}개예요.`)],
       };
     } else {
       // 도형 이름 맞히기 문장제

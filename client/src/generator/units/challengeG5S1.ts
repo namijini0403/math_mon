@@ -306,8 +306,8 @@ const chGcdLcm: SkillDef = {
     const explanation: MathExpr = [
       txt(`두 수는 모두 최대공약수 ${G}의 배수이고, ${G}×㉮, ${G}×㉯ (㉮<㉯, ㉮와 ㉯는 서로소)로 나타낼 수 있어요. `),
       txt(`최소공배수 = ${G}×㉮×㉯ = ${L}이므로 ㉮×㉯ = ${L}÷${G} = ${p * q}이에요. `),
-      txt(`㉮×㉯ = ${p * q}이 되는 서로소인 쌍은 (1, ${p * q})와 (${p}, ${q})가 있어요. `),
-      txt(`(1, ${p * q})이면 두 수가 ${G}와 ${L}인데 ${L}은 두 자리 수가 아니라서 제외돼요. `),
+      txt(`㉮×㉯ = ${nj(p * q, '이/가')} 되는 서로소인 쌍은 (1, ${p * q})와 (${p}, ${q})가 있어요. `),
+      txt(`(1, ${p * q})이면 두 수가 ${nj(G, '과/와')} ${L}인데 ${nj(L, '은/는')} 두 자리 수가 아니라서 제외돼요. `),
       txt(`두 수가 모두 두 자리 수인 (${p}, ${q})를 골라요. `),
       txt(`따라서 두 수는 ${G}×${p} = ${small}, ${G}×${q} = ${ida(large)}.`),
     ];
@@ -365,9 +365,9 @@ const chRemainder: SkillDef = {
     }
 
     const explanation: MathExpr = [
-      txt(`어떤 수를 □라 하면, □를 ${A}로 나누면 ${A - k}가 남고, ${B}로 나누면 ${B - k}가 남아요. `),
-      txt(`즉, □+${k}는 ${A}의 배수이기도 하고 ${B}의 배수이기도 해요. `),
-      txt(`${A}와 ${B}의 최소공배수는 ${L}이므로, □+${k} = ${L}×(자연수)예요. `),
+      txt(`어떤 수를 □라 하면, □를 ${A}로 나누면 ${nj(A - k, '이/가')} 남고, ${B}로 나누면 ${nj(B - k, '이/가')} 남아요. `),
+      txt(`즉, □+${nj(k, '은/는')} ${A}의 배수이기도 하고 ${B}의 배수이기도 해요. `),
+      txt(`${nj(A, '과/와')} ${B}의 최소공배수는 ${L}이므로, □+${k} = ${L}×(자연수)예요. `),
       txt(`조건을 만족하는 수: ${L}-${k}=${L - k}, ${2 * L}-${k}=${2 * L - k}, … `),
       txt(`이 중 ${N}에 가장 가까운 수는 ${ida(ans)}.`),
     ];
@@ -377,7 +377,7 @@ const chRemainder: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `어떤 자연수를 ${A}로 나누면 ${A - k}가 남고, ${B}로 나누면 ${B - k}가 남습니다. 이런 수 중 ${N}에 가장 가까운 수를 구하세요.`,
+      prompt: `어떤 자연수를 ${A}로 나누면 ${nj(A - k, '이/가')} 남고, ${B}로 나누면 ${nj(B - k, '이/가')} 남습니다. 이런 수 중 ${N}에 가장 가까운 수를 구하세요.`,
       expr: [txt('가장 가까운 수 = '), blank(0)],
       blankAnswers: [ans],
       explanation,
@@ -410,7 +410,7 @@ const chGear: SkillDef = {
     const explanation: MathExpr = [
       txt(`톱니 ${a}개짜리와 ${b}개짜리 톱니바퀴가 맞물려 돌아요. `),
       txt(`처음 위치로 돌아오려면 두 바퀴가 맞물린 톱니 수가 같아야 해요. `),
-      txt(`${a}와 ${b}의 최소공배수는 ${L}이에요. `),
+      txt(`${nj(a, '과/와')} ${b}의 최소공배수는 ${L}이에요. `),
       txt(`작은 바퀴(톱니 ${small}개)가 ${L}개의 톱니를 돌리면 ${L}÷${small} = ${ans}바퀴 돌아요.`),
     ];
 
@@ -461,8 +461,8 @@ const chCompose: SkillDef = {
       prompt = `○=□+${a}, ◎=○×${b}일 때, □=${x}이면 ◎는 얼마인가요?`;
       expr = [txt(`□=${x} → ◎ = `), blank(0)];
       explanation = [
-        txt(`○=□+${a}에 □=${x}을 대입하면 ○=${x}+${a}=${ida(circle)}. `),
-        txt(`◎=○×${b}에 ○=${circle}을 대입하면 ◎=${circle}×${b}=${ida(ans)}.`),
+        txt(`○=□+${a}에 □=${nj(x, '을/를')} 대입하면 ○=${x}+${a}=${ida(circle)}. `),
+        txt(`◎=○×${b}에 ○=${nj(circle, '을/를')} 대입하면 ◎=${circle}×${b}=${ida(ans)}.`),
       ];
     } else {
       // 역방향: ◎ 주고 □ 구하기
@@ -533,7 +533,7 @@ const chAge: SkillDef = {
       txt(`조건: ${A}+□ = ${n}×(${B}+□). `),
       txt(`괄호를 풀면 ${A}+□ = ${n * B}+${n}×□이고, 정리하면 ${n - 1}×□ = ${A}−${n * B} = ${A - n * B}. `),
       txt(`□ = ${A - n * B}÷${n - 1} = ${x}. `),
-      txt(`${x}년 후 아빠 ${futureA}세, 아이 ${futureB}세 → ${futureA}는 ${futureB}의 ${n}배가 맞아요.`),
+      txt(`${x}년 후 아빠 ${futureA}세, 아이 ${futureB}세 → ${nj(futureA, '은/는')} ${futureB}의 ${n}배가 맞아요.`),
     ];
 
     return {
@@ -630,7 +630,7 @@ const chFracRange: SkillDef = {
     const kMin = (P + 1) / b; // P = b·kMin − 1 이므로 정수
     const kMax = (Q - 1) / b; // Q = b·kMax + 1 이므로 정수
     const explanation: MathExpr = [
-      txt(`기약분수 ${a}/${b}와 크기가 같은 분수는 ${a}×□ / ${b}×□ (□=1,2,3,…)로 만들 수 있어요. `),
+      txt(`기약분수 ${a}/${nj(b, '과/와')} 크기가 같은 분수는 ${a}×□ / ${b}×□ (□=1,2,3,…)로 만들 수 있어요. `),
       txt(`분모 ${b}×□가 ${P} 초과 ${Q} 미만이 되려면, `),
       txt(`□=${kMin}이면 분모 ${b * kMin}, □=${kMax}이면 분모 ${b * kMax}로 모두 범위 안이에요. `),
       txt(`따라서 □는 ${kMin}부터 ${kMax}까지 ${count}개예요.`),
@@ -641,7 +641,7 @@ const chFracRange: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `기약분수로 나타내면 ${a}/${b}가 되는 분수 중 분모가 ${P}보다 크고 ${Q}보다 작은 것은 모두 몇 개인가요?`,
+      prompt: `기약분수로 나타내면 ${a}/${nj(b, '이/가')} 되는 분수 중 분모가 ${P}보다 크고 ${Q}보다 작은 것은 모두 몇 개인가요?`,
       expr: [blank(0), txt(' 개')],
       blankAnswers: [count],
       explanation,
@@ -694,7 +694,7 @@ const chFracAddSame: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `분수 ${a}/${b}의 분자와 분모에 같은 수를 더하여 ${c}/${d}와 같은 분수를 만들려고 합니다. 더한 수를 구하세요.`,
+      prompt: `분수 ${a}/${b}의 분자와 분모에 같은 수를 더하여 ${c}/${nj(d, '과/와')} 같은 분수를 만들려고 합니다. 더한 수를 구하세요.`,
       expr: [txt('더한 수 = '), blank(0)],
       blankAnswers: [box],
       explanation,
@@ -751,7 +751,7 @@ const chFracIneq: SkillDef = {
     const hiInt = Number.isInteger((c / d) * N) ? (c / d) * N - 1 : Math.floor((c / d) * N);
 
     const explanation: MathExpr = [
-      txt(`${a}/${b} < □/${N} < ${c}/${d}를 ${N}을 분모로 통분해요. `),
+      txt(`${a}/${b} < □/${N} < ${c}/${nj(d, '을/를')} ${nj(N, '을/를')} 분모로 통분해요. `),
       txt(`${a}/${b} = ${a * (N / b)}/${N},  ${c}/${d} = ${c * (N / d)}/${N}. `),
       txt(`따라서 ${a * (N / b)} < □ < ${c * (N / d)}. `),
       txt(`이를 만족하는 자연수 □: ${loInt}~${hiInt}, 총 ${count}개예요.`),
@@ -762,7 +762,7 @@ const chFracIneq: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${a}/${b} < □/${N} < ${c}/${d}를 만족하는 자연수 □는 모두 몇 개인가요?`,
+      prompt: `${a}/${b} < □/${N} < ${c}/${nj(d, '을/를')} 만족하는 자연수 □는 모두 몇 개인가요?`,
       expr: [txt(`${a}/${b} < □/${N} < ${c}/${d}, 자연수 □의 개수 = `), blank(0)],
       blankAnswers: [count],
       explanation,
@@ -852,7 +852,7 @@ const chTape: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fraction-input',
-      prompt: `길이가 ${lenM.whole}과 ${lenM.n}/${lenM.d} m인 테이프 ${n}장을 ${overlapF.n}/${overlapF.d} m씩 겹쳐서 이어 붙였습니다. 전체 길이는 몇 m인가요? (대분수로 나타내세요)`,
+      prompt: `길이가 ${nj(lenM.whole, '과/와')} ${lenM.n}/${lenM.d} m인 테이프 ${n}장을 ${overlapF.n}/${overlapF.d} m씩 겹쳐서 이어 붙였습니다. 전체 길이는 몇 m인가요? (대분수로 나타내세요)`,
       mixed: tm.whole > 0,
       requireIrreducible: true,
       answer,
@@ -951,7 +951,7 @@ const chSumDiff: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fraction-input',
-      prompt: `㉮+㉯ = ${sM.whole > 0 ? sM.whole + '과 ' : ''}${sM.n}/${sM.d},  ㉮−㉯ = ${dM.n}/${dM.d}일 때 ㉮를 구하세요.`,
+      prompt: `㉮+㉯ = ${sM.whole > 0 ? nj(sM.whole, '과/와') + ' ' : ''}${sM.n}/${sM.d},  ㉮−㉯ = ${dM.n}/${dM.d}일 때 ㉮를 구하세요.`,
       mixed: rm.whole > 0,
       requireIrreducible: true,
       answer,

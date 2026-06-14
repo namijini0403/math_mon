@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -81,7 +82,7 @@ const mul32TensTens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a}는 십이 ${a / 10}개, ${b}는 십이 ${b / 10}개예요. 먼저 ${a / 10} × ${b / 10} = ${(a / 10) * (b / 10)}을 구하고, 자리값이 백이라 100을 곱하면 ${ans}이에요.`)],
+      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개, ${nj(b, '은/는')} 십이 ${b / 10}개예요. 먼저 ${a / 10} × ${b / 10} = ${nj((a / 10) * (b / 10), '을/를')} 구하고, 자리값이 백이라 100을 곱하면 ${ans}이에요.`)],
     };
   },
 };
@@ -126,7 +127,7 @@ const mul32TwoByTwo: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${b}를 ${bTens * 10}과 ${bOnes}로 나누어 곱해요. ${a} × ${bOnes} = ${partial1}, ${a} × ${bTens * 10} = ${partial2}. 두 곱을 더하면 ${partial1} + ${partial2} = ${ans}이에요.`)],
+      explanation: [txt(`${nj(b, '을/를')} ${nj(bTens * 10, '과/와')} ${bOnes}로 나누어 곱해요. ${a} × ${bOnes} = ${partial1}, ${a} × ${bTens * 10} = ${partial2}. 두 곱을 더하면 ${partial1} + ${partial2} = ${ans}이에요.`)],
     };
   },
 };

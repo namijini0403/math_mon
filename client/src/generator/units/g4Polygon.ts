@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -52,7 +53,7 @@ const pgonPerimeter: SkillDef = {
       expr: [txt(`한 변: ${side} cm, 둘레: `), { kind: 'blank', slot: 0 }, txt(' cm')],
       blankAnswers: [peri],
       explanation: [
-        txt(`${name}은 ${n}개의 변이 모두 같아요. ${side} × ${n} = ${peri} cm`),
+        txt(`${nj(name, '은/는')} ${n}개의 변이 모두 같아요. ${side} × ${n} = ${peri} cm`),
       ],
     };
   },
@@ -172,7 +173,7 @@ const pgonName: SkillDef = {
         expr: [txt(name)],
         choices,
         answerIndex,
-        explanation: [txt(`${name}은 변이 ${n}개예요.`)],
+        explanation: [txt(`${nj(name, '은/는')} 변이 ${n}개예요.`)],
       };
     }
   },

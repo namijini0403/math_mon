@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -40,7 +41,7 @@ const num9Count: SkillDef = {
       prompt: `${display}\n개수를 세어 쓰세요.`,
       expr,
       blankAnswers: [count],
-      explanation: [txt(`하나씩 차례로 세어 보면 ${emoji}이(가) 모두 ${count}개예요.`)],
+      explanation: [txt(`하나씩 차례로 세어 보면 ${nj(emoji, '이/가')} 모두 ${count}개예요.`)],
     };
   },
 };
@@ -78,8 +79,8 @@ const num9Order: SkillDef = {
       // 사이 수: a, _, a+2 → 빈칸에 a+1
       const a = rng.int(1, 7);
       answer = a + 1;
-      promptStr = `${a}과(와) ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${a + 2}을(를) 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      promptStr = `${nj(a, '과/와')} ${a + 2} 사이에 있는 수는 얼마인가요?`;
+      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
     }
 
     return {
@@ -126,7 +127,7 @@ const num9Compare: SkillDef = {
       answer,
       // 부등호는 '클릭 선택'(ComparisonView)으로만 입력. 풀이는 말로 짚어 주고 기호도 함께 보여준다.
       explanation: [
-        txt(`수를 순서대로 늘어놓으면 뒤에 오는 수가 더 커요. ${a}은(는) ${b}보다 ${a < b ? '작아요' : '커요'}. 그래서 ${a} ${answer} ${b} 예요.`),
+        txt(`수를 순서대로 늘어놓으면 뒤에 오는 수가 더 커요. ${nj(a, '은/는')} ${b}보다 ${a < b ? '작아요' : '커요'}. 그래서 ${a} ${answer} ${b} 예요.`),
       ],
     };
   },
@@ -168,7 +169,7 @@ const num9Ordinal: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${display}\n${fromFront ? '앞' : '뒤'}에서 ${emojis[pos]}은(는) 몇째인가요?`,
+      prompt: `${display}\n${fromFront ? '앞' : '뒤'}에서 ${nj(emojis[pos], '은/는')} 몇째인가요?`,
       choices,
       answerIndex,
       explanation: [
@@ -207,7 +208,7 @@ const num9Word: SkillDef = {
         if (tb >= 1) { a = ta; b = tb; break; }
       }
       answer = a + b;
-      promptStr = `${item}가 ${a}개 있어요. ${b}개를 더 받으면 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 더 받으면 모두 몇 개인가요?`;
       explanation = [txt(`${a}개에서 ${b}개를 더 세면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
     } else if (pat === 1) {
       // 남은 수 세기: a개에서 b개 먹으면 (차 ≥ 1)
@@ -218,7 +219,7 @@ const num9Word: SkillDef = {
         a = ta; b = tb; break;
       }
       answer = a - b;
-      promptStr = `${item}가 ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
       explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} − ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
     } else {
       // 비교: 두 묶음 중 더 많은 쪽
@@ -230,7 +231,7 @@ const num9Word: SkillDef = {
       }
       answer = Math.max(a, b);
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
-      promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. 더 많은 것은 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개, ${nj(item2, '이/가')} ${b}개 있어요. 더 많은 것은 몇 개인가요?`;
       explanation = [txt(`${a}개와 ${b}개를 비교하면 ${answer}개가 더 많아요. 그래서 답은 ${answer}개예요.`)];
     }
 

@@ -7,6 +7,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -328,7 +329,7 @@ const guguWord: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${emoji} ${item}이 ${dan}개씩 ${n}봉지 있어요. ${item}은 모두 몇 개인가요?`,
+        prompt: `${emoji} ${nj(item, '이/가')} ${dan}개씩 ${n}봉지 있어요. ${nj(item, '은/는')} 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`한 봉지에 ${dan}개씩 ${n}봉지니까 ${dan}단 구구로 ${dan} × ${n} = ${ans}개예요.`)],
@@ -344,7 +345,7 @@ const guguWord: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${emoji} ${item}을 ${rows}줄로 놓았더니 한 줄에 ${cols}개씩 있어요. ${item}은 모두 몇 개인가요?`,
+        prompt: `${emoji} ${nj(item, '을/를')} ${rows}줄로 놓았더니 한 줄에 ${cols}개씩 있어요. ${nj(item, '은/는')} 모두 몇 개인가요?`,
         expr,
         blankAnswers: [total],
         explanation: [txt(`한 줄에 ${cols}개씩 ${rows}줄이니까 ${rows} × ${cols} = ${total}개예요.`)],

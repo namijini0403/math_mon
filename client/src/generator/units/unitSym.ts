@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -58,7 +59,7 @@ const corrSide: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `삼각형 ㄱㄴㄷ과 삼각형 ㄹㅁㅂ은 서로 합동입니다. 변 ${vA0}${vA1}이 ${len} cm일 때, 대응변인 변 ${vB0}${vB1}은 몇 cm인가요?`,
+      prompt: `삼각형 ㄱㄴㄷ과 삼각형 ㄹㅁㅂ은 서로 합동입니다. 변 ${vA0}${nj(vA1, '이/가')} ${len} cm일 때, 대응변인 변 ${vB0}${nj(vB1, '은/는')} 몇 cm인가요?`,
       expr,
       blankAnswers: [len],
       explanation,
@@ -97,7 +98,7 @@ const corrAngle: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `삼각형 ㄱㄴㄷ과 삼각형 ㄹㅁㅂ은 서로 합동입니다. 각 ${vA}이 ${deg}°일 때, 대응각인 각 ${vB}은 몇 도인가요?`,
+      prompt: `삼각형 ㄱㄴㄷ과 삼각형 ㄹㅁㅂ은 서로 합동입니다. 각 ${nj(vA, '이/가')} ${deg}°일 때, 대응각인 각 ${nj(vB, '은/는')} 몇 도인가요?`,
       expr,
       blankAnswers: [deg],
       explanation,
@@ -197,7 +198,7 @@ const axisCount: SkillDef = {
     ];
 
     const explanation: MathExpr = [
-      txt(`${shape.name}은(는) 선대칭도형이에요. `),
+      txt(`${nj(shape.name, '은/는')} 선대칭도형이에요. `),
       txt(`${shape.name}의 대칭축은 모두 ${shape.axes}개예요.`),
     ];
 

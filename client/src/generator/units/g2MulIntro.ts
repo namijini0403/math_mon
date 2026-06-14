@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -39,10 +40,10 @@ const muliGroup: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${emoji}이 ${n}개씩 ${m}묶음 있어요. 모두 몇 개인가요?\n${display}`,
+      prompt: `${nj(emoji, '이/가')} ${n}개씩 ${m}묶음 있어요. 모두 몇 개인가요?\n${display}`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${n}개씩 ${m}묶음이니 ${n}을 ${m}번 더해요: ${Array(m).fill(String(n)).join(' + ')} = ${ans}. 곱셈식으로는 ${n} × ${m} = ${ans}개예요.`)],
+      explanation: [txt(`${n}개씩 ${m}묶음이니 ${nj(n, '을/를')} ${m}번 더해요: ${Array(m).fill(String(n)).join(' + ')} = ${ans}. 곱셈식으로는 ${n} × ${m} = ${ans}개예요.`)],
     };
   },
 };
@@ -73,7 +74,7 @@ const muliTimes: SkillDef = {
         prompt: `${a}의 ${b}배는 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a}의 ${b}배는 ${a}을 ${b}번 더한 것이에요: ${Array(b).fill(String(a)).join(' + ')} = ${ans}. 곱셈식으로는 ${a} × ${b} = ${ans}이에요.`)],
+        explanation: [txt(`${a}의 ${b}배는 ${nj(a, '을/를')} ${b}번 더한 것이에요: ${Array(b).fill(String(a)).join(' + ')} = ${ans}. 곱셈식으로는 ${a} × ${b} = ${ans}이에요.`)],
       };
     } else {
       // 몇 배인지 구하기
@@ -86,7 +87,7 @@ const muliTimes: SkillDef = {
         prompt: `${a}의 몇 배가 ${ans}인가요?`,
         expr,
         blankAnswers: [b],
-        explanation: [txt(`${a}씩 뛰어 세 보면 ${Array(b).fill(0).map((_, i) => a * (i + 1)).join(', ')}이에요. ${a}을 ${b}번 더하면 ${ans}가 되니까 ${a}의 ${b}배예요.`)],
+        explanation: [txt(`${a}씩 뛰어 세 보면 ${Array(b).fill(0).map((_, i) => a * (i + 1)).join(', ')}이에요. ${nj(a, '을/를')} ${b}번 더하면 ${nj(ans, '이/가')} 되니까 ${a}의 ${b}배예요.`)],
       };
     }
   },
@@ -121,7 +122,7 @@ const muliExpr: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${emoji}이 ${n}개씩 ${m}묶음 있어요. 곱셈식으로 나타내세요.`,
+        prompt: `${nj(emoji, '이/가')} ${n}개씩 ${m}묶음 있어요. 곱셈식으로 나타내세요.`,
         expr,
         blankAnswers: [n, m],
         explanation: [txt(`${n}개씩 ${m}묶음 → ${n} × ${m} = ${ans}`)],
@@ -137,7 +138,7 @@ const muliExpr: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${emoji}이 ${n}개씩 ${m}묶음일 때 곱셈식의 결과는 얼마인가요?`,
+        prompt: `${nj(emoji, '이/가')} ${n}개씩 ${m}묶음일 때 곱셈식의 결과는 얼마인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`${n} × ${m} = ${ans}`)],
@@ -177,7 +178,7 @@ const muliConvert: SkillDef = {
         prompt: `덧셈식을 곱셈식으로 나타내세요.\n${addStr} = ${ans}`,
         expr,
         blankAnswers: [n, m],
-        explanation: [txt(`${n}이 ${m}번 반복 → ${n} × ${m} = ${ans}`)],
+        explanation: [txt(`${nj(n, '이/가')} ${m}번 반복 → ${n} × ${m} = ${ans}`)],
       };
     } else {
       // 곱셈식 → 덧셈식 결과
@@ -223,10 +224,10 @@ const muliWord: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${emoji} ${item}이 ${n}개씩 ${m}봉지 있어요. ${item}은 모두 몇 개인가요?`,
+        prompt: `${emoji} ${nj(item, '이/가')} ${n}개씩 ${m}봉지 있어요. ${nj(item, '은/는')} 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`한 봉지에 ${n}개씩 ${m}봉지니까 ${n}을 ${m}번 더해요. 곱셈식으로 ${n} × ${m} = ${ans}개예요.`)],
+        explanation: [txt(`한 봉지에 ${n}개씩 ${m}봉지니까 ${nj(n, '을/를')} ${m}번 더해요. 곱셈식으로 ${n} × ${m} = ${ans}개예요.`)],
       };
     } else {
       // 몇 배 문장제
@@ -239,7 +240,7 @@ const muliWord: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `민준이는 ${item}을 ${a}개 가지고 있어요. 수아는 민준이의 ${b}배만큼 가지고 있어요. 수아가 가진 ${item}은 몇 개인가요?`,
+        prompt: `민준이는 ${nj(item, '을/를')} ${a}개 가지고 있어요. 수아는 민준이의 ${b}배만큼 가지고 있어요. 수아가 가진 ${nj(item, '은/는')} 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`${a}의 ${b}배 = ${a} × ${b} = ${ans}개`)],

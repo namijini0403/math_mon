@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -53,10 +54,10 @@ const num100Compose: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${total}은 10개씩 묶음 ${bundles}개와 낱개 몇 개인가요?`,
+        prompt: `${nj(total, '은/는')} 10개씩 묶음 ${bundles}개와 낱개 몇 개인가요?`,
         expr,
         blankAnswers: [singles],
-        explanation: [txt(`${total}은 10개씩 ${bundles}묶음(${bundles * 10}개)과 낱개로 이루어져요. 그래서 낱개는 ${singles}개예요.`)],
+        explanation: [txt(`${nj(total, '은/는')} 10개씩 ${bundles}묶음(${bundles * 10}개)과 낱개로 이루어져요. 그래서 낱개는 ${singles}개예요.`)],
       };
     }
   },
@@ -95,8 +96,8 @@ const num100Order: SkillDef = {
       // 사이 수: a, ?, a+2
       const a = rng.int(51, 98);
       answer = a + 1;
-      promptStr = `${a}과(와) ${a + 2} 사이에 있는 수는 얼마인가요?`;
-      explanation = [txt(`${a}, ${answer}, ${a + 2}을(를) 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
+      promptStr = `${nj(a, '과/와')} ${a + 2} 사이에 있는 수는 얼마인가요?`;
+      explanation = [txt(`${a}, ${answer}, ${nj(a + 2, '을/를')} 순서대로 세어 보면 가운데 수는 ${answer}예요.`)];
     }
 
     return {
@@ -141,7 +142,7 @@ const num100Compare: SkillDef = {
       right: [{ kind: 'decimal', v: b }],
       answer,
       // 부등호는 클릭 선택(ComparisonView). 풀이는 어느 수가 큰지 말로 + 기호 병기.
-      explanation: [txt(`${a}와(과) ${b} 중에서 ${Math.max(a, b)}이(가) 더 커요. 그래서 ${a} ${answer} ${b}예요.`)],
+      explanation: [txt(`${nj(a, '과/와')} ${b} 중에서 ${nj(Math.max(a, b), '이/가')} 더 커요. 그래서 ${a} ${answer} ${b}예요.`)],
     };
   },
 };
@@ -170,15 +171,15 @@ const num100EvenOdd: SkillDef = {
 
     // 1학년은 나눗셈을 배우기 전 — 짝수/홀수는 '둘씩 짝짓기'로 설명한다.
     const reason = isEven
-      ? `${n}개를 둘씩 짝지으면 남는 것이 없어요. 그래서 ${n}은 짝수예요.`
-      : `${n}개를 둘씩 짝지으면 하나가 남아요. 그래서 ${n}은 홀수예요.`;
+      ? `${n}개를 둘씩 짝지으면 남는 것이 없어요. 그래서 ${nj(n, '은/는')} 짝수예요.`
+      : `${n}개를 둘씩 짝지으면 하나가 남아요. 그래서 ${nj(n, '은/는')} 홀수예요.`;
 
     return {
       id: `${this.id}:${seed}`,
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${n}은 짝수인가요, 홀수인가요?`,
+      prompt: `${nj(n, '은/는')} 짝수인가요, 홀수인가요?`,
       choices,
       answerIndex,
       explanation: [txt(reason)],
@@ -211,7 +212,7 @@ const num100Word: SkillDef = {
       const bundles = rng.int(5, 9);
       const singles = rng.int(1, 9);
       answer = bundles * 10 + singles;
-      promptStr = `${item}이 10개씩 ${bundles}묶음과 낱개 ${singles}개 있어요. 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} 10개씩 ${bundles}묶음과 낱개 ${singles}개 있어요. 모두 몇 개인가요?`;
       explanation = [txt(`10개씩 ${bundles}묶음은 ${bundles * 10}개예요. 낱개 ${singles}개와 합치면 ${answer}개예요.`)];
     } else {
       // 몇 십 + 몇 개 더
@@ -222,7 +223,7 @@ const num100Word: SkillDef = {
         if (tb + te <= 99) { base = tb; extra = te; break; }
       }
       answer = base + extra;
-      promptStr = `${item}이 ${base}개 있었어요. ${extra}개를 더 가져오면 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${base}개 있었어요. ${extra}개를 더 가져오면 모두 몇 개인가요?`;
       explanation = [txt(`${base}개에 ${extra}개를 더하면 ${base} + ${extra} = ${answer}이에요. 모두 ${answer}개예요.`)];
     }
 

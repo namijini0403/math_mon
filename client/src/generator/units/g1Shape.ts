@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -65,10 +66,10 @@ const shape1Classify: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${item}은(는) 어떤 모양인가요?`,
+      prompt: `${nj(item, '은/는')} 어떤 모양인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${item}은(는) ${SHAPE_TRAIT[correct]}. 그래서 ${correct}이에요.`)],
+      explanation: [txt(`${nj(item, '은/는')} ${SHAPE_TRAIT[correct]}. 그래서 ${correct}이에요.`)],
     };
   },
 };
@@ -121,11 +122,11 @@ const shape1Same: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${referenceItem}과(와) 같은 모양의 물건을 고르세요.`,
+      prompt: `${nj(referenceItem, '과/와')} 같은 모양의 물건을 고르세요.`,
       choices,
       answerIndex,
       explanation: [
-        txt(`${referenceItem}과(와) ${correctItem}은(는) 둘 다 ${SHAPES[which]}이라 같은 모양이에요.`),
+        txt(`${nj(referenceItem, '과/와')} ${nj(correctItem, '은/는')} 둘 다 ${SHAPES[which]}이라 같은 모양이에요.`),
       ],
     };
   },
@@ -167,7 +168,7 @@ const shape1Count: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${display}\n${shapeNames[ask]}은(는) 몇 개인가요?`,
+      prompt: `${display}\n${nj(shapeNames[ask], '은/는')} 몇 개인가요?`,
       expr,
       blankAnswers: [counts[ask]],
       explanation: [txt(`${shapeNames[ask]}만 하나씩 골라 세어 보면 ${counts[ask]}개예요.`)],

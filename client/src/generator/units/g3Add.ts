@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -39,11 +40,11 @@ function subExplain(a: number, b: number): string {
   if (t1e < t2) { tRes = t1e + 10 - t2; borrowT = 1; } else { tRes = t1e - t2; }
   const hRes = h1 - borrowT - h2;
   const uStep = borrowU
-    ? `일의 자리: ${u1}이 ${u2}보다 작으니 십의 자리에서 10을 빌려 ${u1} + 10 - ${u2} = ${uRes}.`
+    ? `일의 자리: ${nj(u1, '이/가')} ${u2}보다 작으니 십의 자리에서 10을 빌려 ${u1} + 10 - ${u2} = ${uRes}.`
     : `일의 자리: ${u1} - ${u2} = ${uRes}.`;
   const tBase = borrowU ? `${t1} - 1(빌려줌)= ${t1e}` : `${t1}`;
   const tStep = borrowT
-    ? `십의 자리: ${tBase}이 ${t2}보다 작으니 백의 자리에서 10을 빌려 ${t1e} + 10 - ${t2} = ${tRes}.`
+    ? `십의 자리: ${nj(tBase, '이/가')} ${t2}보다 작으니 백의 자리에서 10을 빌려 ${t1e} + 10 - ${t2} = ${tRes}.`
     : `십의 자리: ${tBase} - ${t2} = ${tRes}.`;
   const hBase = borrowT ? `${h1} - 1(빌려줌)= ${h1 - borrowT}` : `${h1}`;
   const hStep = `백의 자리: ${hBase} - ${h2} = ${hRes}.`;
@@ -198,7 +199,7 @@ const add3Round: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${num}을 몇백으로 어림하면 얼마인가요?`,
+      prompt: `${nj(num, '을/를')} 몇백으로 어림하면 얼마인가요?`,
       expr: [txt(`${num}`)],
       choices,
       answerIndex,
@@ -242,7 +243,7 @@ const add3Missing: SkillDef = {
       answer = ans;
       promptStr = `□ + ${b} = ${c}일 때, □에 알맞은 수를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `□에 ${b}를 더해서 ${c}가 되었어요. 그러니 전체 ${c}에서 ${b}를 빼면 □를 알 수 있어요. □ = ${c} - ${b} = ${ans}.`;
+      explStr = `□에 ${nj(b, '을/를')} 더해서 ${nj(c, '이/가')} 되었어요. 그러니 전체 ${c}에서 ${nj(b, '을/를')} 빼면 □를 알 수 있어요. □ = ${c} - ${b} = ${ans}.`;
     } else if (pat === 1) {
       // a - □ = c
       let a = 543, c = 218, ans = 325;
@@ -257,7 +258,7 @@ const add3Missing: SkillDef = {
       answer = ans;
       promptStr = `${a} - □ = ${c}일 때, □에 알맞은 수를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `${a}에서 □를 빼서 ${c}가 남았어요. 빼낸 수는 처음 수에서 남은 수를 빼면 돼요. □ = ${a} - ${c} = ${ans}.`;
+      explStr = `${a}에서 □를 빼서 ${nj(c, '이/가')} 남았어요. 빼낸 수는 처음 수에서 남은 수를 빼면 돼요. □ = ${a} - ${c} = ${ans}.`;
     } else {
       // a + □ = c
       let a = 234, c = 567, ans = 333;
@@ -272,7 +273,7 @@ const add3Missing: SkillDef = {
       answer = ans;
       promptStr = `${a} + □ = ${c}일 때, □에 알맞은 수를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `${a}에 □를 더해서 ${c}가 되었어요. 그러니 전체 ${c}에서 ${a}를 빼면 □를 알 수 있어요. □ = ${c} - ${a} = ${ans}.`;
+      explStr = `${a}에 □를 더해서 ${nj(c, '이/가')} 되었어요. 그러니 전체 ${c}에서 ${nj(a, '을/를')} 빼면 □를 알 수 있어요. □ = ${c} - ${a} = ${ans}.`;
     }
 
     return {

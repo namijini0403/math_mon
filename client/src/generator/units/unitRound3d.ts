@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -507,7 +508,7 @@ const round3dWord: SkillDef = {
           skillId: this.id,
           seed,
           format: 'decimal-input',
-          prompt: `반지름이 ${r} cm인 ${ball}을 가장 넓게 자른 단면의 넓이는 몇 cm²인가요? (원주율: 3.14)`,
+          prompt: `반지름이 ${r} cm인 ${nj(ball, '을/를')} 가장 넓게 자른 단면의 넓이는 몇 cm²인가요? (원주율: 3.14)`,
           answer: area,
           unit: 'cm²',
           explanation,

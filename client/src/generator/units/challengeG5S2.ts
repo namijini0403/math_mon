@@ -66,8 +66,8 @@ const chRoundDiff: SkillDef = {
     }
 
     const explanation: MathExpr = [
-      txt(`${N}을 올림하여 만의 자리까지 나타내면 ${roundUpVal}이에요. `),
-      txt(`${N}을 버림하여 천의 자리까지 나타내면 ${roundDownVal}이에요. `),
+      txt(`${nj(N, '을/를')} 올림하여 만의 자리까지 나타내면 ${roundUpVal}이에요. `),
+      txt(`${nj(N, '을/를')} 버림하여 천의 자리까지 나타내면 ${roundDownVal}이에요. `),
       txt(`두 값의 차: ${roundUpVal} − ${roundDownVal} = ${ans}.`),
     ];
 
@@ -76,7 +76,7 @@ const chRoundDiff: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${N}을 올림하여 만의 자리까지 나타낸 값과 버림하여 천의 자리까지 나타낸 값의 차를 구하세요.`,
+      prompt: `${nj(N, '을/를')} 올림하여 만의 자리까지 나타낸 값과 버림하여 천의 자리까지 나타낸 값의 차를 구하세요.`,
       expr: [txt('차 = '), blank(0)],
       blankAnswers: [ans],
       explanation,
@@ -193,9 +193,9 @@ const chBundleSell: SkillDef = {
     const rem = total % bundleA;
 
     const explanation: MathExpr = [
-      txt(`${total}${itemUnit}을 ${bundleA}${itemUnit}씩 묶으면 ${bigCount}묶음이고 ${rem}${itemUnit}이 남아요. `),
+      txt(`${total}${nj(itemUnit, '을/를')} ${bundleA}${itemUnit}씩 묶으면 ${bigCount}묶음이고 ${rem}${nj(itemUnit, '이/가')} 남아요. `),
       txt(`큰 묶음 금액: ${bigCount} × ${priceA}원 = ${bigCount * priceA}원. `),
-      txt(`남은 ${rem}${itemUnit}을 ${bundleB}${itemUnit}씩 묶으면 ${smallCount}묶음이에요. `),
+      txt(`남은 ${rem}${nj(itemUnit, '을/를')} ${bundleB}${itemUnit}씩 묶으면 ${smallCount}묶음이에요. `),
       txt(`작은 묶음 금액: ${smallCount} × ${priceB}원 = ${smallCount * priceB}원. `),
       txt(`총 금액: ${bigCount * priceA} + ${smallCount * priceB} = ${totalAmt}원.`),
     ];
@@ -205,7 +205,7 @@ const chBundleSell: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${itemName} ${total}${itemUnit}을 ${bundleA}${itemUnit}씩 묶어 ${priceA}원에 팔고, 나머지는 ${bundleB}${itemUnit}씩 묶어 ${priceB}원에 팔았습니다. ${itemName}을 판 금액은 모두 얼마인가요?`,
+      prompt: `${itemName} ${total}${nj(itemUnit, '을/를')} ${bundleA}${itemUnit}씩 묶어 ${priceA}원에 팔고, 나머지는 ${bundleB}${itemUnit}씩 묶어 ${priceB}원에 팔았습니다. ${nj(itemName, '을/를')} 판 금액은 모두 얼마인가요?`,
       expr: [txt('총 금액 = '), blank(0), txt(' 원')],
       blankAnswers: [totalAmt],
       explanation,
@@ -277,8 +277,8 @@ const chFracIneqNat: SkillDef = {
     const uFracN = upperN - uWholePart * upperD;
 
     const explanation: MathExpr = [
-      txt(`${lWholePart}과 ${lFracN}/${lowerD} < □ × ${p}/${q} < ${uWholePart}과 ${uFracN}/${upperD}에서 `),
-      txt(`각 변을 ${p}/${q}로 나눠요 (= ${q}/${p}를 곱해요). `),
+      txt(`${nj(lWholePart, '과/와')} ${lFracN}/${lowerD} < □ × ${p}/${q} < ${nj(uWholePart, '과/와')} ${uFracN}/${upperD}에서 `),
+      txt(`각 변을 ${p}/${q}로 나눠요 (= ${q}/${nj(p, '을/를')} 곱해요). `),
       txt(`${lowerN}/${lowerD} × ${q}/${p} = ${lowerN * q}/${lowerD * p},  ${upperN}/${upperD} × ${q}/${p} = ${upperN * q}/${upperD * p}이에요. `),
       txt(`따라서 □는 ${lowerN * q}/${lowerD * p}보다 크고 ${upperN * q}/${upperD * p}보다 작은 자연수예요. `),
       txt(`만족하는 자연수는 ${minAns}부터 ${maxAns}까지예요. `),
@@ -290,7 +290,7 @@ const chFracIneqNat: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${lWholePart}과 ${lFracN}/${lowerD} < □ × ${p}/${q} < ${uWholePart}과 ${uFracN}/${upperD}에서 □ 안에 들어갈 수 있는 자연수 중 가장 작은 수와 가장 큰 수를 구하세요.`,
+      prompt: `${nj(lWholePart, '과/와')} ${lFracN}/${lowerD} < □ × ${p}/${q} < ${nj(uWholePart, '과/와')} ${uFracN}/${upperD}에서 □ 안에 들어갈 수 있는 자연수 중 가장 작은 수와 가장 큰 수를 구하세요.`,
       expr: [txt('가장 작은 수: '), blank(0), txt(',  가장 큰 수: '), blank(1)],
       blankAnswers: [minAns, maxAns],
       explanation,
@@ -383,19 +383,19 @@ const chFracConsume: SkillDef = {
 
     // total 표시용 (대분수이면 대분수 형태로)
     const totalStr = totalM.whole > 0
-      ? `${totalM.whole}과 ${totalM.n}/${totalM.d}`
+      ? `${nj(totalM.whole, '과/와')} ${totalM.n}/${totalM.d}`
       : `${totalF.n}/${totalF.d}`;
 
     const explanation: MathExpr = [
       txt(`총량: `),
       mixT(totalF),
       txt(` ${ctx.unit}. `),
-      txt(`${ctx.use1}에 전체의 ${f1N}/${f1D}를 사용하면 남은 양: `),
+      txt(`${ctx.use1}에 전체의 ${f1N}/${nj(f1D, '을/를')} 사용하면 남은 양: `),
       mixT(totalF),
       txt(` × ${f1D - f1N}/${f1D} = `),
       mixT(after1F),
       txt(` ${ctx.unit}. `),
-      txt(`${ctx.use2}에 나머지의 ${f2N}/${f2D}를 사용하면 남은 양: `),
+      txt(`${ctx.use2}에 나머지의 ${f2N}/${nj(f2D, '을/를')} 사용하면 남은 양: `),
       mixT(after1F),
       txt(` × ${f2D - f2N}/${f2D} = `),
       mixT(after2F),
@@ -407,7 +407,7 @@ const chFracConsume: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fraction-input',
-      prompt: `${ctx.material}이 ${totalStr} ${ctx.unit} 있습니다. 전체의 ${f1N}/${f1D}를 ${ctx.use1}에 사용하고, 나머지의 ${f2N}/${f2D}를 ${ctx.use2}에 사용했습니다. 남은 ${ctx.material}은 몇 ${ctx.unit}인가요?`,
+      prompt: `${nj(ctx.material, '이/가')} ${totalStr} ${ctx.unit} 있습니다. 전체의 ${f1N}/${nj(f1D, '을/를')} ${ctx.use1}에 사용하고, 나머지의 ${f2N}/${nj(f2D, '을/를')} ${ctx.use2}에 사용했습니다. 남은 ${nj(ctx.material, '은/는')} 몇 ${ctx.unit}인가요?`,
       mixed: after2M.whole > 0,
       requireIrreducible: true,
       answer,
@@ -484,7 +484,7 @@ const chAreaScale: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fraction-input',
-      prompt: `직사각형의 가로를 처음의 ${wWhole}과 ${wFracN}/${wD}배로 늘이고, 세로를 처음의 ${hN}/${hD}배로 줄였습니다. 새 직사각형의 넓이는 처음의 몇 배인가요?`,
+      prompt: `직사각형의 가로를 처음의 ${nj(wWhole, '과/와')} ${wFracN}/${wD}배로 늘이고, 세로를 처음의 ${hN}/${hD}배로 줄였습니다. 새 직사각형의 넓이는 처음의 몇 배인가요?`,
       mixed: false,
       requireIrreducible: true,
       answer: { n: resN, d: resD },
@@ -827,7 +827,7 @@ const chSavingsGap: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `작년 ${ctx.subject}이 ${base}원이었습니다. 올해는 작년의 ${r1Str}배를 ${ctx.verb}고, 올해 목표는 작년의 ${r2Str}배입니다. 목표를 채우려면 얼마를 더 모아야 하나요?`,
+      prompt: `작년 ${nj(ctx.subject, '이/가')} ${base}원이었습니다. 올해는 작년의 ${r1Str}배를 ${ctx.verb}고, 올해 목표는 작년의 ${r2Str}배입니다. 목표를 채우려면 얼마를 더 모아야 하나요?`,
       expr: [txt('더 필요한 금액 = '), blank(0), txt(' 원')],
       blankAnswers: [gap],
       explanation,
@@ -1168,7 +1168,7 @@ const chNewMember: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${nOld}명 ${ctx.group}의 평균 ${ctx.attr}이 ${avgOld}${ctx.unit}입니다. ${nNew}명이 새로 가입하여 전체 평균이 ${avgAll}${ctx.unit}이 되었을 때, 새로 가입한 회원들의 평균 ${ctx.attr}은 얼마인가요?`,
+      prompt: `${nOld}명 ${ctx.group}의 평균 ${nj(ctx.attr, '이/가')} ${avgOld}${ctx.unit}입니다. ${nNew}명이 새로 가입하여 전체 평균이 ${avgAll}${nj(ctx.unit, '이/가')} 되었을 때, 새로 가입한 회원들의 평균 ${nj(ctx.attr, '은/는')} 얼마인가요?`,
       expr: [txt(`새 회원 평균 = `), blank(0), txt(` ${ctx.unit}`)],
       blankAnswers: [newAvg],
       explanation,
@@ -1236,7 +1236,7 @@ const chExcludeOne: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${ctx.event} ${n}명의 전체 ${ctx.attr} 평균이 ${avgAll}${ctx.unit}이고, 가장 높은 ${ctx.attr}을 제외한 ${n - 1}명의 평균이 ${avgExcl}${ctx.unit}일 때, 제외된 ${ctx.attr}은 몇 ${ctx.unit}인가요?`,
+      prompt: `${ctx.event} ${n}명의 전체 ${ctx.attr} 평균이 ${avgAll}${ctx.unit}이고, 가장 높은 ${nj(ctx.attr, '을/를')} 제외한 ${n - 1}명의 평균이 ${avgExcl}${ctx.unit}일 때, 제외된 ${nj(ctx.attr, '은/는')} 몇 ${ctx.unit}인가요?`,
       expr: [txt('제외된 값 = '), blank(0), txt(` ${ctx.unit}`)],
       blankAnswers: [excludedVal],
       explanation,

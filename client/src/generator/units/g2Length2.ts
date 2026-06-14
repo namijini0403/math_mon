@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -219,7 +220,7 @@ const len22Unit: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${chosen.item}을 나타낼 때 알맞은 단위를 고르세요.`,
+      prompt: `${nj(chosen.item, '을/를')} 나타낼 때 알맞은 단위를 고르세요.`,
       choices,
       answerIndex,
       explanation: [txt(chosen.reason)],

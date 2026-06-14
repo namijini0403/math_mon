@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -42,7 +43,7 @@ const as12cCarry: SkillDef = {
       expr,
       blankAnswers: [ans],
       // 1학년 받아올림: 한 수를 갈라 10을 먼저 만든다
-      explanation: [txt(`${b}를 ${10 - a}와 ${ans - 10}로 가르면 ${a} + ${10 - a} = 10, 10 + ${ans - 10} = ${ans}이에요.`)],
+      explanation: [txt(`${nj(b, '을/를')} ${nj(10 - a, '과/와')} ${ans - 10}로 가르면 ${a} + ${10 - a} = 10, 10 + ${ans - 10} = ${ans}이에요.`)],
     };
   },
 };
@@ -82,7 +83,7 @@ const as12cBorrow: SkillDef = {
       expr,
       blankAnswers: [ans],
       // 1학년 받아내림: 십몇을 10과 낱개로 가르고 10에서 먼저 뺀다
-      explanation: [txt(`${a}를 10과 ${a % 10}으로 가르고, 10 - ${b} = ${10 - b}, ${10 - b} + ${a % 10} = ${ans}이에요.`)],
+      explanation: [txt(`${nj(a, '을/를')} 10과 ${a % 10}으로 가르고, 10 - ${b} = ${10 - b}, ${10 - b} + ${a % 10} = ${ans}이에요.`)],
     };
   },
 };
@@ -120,7 +121,7 @@ const as12cRelation: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${a} + ${b} = ${c}이에요. 이것을 이용하여 ${c} - ${sub}를 구하세요.`,
+      prompt: `${a} + ${b} = ${c}이에요. 이것을 이용하여 ${c} - ${nj(sub, '을/를')} 구하세요.`,
       expr,
       blankAnswers: [answer],
       explanation: [txt(`${a} + ${b} = ${c}이므로 ${c} - ${sub} = ${answer}예요.`)],
@@ -169,7 +170,7 @@ const as12cMissing: SkillDef = {
       }
       answer = c - a;
       promptStr = `${c} - □ = ${a}일 때, □에 알맞은 수를 구하세요.`;
-      explanation = [txt(`${c}에서 얼마를 빼야 ${a}가 될까요? □ = ${c} - ${a} = ${answer}.`)];
+      explanation = [txt(`${c}에서 얼마를 빼야 ${nj(a, '이/가')} 될까요? □ = ${c} - ${a} = ${answer}.`)];
     }
 
     return {
@@ -212,7 +213,7 @@ const as12cWord: SkillDef = {
         if (ta + tb >= 11 && ta + tb <= 18) { a = ta; b = tb; break; }
       }
       answer = a + b;
-      promptStr = `${item}가 ${a}개 있어요. ${b}개를 더 가져오면 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 더 가져오면 모두 몇 개인가요?`;
       explanation = [txt(`${a}개에 ${b}개를 더하면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
     } else {
       // 받아내림 뺄셈
@@ -225,7 +226,7 @@ const as12cWord: SkillDef = {
         if (result >= 1) { a = ta; b = tb; break; }
       }
       answer = a - b;
-      promptStr = `${item}가 ${a}개 있어요. ${b}개를 친구에게 주면 몇 개가 남나요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 친구에게 주면 몇 개가 남나요?`;
       explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} - ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
     }
 

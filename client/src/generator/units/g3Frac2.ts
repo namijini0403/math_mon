@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -52,7 +53,7 @@ const frac32OfWhole: SkillDef = {
       expr,
       blankAnswers: [ans],
       explanation: [
-        txt(`전체 ${total}개를 ${d}묶음으로 똑같이 나누면 한 묶음은 ${total} ÷ ${d} = ${k}개예요. ${n}/${d}은 ${n}묶음이니 ${k} × ${n} = ${ans}개예요.`),
+        txt(`전체 ${total}개를 ${d}묶음으로 똑같이 나누면 한 묶음은 ${total} ÷ ${d} = ${k}개예요. ${n}/${nj(d, '은/는')} ${n}묶음이니 ${k} × ${n} = ${ans}개예요.`),
       ],
     };
   },
@@ -90,7 +91,7 @@ const frac32Classify: SkillDef = {
       const d = rng.int(2, 12);
       const whole = rng.int(1, 5);
       const n = rng.int(1, d - 1);
-      fracStr = `${whole}과 ${n}/${d}`;
+      fracStr = `${nj(whole, '과/와')} ${n}/${d}`;
       answer = '대분수';
     }
 
@@ -138,13 +139,13 @@ const frac32Convert: SkillDef = {
       const whole = rng.int(1, 5);
       const n = rng.int(1, d - 1);
       const impN = whole * d + n;
-      prompt = `${whole}과 ${n}/${d}을 가분수로 나타내세요.`;
+      prompt = `${nj(whole, '과/와')} ${n}/${nj(d, '을/를')} 가분수로 나타내세요.`;
       ansN = impN;
       ansD = d;
       ansWhole = undefined;
       mixed = false;
       explanation = [
-        txt(`자연수 ${whole}은 ${d}분의 ${d}이 ${whole}개라 ${whole * d}/${d}이에요. 여기에 ${n}/${d}을 더하면 ${whole} × ${d} + ${n} = ${impN}, 그래서 `),
+        txt(`자연수 ${nj(whole, '은/는')} ${d}분의 ${nj(d, '이/가')} ${whole}개라 ${whole * d}/${d}이에요. 여기에 ${n}/${nj(d, '을/를')} 더하면 ${whole} × ${d} + ${n} = ${impN}, 그래서 `),
         { kind: 'frac', n: impN, d },
         txt(`이에요.`),
       ];
@@ -153,13 +154,13 @@ const frac32Convert: SkillDef = {
       const whole = rng.int(1, 5);
       const remN = rng.int(1, d - 1);
       const impN = whole * d + remN;
-      prompt = `${impN}/${d}을 대분수로 나타내세요.`;
+      prompt = `${impN}/${nj(d, '을/를')} 대분수로 나타내세요.`;
       ansN = remN;
       ansD = d;
       ansWhole = whole;
       mixed = true;
       explanation = [
-        txt(`${impN} ÷ ${d} = ${whole} 나머지 ${remN}이에요. 몫 ${whole}이 자연수, 나머지 ${remN}이 분자가 되어 `),
+        txt(`${impN} ÷ ${d} = ${whole} 나머지 ${remN}이에요. 몫 ${nj(whole, '이/가')} 자연수, 나머지 ${nj(remN, '이/가')} 분자가 되어 `),
         { kind: 'frac', n: remN, d, whole },
         txt(`이에요.`),
       ];
@@ -259,8 +260,8 @@ const frac32Word: SkillDef = {
       const impN = whole * d + remN;
       ans = whole;
       unit = '';
-      prompt = `${impN}/${d}을 대분수로 나타낼 때, 자연수 부분은 얼마인가요?`;
-      expl = `${impN} ÷ ${d} = ${whole} 나머지 ${remN}이라 ${whole}과 ${remN}/${d}이에요. 자연수 부분은 ${whole}이에요.`;
+      prompt = `${impN}/${nj(d, '을/를')} 대분수로 나타낼 때, 자연수 부분은 얼마인가요?`;
+      expl = `${impN} ÷ ${d} = ${whole} 나머지 ${remN}이라 ${nj(whole, '과/와')} ${remN}/${d}이에요. 자연수 부분은 ${whole}이에요.`;
     } else {
       // 분수 크기 비교: 더 큰 쪽의 분자
       const d = rng.int(3, 10);
@@ -270,7 +271,7 @@ const frac32Word: SkillDef = {
       if (maxN <= 0) {
         ans = 2;
         unit = '조각';
-        prompt = `피자를 ${d}조각으로 나누었어요. 드래곤이 1/${d}을 먹었어요. 남은 조각은 몇 조각인가요?`;
+        prompt = `피자를 ${d}조각으로 나누었어요. 드래곤이 1/${nj(d, '을/를')} 먹었어요. 남은 조각은 몇 조각인가요?`;
         expl = `${d} - 1 = ${d - 1}조각`;
         return {
           id: `${this.id}:${seed}`,
@@ -285,7 +286,7 @@ const frac32Word: SkillDef = {
       }
       ans = maxN;
       unit = '개';
-      prompt = `분모가 ${d}인 두 분수 ${n1}/${d}과 ${n2}/${d} 중 더 큰 분수의 분자는 얼마인가요?`;
+      prompt = `분모가 ${d}인 두 분수 ${n1}/${nj(d, '과/와')} ${n2}/${d} 중 더 큰 분수의 분자는 얼마인가요?`;
       expl = `분모가 같을 때 분자가 클수록 커요. ${n1} ${n1 < n2 ? '<' : '>'} ${n2}이므로 더 큰 분수의 분자는 ${maxN}이에요.`;
     }
 

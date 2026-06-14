@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -34,7 +35,7 @@ const as1Gather: SkillDef = {
       }
       const ans = a + b;
       const expr: MathExpr = [
-        txt(`${a}과 ${b}을 모으면 `),
+        txt(`${nj(a, '과/와')} ${nj(b, '을/를')} 모으면 `),
         { kind: 'blank', slot: 0 },
         txt('이에요.'),
       ];
@@ -43,10 +44,10 @@ const as1Gather: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${a}과 ${b}을 모으면 얼마인가요?`,
+        prompt: `${nj(a, '과/와')} ${nj(b, '을/를')} 모으면 얼마인가요?`,
         expr,
         blankAnswers: [ans],
-        explanation: [txt(`${a}과 ${b}을 모으면 ${ans}이에요.`)],
+        explanation: [txt(`${nj(a, '과/와')} ${nj(b, '을/를')} 모으면 ${ans}이에요.`)],
       };
     } else {
       // 가르기: n을 a와 ?로 가르기 (? ≥ 1)
@@ -58,7 +59,7 @@ const as1Gather: SkillDef = {
       }
       const ans = n - a;
       const expr: MathExpr = [
-        txt(`${n}은 ${a}과 `),
+        txt(`${nj(n, '은/는')} ${nj(a, '과/와')} `),
         { kind: 'blank', slot: 0 },
         txt('으로 가를 수 있어요.'),
       ];
@@ -67,7 +68,7 @@ const as1Gather: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${n}을 ${a}과 얼마로 가를 수 있나요?`,
+        prompt: `${nj(n, '을/를')} ${nj(a, '과/와')} 얼마로 가를 수 있나요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`${n} = ${a} + ${ans}이에요.`)],
@@ -230,7 +231,7 @@ const as1Missing: SkillDef = {
       }
       answer = a - c;
       promptStr = `${a} - □ = ${c}일 때, □에 알맞은 수를 구하세요.`;
-      explanation = [txt(`${a}에서 얼마를 빼야 ${c}가 될까요? □ = ${a} - ${c} = ${answer}.`)];
+      explanation = [txt(`${a}에서 얼마를 빼야 ${nj(c, '이/가')} 될까요? □ = ${a} - ${c} = ${answer}.`)];
     }
 
     return {
@@ -274,7 +275,7 @@ const as1Word: SkillDef = {
         if (tb >= 1) { a = ta; b = tb; break; }
       }
       answer = a + b;
-      promptStr = `${item}가 ${a}개 있어요. ${b}개를 더 사면 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 더 사면 모두 몇 개인가요?`;
       explanation = [txt(`${a}개에 ${b}개를 더하면 ${a} + ${b} = ${answer}이에요. 모두 ${answer}개예요.`)];
     } else {
       // 뺄셈
@@ -285,7 +286,7 @@ const as1Word: SkillDef = {
         a = ta; b = tb; break;
       }
       answer = a - b;
-      promptStr = `${item}가 ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${b}개를 먹으면 몇 개가 남나요?`;
       explanation = [txt(`${a}개에서 ${b}개를 덜어 내면 ${a} - ${b} = ${answer}이에요. ${answer}개가 남아요.`)];
     }
 

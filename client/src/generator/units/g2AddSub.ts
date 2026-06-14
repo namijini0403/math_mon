@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -78,7 +79,7 @@ const as2Sub: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`일의 자리 ${u1}에서 ${u2}를 뺄 수 없어요. 십의 자리에서 10을 받아내리면 ${10 + u1} - ${u2} = ${10 + u1 - u2}이에요. 십의 자리는 1을 빌려줬으니 ${at} - 1 - ${bt} = ${at - 1 - bt}이에요. 그래서 ${a} - ${b} = ${ans}이에요.`)],
+      explanation: [txt(`일의 자리 ${u1}에서 ${nj(u2, '을/를')} 뺄 수 없어요. 십의 자리에서 10을 받아내리면 ${10 + u1} - ${u2} = ${10 + u1 - u2}이에요. 십의 자리는 1을 빌려줬으니 ${at} - 1 - ${bt} = ${at - 1 - bt}이에요. 그래서 ${a} - ${b} = ${ans}이에요.`)],
     };
   },
 };
@@ -128,13 +129,13 @@ const as2Three: SkillDef = {
     let step1: number, expStr: string;
     if (pat === 0) {
       step1 = n1 + n2;
-      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기에 ${n3}을 더하면 ${step1} + ${n3} = ${ans}이에요.`;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기에 ${nj(n3, '을/를')} 더하면 ${step1} + ${n3} = ${ans}이에요.`;
     } else if (pat === 1) {
       step1 = n1 + n2;
-      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기서 ${n3}을 빼면 ${step1} - ${n3} = ${ans}이에요.`;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} + ${n2} = ${step1}, 거기서 ${nj(n3, '을/를')} 빼면 ${step1} - ${n3} = ${ans}이에요.`;
     } else {
       step1 = n1 - n2;
-      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} - ${n2} = ${step1}, 거기에 ${n3}을 더하면 ${step1} + ${n3} = ${ans}이에요.`;
+      expStr = `앞에서부터 차례로 계산해요. 먼저 ${n1} - ${n2} = ${step1}, 거기에 ${nj(n3, '을/를')} 더하면 ${step1} + ${n3} = ${ans}이에요.`;
     }
     const expr: MathExpr = [txt(`${opStr} = `), { kind: 'blank', slot: 0 }];
     return {
@@ -175,7 +176,7 @@ const as2Missing: SkillDef = {
       ans = a;
       const total = a + b;
       promptStr = `□ + ${b} = ${total}`;
-      expStr = `□와 ${b}를 더해 ${total}이 되었어요. □를 구하려면 전체 ${total}에서 ${b}를 빼면 돼요: ${total} - ${b} = ${ans}.`;
+      expStr = `□와 ${nj(b, '을/를')} 더해 ${nj(total, '이/가')} 되었어요. □를 구하려면 전체 ${total}에서 ${nj(b, '을/를')} 빼면 돼요: ${total} - ${b} = ${ans}.`;
     } else {
       // a - □ = a-b  →  □ = b
       for (let tries = 0; tries < 200; tries++) {
@@ -186,7 +187,7 @@ const as2Missing: SkillDef = {
       ans = b;
       const diff = a - b;
       promptStr = `${a} - □ = ${diff}`;
-      expStr = `${a}에서 □를 빼서 ${diff}가 남았어요. □를 구하려면 ${a}에서 남은 ${diff}를 빼면 돼요: ${a} - ${diff} = ${ans}.`;
+      expStr = `${a}에서 □를 빼서 ${nj(diff, '이/가')} 남았어요. □를 구하려면 ${a}에서 남은 ${nj(diff, '을/를')} 빼면 돼요: ${a} - ${diff} = ${ans}.`;
     }
 
     const expr: MathExpr = [{ kind: 'blank', slot: 0 }];
@@ -235,7 +236,7 @@ const as2Word: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${item}이 ${a}개 있었어요. ${b}개를 더 받았어요. 모두 몇 개인가요?`,
+        prompt: `${nj(item, '이/가')} ${a}개 있었어요. ${b}개를 더 받았어요. 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`처음 ${a}개에 받은 ${b}개를 더해요. ${a} + ${b} = ${ans}개예요.`)],
@@ -257,7 +258,7 @@ const as2Word: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${item}이 ${a}개 있었어요. ${b}개를 먹었어요. 남은 것은 몇 개인가요?`,
+        prompt: `${nj(item, '이/가')} ${a}개 있었어요. ${b}개를 먹었어요. 남은 것은 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`처음 ${a}개에서 먹은 ${b}개를 빼요. ${a} - ${b} = ${ans}개예요.`)],

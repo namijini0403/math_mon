@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -128,8 +129,8 @@ const lineTwoDiff: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `[${data.topic.subject}]\n${data.dataText}\n\n${t1}과 ${t2}의 차는 몇 ${data.topic.unit}인가요?`,
-      expr: [txt(`${t1}과 ${t2}의 차: `), { kind: 'blank', slot: 0 }, txt(` ${data.topic.unit}`)],
+      prompt: `[${data.topic.subject}]\n${data.dataText}\n\n${nj(t1, '과/와')} ${t2}의 차는 몇 ${data.topic.unit}인가요?`,
+      expr: [txt(`${nj(t1, '과/와')} ${t2}의 차: `), { kind: 'blank', slot: 0 }, txt(` ${data.topic.unit}`)],
       blankAnswers: [answer],
       explanation: [
         txt(`${t1}: ${data.values[i1]}${data.topic.unit}, ${t2}: ${data.values[i2]}${data.topic.unit}`),
@@ -198,7 +199,7 @@ const lineScale: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `꺾은선그래프에서 [${subject}]를 나타낼 때, 물결선이 ${start}부터 시작하고 눈금 한 칸이 ${tickSize}을 나타내요. ${timePoint}의 점이 눈금 ${ticks}칸 위에 있다면 실제 값은 얼마인가요?`,
+      prompt: `꺾은선그래프에서 [${subject}]를 나타낼 때, 물결선이 ${start}부터 시작하고 눈금 한 칸이 ${nj(tickSize, '을/를')} 나타내요. ${timePoint}의 점이 눈금 ${ticks}칸 위에 있다면 실제 값은 얼마인가요?`,
       expr: [txt(`실제 값: `), { kind: 'blank', slot: 0 }],
       blankAnswers: [value],
       explanation: [
@@ -255,7 +256,7 @@ const lineWord: SkillDef = {
       {
         const big = Math.max(data.values[i1], data.values[i2]);
         const small = Math.min(data.values[i1], data.values[i2]);
-        prompt = `[마법사 탑의 ${data.topic.subject}]\n${data.dataText}\n\n${data.times[i1]}와 ${data.times[i2]}의 차는 몇 ${data.topic.unit}인가요?`;
+        prompt = `[마법사 탑의 ${data.topic.subject}]\n${data.dataText}\n\n${nj(data.times[i1], '과/와')} ${data.times[i2]}의 차는 몇 ${data.topic.unit}인가요?`;
         explanation = [txt(`큰 값에서 작은 값을 빼요. ${big} − ${small} = ${answer}${data.topic.unit}`)];
       }
     } else if (pat === 2) {

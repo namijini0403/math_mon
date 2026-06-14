@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -133,7 +134,7 @@ const mul31Tens: SkillDef = {
       prompt: '계산하세요.',
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${a}는 십이 ${a / 10}개예요. 먼저 ${a / 10} × ${b} = ${(a / 10) * b}을 구하고, 자리값이 십이라 10을 곱하면 ${ans}이에요.`)],
+      explanation: [txt(`${nj(a, '은/는')} 십이 ${a / 10}개예요. 먼저 ${a / 10} × ${b} = ${nj((a / 10) * b, '을/를')} 구하고, 자리값이 십이라 10을 곱하면 ${ans}이에요.`)],
     };
   },
 };
@@ -188,7 +189,7 @@ const mul31Estimate: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${aDisplay}를 몇십으로 어림하여 ${aDisplay} × ${b}의 어림값을 구하세요.`,
+      prompt: `${nj(aDisplay, '을/를')} 몇십으로 어림하여 ${aDisplay} × ${b}의 어림값을 구하세요.`,
       expr: [txt(`${aDisplay} × ${b} ≈ ?`)],
       choices,
       answerIndex,

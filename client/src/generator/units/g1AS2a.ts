@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -229,7 +230,7 @@ const as12aWord: SkillDef = {
       }
       const a = tens * 10 + ones;
       answer = a + add;
-      promptStr = `${item}가 ${a}개 있어요. ${add}개를 더 가져오면 모두 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${add}개를 더 가져오면 모두 몇 개인가요?`;
       explanation = [txt(`${a}개에 ${add}개를 더하면 ${a} + ${add} = ${answer}이에요. 모두 ${answer}개예요.`)];
     } else {
       // 뺄셈
@@ -242,7 +243,7 @@ const as12aWord: SkillDef = {
       }
       const a = tens * 10 + ones;
       answer = a - sub;
-      promptStr = `${item}가 ${a}개 있어요. ${sub}개를 먹으면 몇 개가 남나요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개 있어요. ${sub}개를 먹으면 몇 개가 남나요?`;
       explanation = [txt(`${a}개에서 ${sub}개를 덜어 내면 ${a} - ${sub} = ${answer}이에요. ${answer}개가 남아요.`)];
     }
 

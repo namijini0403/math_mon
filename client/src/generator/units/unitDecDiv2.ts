@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text', text }) as const;
@@ -264,7 +265,7 @@ const ddiv2Round: SkillDef = {
     }
 
     const explanation: MathExpr = [
-      txt(`${a} ÷ ${b}를 계산하면 나누어떨어지지 않아요. `),
+      txt(`${a} ÷ ${nj(b, '을/를')} 계산하면 나누어떨어지지 않아요. `),
       txt(`${placeStr}까지 나타내려면 한 자리 아래에서 반올림해요. `),
       roundPlace === 0
         ? txt(`${a} × 10 = ${a * 10}, ${a * 10} ÷ ${b} ≈ ${Math.round((a * 10) / b)}이므로 `)
@@ -322,7 +323,7 @@ const ddiv2Share: SkillDef = {
           expr: [{ kind: 'blank', slot: 0 }] as MathExpr,
           blankAnswers: [quotient],
           explanation: [
-            txt(`${fmtDec(total)} ÷ ${perBottle}를 계산해요. `),
+            txt(`${fmtDec(total)} ÷ ${nj(perBottle, '을/를')} 계산해요. `),
             txt(`${perBottle} × ${quotient} = ${perBottle * quotient}이고, `),
             txt(`${fmtDec(total)} - ${perBottle * quotient} = ${fmtDec(remainder)}이므로 `),
             txt(`${quotient}병까지 담을 수 있고 ${fmtDec(remainder)} L가 남아요.`),
@@ -343,7 +344,7 @@ const ddiv2Share: SkillDef = {
           expr: [{ kind: 'blank', slot: 0 }] as MathExpr,
           blankAnswers: [quotient],
           explanation: [
-            txt(`${fmtDec(total)} ÷ ${perPiece}를 계산해요. `),
+            txt(`${fmtDec(total)} ÷ ${nj(perPiece, '을/를')} 계산해요. `),
             txt(`${perPiece} × ${quotient} = ${perPiece * quotient}이고, `),
             txt(`${fmtDec(total)} - ${perPiece * quotient} = ${fmtDec(remainder)}이므로 `),
             txt(`${quotient}도막을 만들 수 있고 ${fmtDec(remainder)} m가 남아요.`),
@@ -364,7 +365,7 @@ const ddiv2Share: SkillDef = {
           expr: [{ kind: 'blank', slot: 0 }] as MathExpr,
           blankAnswers: [quotient],
           explanation: [
-            txt(`${fmtDec(total)} ÷ ${perCup}를 계산해요. `),
+            txt(`${fmtDec(total)} ÷ ${nj(perCup, '을/를')} 계산해요. `),
             txt(`${perCup} × ${quotient} = ${perCup * quotient}이고, `),
             txt(`${fmtDec(total)} - ${perCup * quotient} = ${fmtDec(remainder)}이므로 `),
             txt(`${quotient}잔까지 줄 수 있고 ${fmtDec(remainder)} L가 남아요.`),
@@ -385,7 +386,7 @@ const ddiv2Share: SkillDef = {
           expr: [{ kind: 'blank', slot: 0 }] as MathExpr,
           blankAnswers: [quotient],
           explanation: [
-            txt(`${fmtDec(total)} ÷ ${perPiece}를 계산해요. `),
+            txt(`${fmtDec(total)} ÷ ${nj(perPiece, '을/를')} 계산해요. `),
             txt(`${perPiece} × ${quotient} = ${perPiece * quotient}이고, `),
             txt(`${fmtDec(total)} - ${perPiece * quotient} = ${fmtDec(remainder)}이므로 `),
             txt(`${quotient}조각을 만들 수 있고 ${fmtDec(remainder)} m가 남아요.`),

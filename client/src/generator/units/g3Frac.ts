@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -144,7 +145,7 @@ const frac3DecRel: SkillDef = {
 
     if (dir === 0) {
       // 0.n = □/10
-      prompt = `0.${n}을 분수로 나타내면 □/10입니다. □에 알맞은 수를 구하세요.`;
+      prompt = `0.${nj(n, '을/를')} 분수로 나타내면 □/10입니다. □에 알맞은 수를 구하세요.`;
       expr = [
         { kind: 'decimal', v: n / 10 },
         txt(' = '),
@@ -170,7 +171,7 @@ const frac3DecRel: SkillDef = {
       expr,
       blankAnswers: [n],
       explanation: [
-        txt(`0.${n}은 0.1이 ${n}개예요. 0.1은 `),
+        txt(`0.${nj(n, '은/는')} 0.1이 ${n}개예요. 0.1은 `),
         { kind: 'frac', n: 1, d: 10 },
         txt(`과 같으니 0.${n} = `),
         { kind: 'frac', n, d: 10 },
@@ -258,8 +259,8 @@ const frac3Word: SkillDef = {
       const n = rng.int(1, 9);
       ans = n;
       unit = '칸';
-      prompt = `리본을 10칸으로 나누었을 때 0.${n}은 몇 칸인가요?`;
-      expl = `10칸으로 나누면 한 칸이 0.1이에요. 0.${n}은 0.1이 ${n}개니 ${n}칸이에요.`;
+      prompt = `리본을 10칸으로 나누었을 때 0.${nj(n, '은/는')} 몇 칸인가요?`;
+      expl = `10칸으로 나누면 한 칸이 0.1이에요. 0.${nj(n, '은/는')} 0.1이 ${n}개니 ${n}칸이에요.`;
     } else {
       // 분수 비교 문장제
       const d = rng.int(4, 12);

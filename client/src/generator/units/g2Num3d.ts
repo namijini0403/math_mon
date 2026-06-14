@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -49,10 +50,10 @@ const num3dCompose: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${num}은 백 모형이 몇 개인가요?`,
+        prompt: `${nj(num, '은/는')} 백 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [h],
-        explanation: [txt(`${num}을 백·십·일로 가르면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
+        explanation: [txt(`${nj(num, '을/를')} 백·십·일로 가르면 백의 자리 숫자가 ${h}이에요. 그래서 백 모형은 ${h}개예요.`)],
       };
     } else {
       // 수 → 십 자리 숫자
@@ -66,10 +67,10 @@ const num3dCompose: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${num}은 십 모형이 몇 개인가요?`,
+        prompt: `${nj(num, '은/는')} 십 모형이 몇 개인가요?`,
         expr,
         blankAnswers: [t],
-        explanation: [txt(`${num}을 백·십·일로 가르면 십의 자리 숫자가 ${t}이에요. 그래서 십 모형은 ${t}개예요.`)],
+        explanation: [txt(`${nj(num, '을/를')} 백·십·일로 가르면 십의 자리 숫자가 ${t}이에요. 그래서 십 모형은 ${t}개예요.`)],
       };
     }
   },
@@ -113,7 +114,7 @@ const num3dPlace: SkillDef = {
       prompt: `${num}에서 ${posName}의 자리 숫자가 나타내는 값은 얼마인가요?`,
       expr,
       blankAnswers: [ans],
-      explanation: [txt(`${num}에서 ${posName}의 자리 숫자는 ${pos === 0 ? h : pos === 1 ? t : u}이에요. ${posName}의 자리에 있으므로 ${ans}을 나타내요.`)],
+      explanation: [txt(`${num}에서 ${posName}의 자리 숫자는 ${pos === 0 ? h : pos === 1 ? t : u}이에요. ${posName}의 자리에 있으므로 ${nj(ans, '을/를')} 나타내요.`)],
     };
   },
 };
@@ -150,7 +151,7 @@ const num3dSkip: SkillDef = {
       prompt: `${step}씩 뛰어 셀 때 □에 알맞은 수를 쓰세요.\n${display}`,
       expr,
       blankAnswers: [answer],
-      explanation: [txt(`${step}씩 뛰어 세면 ${step === 100 ? '백' : step === 10 ? '십' : '일'}의 자리 숫자가 1씩 커져요: ${nums.join(', ')}. 그래서 □에는 ${answer}가 들어가요.`)],
+      explanation: [txt(`${step}씩 뛰어 세면 ${step === 100 ? '백' : step === 10 ? '십' : '일'}의 자리 숫자가 1씩 커져요: ${nums.join(', ')}. 그래서 □에는 ${nj(answer, '이/가')} 들어가요.`)],
     };
   },
 };
@@ -178,11 +179,11 @@ const num3dCompare: SkillDef = {
     const au = a % 10, bu = b % 10;
     let reason: string;
     if (ah !== bh) {
-      reason = `백의 자리를 비교하면 ${ah}과 ${bh}이라서, ${bigger}가 더 큽니다`;
+      reason = `백의 자리를 비교하면 ${nj(ah, '과/와')} ${bh}이라서, ${nj(bigger, '이/가')} 더 큽니다`;
     } else if (at !== bt) {
-      reason = `백의 자리는 ${ah}로 같으니 십의 자리를 비교하면 ${at}과 ${bt}이라서, ${bigger}가 더 큽니다`;
+      reason = `백의 자리는 ${ah}로 같으니 십의 자리를 비교하면 ${nj(at, '과/와')} ${bt}이라서, ${nj(bigger, '이/가')} 더 큽니다`;
     } else {
-      reason = `백·십의 자리가 같으니 일의 자리를 비교하면 ${au}과 ${bu}이라서, ${bigger}가 더 큽니다`;
+      reason = `백·십의 자리가 같으니 일의 자리를 비교하면 ${nj(au, '과/와')} ${bu}이라서, ${nj(bigger, '이/가')} 더 큽니다`;
     }
     return {
       id: `${this.id}:${seed}`,
@@ -224,7 +225,7 @@ const num3dWord: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${item}이 100개짜리 상자 ${h}개, 10개짜리 묶음 ${t}개, 낱개 ${u}개 있어요. 모두 몇 개인가요?`,
+        prompt: `${nj(item, '이/가')} 100개짜리 상자 ${h}개, 10개짜리 묶음 ${t}개, 낱개 ${u}개 있어요. 모두 몇 개인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`100개짜리 ${h}상자는 ${h * 100}개, 10개짜리 ${t}묶음은 ${t * 10}개, 낱개 ${u}개. 모두 더하면 ${h * 100} + ${t * 10} + ${u} = ${ans}개예요.`)],

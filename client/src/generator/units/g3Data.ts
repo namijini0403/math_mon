@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -108,7 +109,7 @@ const data3TableDiff: SkillDef = {
     const item2 = data.items[i2];
 
     const expr: MathExpr = [
-      txt(`${item1}과 ${item2}의 차: `),
+      txt(`${nj(item1, '과/와')} ${item2}의 차: `),
       { kind: 'blank', slot: 0 },
       txt(data.topic.unit),
     ];
@@ -118,7 +119,7 @@ const data3TableDiff: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `[${data.topic.title}]\n${data.dataText}\n\n${item1}과 ${item2}의 차는 몇 ${data.topic.unit}인가요?`,
+      prompt: `[${data.topic.title}]\n${data.dataText}\n\n${nj(item1, '과/와')} ${item2}의 차는 몇 ${data.topic.unit}인가요?`,
       expr,
       blankAnswers: [ans],
       explanation: [
@@ -167,7 +168,7 @@ const data3PictoRead: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `[${topic.title}] 그림그래프 (🔵=10${topic.unit}, 🔹=1${topic.unit})\n${item}: ${picStr}\n\n${item}은(는) 몇 ${topic.unit}인가요?`,
+      prompt: `[${topic.title}] 그림그래프 (🔵=10${topic.unit}, 🔹=1${topic.unit})\n${item}: ${picStr}\n\n${nj(item, '은/는')} 몇 ${topic.unit}인가요?`,
       expr,
       blankAnswers: [ans],
       explanation: [
@@ -281,8 +282,8 @@ const data3Word: SkillDef = {
       const known = data.values[idx];
       ans = total - known;
       unit = data.topic.unit;
-      prompt = `[${data.topic.title}]\n${data.dataText}\n\n전체는 ${total}${unit}이고 ${data.items[idx]}이 ${known}${unit}이라면, 나머지 항목의 합은 몇 ${unit}인가요?`;
-      expl = `전체에서 ${data.items[idx]}을 빼면 나머지의 합이에요. ${total} - ${known} = ${ans}${unit}이에요.`;
+      prompt = `[${data.topic.title}]\n${data.dataText}\n\n전체는 ${total}${unit}이고 ${nj(data.items[idx], '이/가')} ${known}${unit}이라면, 나머지 항목의 합은 몇 ${unit}인가요?`;
+      expl = `전체에서 ${nj(data.items[idx], '을/를')} 빼면 나머지의 합이에요. ${total} - ${known} = ${ans}${unit}이에요.`;
     } else if (pat === 1) {
       // 가장 많은 것과 가장 적은 것의 차
       const data = generateTableData(rng);
@@ -292,7 +293,7 @@ const data3Word: SkillDef = {
       const minItem = data.items[data.values.indexOf(minVal)];
       ans = maxVal - minVal;
       unit = data.topic.unit;
-      prompt = `[${data.topic.title}]\n${data.dataText}\n\n가장 많은 ${maxItem}은 가장 적은 ${minItem}보다 몇 ${unit} 더 많은가요?`;
+      prompt = `[${data.topic.title}]\n${data.dataText}\n\n가장 많은 ${nj(maxItem, '은/는')} 가장 적은 ${minItem}보다 몇 ${unit} 더 많은가요?`;
       expl = `가장 많은 ${maxItem}(${maxVal})에서 가장 적은 ${minItem}(${minVal})을 빼요. ${maxVal} - ${minVal} = ${ans}${unit}이에요.`;
     } else {
       // 그림그래프 문장제: 두 항목 합
@@ -306,7 +307,7 @@ const data3Word: SkillDef = {
       const v2 = big2 * 10 + small2;
       ans = v1 + v2;
       unit = topic.unit;
-      prompt = `[${topic.title}] 그림그래프 (🔵=10${unit}, 🔹=1${unit})\n${items[0]}: 🔵${big1}개 🔹${small1}개 (${v1}${unit})\n${items[1]}: 🔵${big2}개 🔹${small2}개 (${v2}${unit})\n\n${items[0]}과 ${items[1]}을 합치면 모두 몇 ${unit}인가요?`;
+      prompt = `[${topic.title}] 그림그래프 (🔵=10${unit}, 🔹=1${unit})\n${items[0]}: 🔵${big1}개 🔹${small1}개 (${v1}${unit})\n${items[1]}: 🔵${big2}개 🔹${small2}개 (${v2}${unit})\n\n${nj(items[0], '과/와')} ${nj(items[1], '을/를')} 합치면 모두 몇 ${unit}인가요?`;
       expl = `두 항목의 값을 더해요. ${v1} + ${v2} = ${ans}${unit}이에요.`;
     }
 

@@ -7,6 +7,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -62,11 +63,11 @@ const ddiv1Basic: SkillDef = {
     const dividendInt = Math.round(dividend * 10);
 
     const explanation: MathExpr = [
-      txt(`${fmtDec(dividend)}은 ${dividendInt}의 `),
+      txt(`${nj(fmtDec(dividend), '은/는')} ${dividendInt}의 `),
       { kind: 'frac', n: 1, d: 10 },
       txt(`이에요. `),
       txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이므로 `),
-      txt(`${fmtDec(dividend)} ÷ ${n}은 ${dividendInt / n}의 `),
+      txt(`${fmtDec(dividend)} ÷ ${nj(n, '은/는')} ${dividendInt / n}의 `),
       { kind: 'frac', n: 1, d: 10 },
       txt(`인 ${fmtDec(q)}이에요.`),
     ];
@@ -135,7 +136,7 @@ const ddiv1Carry: SkillDef = {
     const dividendInt = Math.round(finalDividend * dividendScale);
 
     const explanation: MathExpr = [
-      txt(`${fmtDec(finalDividend)}은 ${dividendInt}의 `),
+      txt(`${nj(fmtDec(finalDividend), '은/는')} ${dividendInt}의 `),
       { kind: 'frac', n: 1, d: dividendScale },
       txt(`이에요. `),
       txt(`${dividendInt} ÷ ${finalN} = ${dividendInt / finalN}이므로 `),
@@ -186,10 +187,10 @@ const ddiv1Zero: SkillDef = {
     const dividendInt = Math.round(dividend * dividendScale);
 
     const explanation: MathExpr = [
-      txt(`${fmtDec(dividend)} ÷ ${n}을 세로로 계산할 때, `),
+      txt(`${fmtDec(dividend)} ÷ ${nj(n, '을/를')} 세로로 계산할 때, `),
       txt(`수를 하나 내려도 나눌 수 없으면 몫에 0을 써요. `),
       txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이고, `),
-      txt(`${fmtDec(dividend)}은 ${dividendInt}의 `),
+      txt(`${nj(fmtDec(dividend), '은/는')} ${dividendInt}의 `),
       { kind: 'frac', n: 1, d: dividendScale },
       txt(`이므로 몫은 ${fmtDec(q)}이에요.`),
     ];
@@ -258,7 +259,7 @@ const ddiv1NatNat: SkillDef = {
     const { dividend, divisor, answer } = chosen;
 
     const explanation: MathExpr = [
-      txt(`${dividend} ÷ ${divisor}는 나누어떨어지지 않으므로 소수로 나타내요. `),
+      txt(`${dividend} ÷ ${nj(divisor, '은/는')} 나누어떨어지지 않으므로 소수로 나타내요. `),
       txt(`${dividend} ÷ ${divisor} = `),
       { kind: 'frac', n: dividend, d: divisor },
       txt(`이고, 분모를 10 또는 100으로 바꾸면 `),
@@ -345,7 +346,7 @@ const ddiv1Point: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`${aBase} ÷ ${n} = ${qBase}임을 이용해요. `),
-      txt(`${fmtDec(aDec)}은 ${aBase}의 `),
+      txt(`${nj(fmtDec(aDec), '은/는')} ${aBase}의 `),
       { kind: 'frac', n: 1, d: 100 },
       txt(`이므로, ${fmtDec(aDec)} ÷ ${n}의 몫은 ${qBase}의 `),
       { kind: 'frac', n: 1, d: 100 },
@@ -357,7 +358,7 @@ const ddiv1Point: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${aBase} ÷ ${n} = ${qBase}를 이용하여 ${fmtDec(aDec)} ÷ ${n}을 구하세요.`,
+      prompt: `${aBase} ÷ ${n} = ${nj(qBase, '을/를')} 이용하여 ${fmtDec(aDec)} ÷ ${nj(n, '을/를')} 구하세요.`,
       choices,
       answerIndex,
       explanation,
@@ -396,9 +397,9 @@ const ddiv1Word: SkillDef = {
       const dividendInt = Math.round(totalLen * 10);
       explanation = [
         txt(`${fmtDec(totalLen)} m를 ${n}명이 나누므로 `),
-        txt(`${fmtDec(totalLen)} ÷ ${n}을 계산해요. `),
+        txt(`${fmtDec(totalLen)} ÷ ${nj(n, '을/를')} 계산해요. `),
         txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이고 `),
-        txt(`${fmtDec(totalLen)}은 ${dividendInt}의 `),
+        txt(`${nj(fmtDec(totalLen), '은/는')} ${dividendInt}의 `),
         { kind: 'frac', n: 1, d: 10 },
         txt(`이므로 한 사람의 끈은 ${fmtDec(q)} m예요.`),
       ];
@@ -416,9 +417,9 @@ const ddiv1Word: SkillDef = {
       const dividendInt = Math.round(total * 10);
       explanation = [
         txt(`${fmtDec(total)} L를 ${n}컵에 나누므로 `),
-        txt(`${fmtDec(total)} ÷ ${n}을 계산해요. `),
+        txt(`${fmtDec(total)} ÷ ${nj(n, '을/를')} 계산해요. `),
         txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이고 `),
-        txt(`${fmtDec(total)}은 ${dividendInt}의 `),
+        txt(`${nj(fmtDec(total), '은/는')} ${dividendInt}의 `),
         { kind: 'frac', n: 1, d: 10 },
         txt(`이므로 한 컵에 담기는 우유는 ${fmtDec(q)} L예요.`),
       ];
@@ -436,9 +437,9 @@ const ddiv1Word: SkillDef = {
       const dividendInt = Math.round(total * 10);
       explanation = [
         txt(`${fmtDec(total)} kg을 ${n}봉지에 나누므로 `),
-        txt(`${fmtDec(total)} ÷ ${n}을 계산해요. `),
+        txt(`${fmtDec(total)} ÷ ${nj(n, '을/를')} 계산해요. `),
         txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이고 `),
-        txt(`${fmtDec(total)}은 ${dividendInt}의 `),
+        txt(`${nj(fmtDec(total), '은/는')} ${dividendInt}의 `),
         { kind: 'frac', n: 1, d: 10 },
         txt(`이므로 한 봉지에 담기는 쌀은 ${fmtDec(q)} kg이에요.`),
       ];
@@ -458,9 +459,9 @@ const ddiv1Word: SkillDef = {
       const dividendInt = Math.round(total * dividendScale);
       explanation = [
         txt(`${fmtDec(total)} m를 ${n}도막으로 자르므로 `),
-        txt(`${fmtDec(total)} ÷ ${n}을 계산해요. `),
+        txt(`${fmtDec(total)} ÷ ${nj(n, '을/를')} 계산해요. `),
         txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이고 `),
-        txt(`${fmtDec(total)}은 ${dividendInt}의 `),
+        txt(`${nj(fmtDec(total), '은/는')} ${dividendInt}의 `),
         { kind: 'frac', n: 1, d: dividendScale },
         txt(`이므로 한 도막은 ${fmtDec(q)} m예요.`),
       ];
@@ -481,7 +482,7 @@ const ddiv1Word: SkillDef = {
       const dividendInt = Math.round(total * dividendScale);
       explanation = [
         txt(`${fmtDec(total)} L를 ${n}개로 나누므로 `),
-        txt(`${fmtDec(total)} ÷ ${n}을 계산해요. `),
+        txt(`${fmtDec(total)} ÷ ${nj(n, '을/를')} 계산해요. `),
         txt(`나누는 도중 수를 내려도 나눌 수 없으면 몫에 0을 써요. `),
         txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이므로 `),
         txt(`한 병에 ${fmtDec(q)} L씩 담겨요.`),
@@ -500,9 +501,9 @@ const ddiv1Word: SkillDef = {
       const dividendInt = Math.round(total * 10);
       explanation = [
         txt(`${fmtDec(total)} km를 ${n}일로 나누므로 `),
-        txt(`${fmtDec(total)} ÷ ${n}을 계산해요. `),
+        txt(`${fmtDec(total)} ÷ ${nj(n, '을/를')} 계산해요. `),
         txt(`${dividendInt} ÷ ${n} = ${dividendInt / n}이고 `),
-        txt(`${fmtDec(total)}은 ${dividendInt}의 `),
+        txt(`${nj(fmtDec(total), '은/는')} ${dividendInt}의 `),
         { kind: 'frac', n: 1, d: 10 },
         txt(`이므로 하루에 달린 거리는 ${fmtDec(q)} km예요.`),
       ];

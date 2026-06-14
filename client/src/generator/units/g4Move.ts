@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -198,7 +199,7 @@ const moveDigital180: SkillDef = {
     const originalNum = parseInt(digits.join(''), 10);
 
     const expr: MathExpr = [
-      txt(`${originalNum}을 180° 돌리면 `),
+      txt(`${nj(originalNum, '을/를')} 180° 돌리면 `),
       { kind: 'blank', slot: 0 },
     ];
 
@@ -207,7 +208,7 @@ const moveDigital180: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `디지털 시계처럼 생긴 수 ${originalNum}을 180° 돌리면 어떤 수가 되나요?`,
+      prompt: `디지털 시계처럼 생긴 수 ${nj(originalNum, '을/를')} 180° 돌리면 어떤 수가 되나요?`,
       expr,
       blankAnswers: [answer],
       explanation: [
@@ -290,20 +291,20 @@ const moveWord: SkillDef = {
       // 총 돌린 각도 계산 (n=2..8)
       const n = rng.int(2, 8);
       answer = n * 90;
-      prompt = `${subject}는 마법 거울을 시계 방향으로 90°씩 ${n}번 돌렸습니다. 마법 거울은 모두 몇 도 돌아간 건가요?`;
+      prompt = `${nj(subject, '은/는')} 마법 거울을 시계 방향으로 90°씩 ${n}번 돌렸습니다. 마법 거울은 모두 몇 도 돌아간 건가요?`;
       explanation = [txt(`90° × ${n} = ${answer}°`)];
     } else if (pat === 1) {
       // 총 각도가 주어졌을 때 횟수 구하기
       const n = rng.int(2, 8);
       const totalDeg = n * 90;
       answer = n;
-      prompt = `${subject}는 보물 상자 뚜껑을 시계 방향으로 90°씩 돌려 ${totalDeg}° 돌렸습니다. 뚜껑을 몇 번 돌린 건가요?`;
+      prompt = `${nj(subject, '은/는')} 보물 상자 뚜껑을 시계 방향으로 90°씩 돌려 ${totalDeg}° 돌렸습니다. 뚜껑을 몇 번 돌린 건가요?`;
       explanation = [txt(`${totalDeg}° ÷ 90° = ${answer}번`)];
     } else if (pat === 2) {
       // 원위치까지 남은 횟수 (done=1..3)
       const done = rng.int(1, 3);
       answer = 4 - done;
-      prompt = `${subject}는 마법 자물쇠를 시계 방향으로 90°씩 ${done}번 돌렸습니다. 처음 모양으로 되돌리려면 같은 방향으로 몇 번 더 돌려야 하나요?`;
+      prompt = `${nj(subject, '은/는')} 마법 자물쇠를 시계 방향으로 90°씩 ${done}번 돌렸습니다. 처음 모양으로 되돌리려면 같은 방향으로 몇 번 더 돌려야 하나요?`;
       explanation = [txt(`4번 돌리면 360°로 원위치. ${4} - ${done} = ${answer}번`)];
     } else if (pat === 3) {
       // 디지털 숫자 돌리기 → 두 수 합 (더 넓은 조합)
@@ -314,7 +315,7 @@ const moveWord: SkillDef = {
       const fa = flipMap[a];
       const fb = flipMap[b];
       answer = fa + fb;
-      prompt = `디지털 시계에 ${a}와 ${b}가 표시되어 있습니다. 두 수를 각각 180° 돌리면 어떤 수가 되는지 구하고, 그 두 수의 합을 구하세요.`;
+      prompt = `디지털 시계에 ${nj(a, '과/와')} ${nj(b, '이/가')} 표시되어 있습니다. 두 수를 각각 180° 돌리면 어떤 수가 되는지 구하고, 그 두 수의 합을 구하세요.`;
       explanation = [
         txt(`${a} → 180° 돌리면 → ${fa}`),
         txt(`${b} → 180° 돌리면 → ${fb}`),
@@ -323,7 +324,7 @@ const moveWord: SkillDef = {
     } else if (pat === 4) {
       // 뒤집기: 같은 방향으로 몇 번 뒤집어야 처음 모양으로 돌아오는가 → 2번
       answer = 2;
-      prompt = `${subject}는 나뭇잎 도형을 같은 방향으로 뒤집고 있습니다. 처음 모양으로 돌아오려면 적어도 몇 번 뒤집어야 하나요?`;
+      prompt = `${nj(subject, '은/는')} 나뭇잎 도형을 같은 방향으로 뒤집고 있습니다. 처음 모양으로 돌아오려면 적어도 몇 번 뒤집어야 하나요?`;
       explanation = [
         txt(`한 번 뒤집으면 거울에 비친 듯 좌우(또는 위아래)가 바뀌어요.`),
         txt(`같은 방향으로 한 번 더, 모두 2번 뒤집으면 처음 모양으로 돌아옵니다.`),
@@ -333,7 +334,7 @@ const moveWord: SkillDef = {
       const n1 = rng.int(1, 4);
       const n2 = rng.int(1, 4);
       answer = (n1 + n2) * 90;
-      prompt = `${subject}는 마법 나침반을 먼저 시계 방향으로 90°씩 ${n1}번, 그다음 90°씩 ${n2}번 돌렸습니다. 나침반은 모두 몇 도 돌아간 건가요?`;
+      prompt = `${nj(subject, '은/는')} 마법 나침반을 먼저 시계 방향으로 90°씩 ${n1}번, 그다음 90°씩 ${n2}번 돌렸습니다. 나침반은 모두 몇 도 돌아간 건가요?`;
       explanation = [txt(`(${n1} + ${n2}) × 90° = ${n1 + n2} × 90° = ${answer}°`)];
     }
 

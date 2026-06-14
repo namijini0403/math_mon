@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -53,10 +54,10 @@ const shape12Classify: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${obj.name}은 어떤 모양인가요?`,
+      prompt: `${nj(obj.name, '은/는')} 어떤 모양인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${obj.name}은 ${PLANE_TRAIT[obj.shape]}. 그래서 ${obj.shape} 모양이에요.`)],
+      explanation: [txt(`${nj(obj.name, '은/는')} ${PLANE_TRAIT[obj.shape]}. 그래서 ${obj.shape} 모양이에요.`)],
     };
   },
 };
@@ -150,10 +151,10 @@ const shape12Trace: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${obj.emoji} ${obj.name}을 종이에 본뜨면 어떤 모양이 나오나요?`,
+      prompt: `${obj.emoji} ${nj(obj.name, '을/를')} 종이에 본뜨면 어떤 모양이 나오나요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${obj.name}을 종이에 본뜨면 ${obj.result} 모양이 나와요.`)],
+      explanation: [txt(`${nj(obj.name, '을/를')} 종이에 본뜨면 ${obj.result} 모양이 나와요.`)],
     };
   },
 };

@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 // ── 공통 헬퍼 ──────────────────────────────────────────────
@@ -42,7 +43,7 @@ const cubCount: SkillDef = {
 
     const explanation: MathExpr = [
       txt(
-        `${shapeName}의 ${part.name}은 모두 ${part.count}${part.unit}이에요. ` +
+        `${shapeName}의 ${nj(part.name, '은/는')} 모두 ${part.count}${part.unit}이에요. ` +
         `직육면체(정육면체 포함)는 면이 6개, 모서리가 12개, 꼭짓점이 8개예요.`,
       ),
     ];
@@ -52,7 +53,7 @@ const cubCount: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${shapeName}의 ${part.name}은 모두 몇 ${part.unit}인가요?`,
+      prompt: `${shapeName}의 ${nj(part.name, '은/는')} 모두 몇 ${part.unit}인가요?`,
       expr,
       blankAnswers: [part.count],
       explanation,
@@ -338,7 +339,7 @@ const cubWord: SkillDef = {
           skillId: this.id,
           seed,
           format: 'fill-blanks',
-          prompt: `가로 ${a} cm, 세로 ${b} cm, 높이 ${c} cm인 직육면체 모양 ${box}의 모든 모서리에 ${mat}를 붙이려고 해요. 필요한 ${mat}는 몇 cm인가요?`,
+          prompt: `가로 ${a} cm, 세로 ${b} cm, 높이 ${c} cm인 직육면체 모양 ${box}의 모든 모서리에 ${nj(mat, '을/를')} 붙이려고 해요. 필요한 ${nj(mat, '은/는')} 몇 cm인가요?`,
           expr,
           blankAnswers: [total],
           explanation,
@@ -429,7 +430,7 @@ const cubWord: SkillDef = {
           skillId: this.id,
           seed,
           format: 'fill-blanks',
-          prompt: `한 모서리가 ${e} cm인 ${obj}을 철사로 만들려고 해요. 필요한 철사는 몇 cm인가요?`,
+          prompt: `한 모서리가 ${e} cm인 ${nj(obj, '을/를')} 철사로 만들려고 해요. 필요한 철사는 몇 cm인가요?`,
           expr,
           blankAnswers: [needed],
           explanation,

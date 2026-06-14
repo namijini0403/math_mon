@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -119,7 +120,7 @@ const plane3Angle: SkillDef = {
         prompt: `${shape.name}의 각은 모두 몇 개인가요?`,
         expr,
         blankAnswers: [shape.angles],
-        explanation: [txt(`${shape.name}은 변이 ${shape.angles}개라 각도 ${shape.angles}개예요. 변과 변이 만나는 곳마다 각이 생겨요.`)],
+        explanation: [txt(`${nj(shape.name, '은/는')} 변이 ${shape.angles}개라 각도 ${shape.angles}개예요. 변과 변이 만나는 곳마다 각이 생겨요.`)],
       };
     } else {
       // 직각 개수 (직각이 0인 도형이면 다시 뽑기)
@@ -147,8 +148,8 @@ const plane3Angle: SkillDef = {
         blankAnswers: [chosen.rightAngles],
         explanation: [txt(
           chosen.rightAngles === chosen.angles
-            ? `${chosen.name}은 네 각이 모두 곧게 선 직각(90°)이라 직각이 ${chosen.rightAngles}개예요.`
-            : `${chosen.name}은 이름처럼 직각(90°)이 ${chosen.rightAngles}개 있어요.`,
+            ? `${nj(chosen.name, '은/는')} 네 각이 모두 곧게 선 직각(90°)이라 직각이 ${chosen.rightAngles}개예요.`
+            : `${nj(chosen.name, '은/는')} 이름처럼 직각(90°)이 ${chosen.rightAngles}개 있어요.`,
         )],
       };
     }
@@ -256,7 +257,7 @@ const plane3Perimeter: SkillDef = {
       answer = w;
       promptStr = `둘레가 ${peri} cm이고 세로가 ${h} cm인 직사각형의 가로는 몇 cm인가요?`;
       expr = [txt('가로 = '), { kind: 'blank', slot: 0 }, txt(' cm')];
-      explStr = `둘레는 (가로 + 세로) × 2예요. 그러니 둘레의 절반이 가로 + 세로예요. ${peri} ÷ 2 = ${peri / 2}. 여기서 세로 ${h}를 빼면 가로 = ${peri / 2} - ${h} = ${w} (cm).`;
+      explStr = `둘레는 (가로 + 세로) × 2예요. 그러니 둘레의 절반이 가로 + 세로예요. ${peri} ÷ 2 = ${peri / 2}. 여기서 세로 ${nj(h, '을/를')} 빼면 가로 = ${peri / 2} - ${h} = ${w} (cm).`;
     } else if (pat === 2) {
       const side = rng.int(2, 25);
       const peri = side * 4;
@@ -329,7 +330,7 @@ const plane3Word: SkillDef = {
       answer = w;
       unit = 'cm';
       prompt = `마법 양탄자는 직사각형 모양으로 둘레가 ${peri} cm이고, 세로가 ${h} cm예요. 가로는 몇 cm인가요?`;
-      explanation = [txt(`둘레의 절반이 가로 + 세로예요. ${peri} ÷ 2 = ${peri / 2}. 여기서 세로 ${h}를 빼면 가로 = ${peri / 2} - ${h} = ${w}이라 ${w} cm예요.`)];
+      explanation = [txt(`둘레의 절반이 가로 + 세로예요. ${peri} ÷ 2 = ${peri / 2}. 여기서 세로 ${nj(h, '을/를')} 빼면 가로 = ${peri / 2} - ${h} = ${w}이라 ${w} cm예요.`)];
     } else {
       // 정사각형 변 역산
       const side = rng.int(3, 20);

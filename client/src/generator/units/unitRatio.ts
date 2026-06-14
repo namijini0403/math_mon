@@ -185,7 +185,7 @@ const ratioPercent: SkillDef = {
       const percentCandidates = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90];
       answerPercent = rng.pick(percentCandidates);
       const decimalVal = answerPercent / 100;
-      prompt = `소수 ${decimalVal}을 백분율로 나타내세요.`;
+      prompt = `소수 ${nj(decimalVal, '을/를')} 백분율로 나타내세요.`;
       expr = [
         { kind: 'decimal', v: decimalVal },
         txt(' = '),
@@ -206,7 +206,7 @@ const ratioPercent: SkillDef = {
       answerPercent = Math.round((numerator / d) * 100);
 
       const { n: sn, d: sd } = simplify({ n: numerator, d });
-      prompt = `분수 ${sn}/${sd}을 백분율로 나타내세요.`;
+      prompt = `분수 ${sn}/${nj(sd, '을/를')} 백분율로 나타내세요.`;
       expr = [
         { kind: 'frac', n: sn, d: sd },
         txt(' = '),
@@ -267,7 +267,7 @@ const percentOf: SkillDef = {
     ] as const;
 
     const sc = rng.pick(scenarios);
-    const prompt = `${sc.ctx} ${sc.subject}은 몇 %인가요?`;
+    const prompt = `${sc.ctx} ${nj(sc.subject, '은/는')} 몇 %인가요?`;
 
     const expr: MathExpr = [
       txt(`비율: `),

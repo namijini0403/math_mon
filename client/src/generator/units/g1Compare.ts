@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -54,7 +55,7 @@ const comp1Emoji: SkillDef = {
       choices,
       answerIndex,
       explanation: [
-        txt(`가는 ${countA}개, 나는 ${countB}개예요. ${countA > countB ? '가' : '나'}가 더 많아요.`),
+        txt(`가는 ${countA}개, 나는 ${countB}개예요. ${nj(countA > countB ? '가' : '나', '이/가')} 더 많아요.`),
       ],
     };
   },
@@ -142,7 +143,7 @@ const comp1Vocab: SkillDef = {
       wrong1 = more ? '더 적어요' : '더 많아요';
       wrong2 = '같아요';
       wrong3 = '모르겠어요';
-      promptStr = `가에는 ${item}가 ${a}개, 나에는 ${b}개 있어요. 가는 나보다 ${item}가 어때요?`;
+      promptStr = `가에는 ${nj(item, '이/가')} ${a}개, 나에는 ${b}개 있어요. 가는 나보다 ${nj(item, '이/가')} 어때요?`;
       explanation = [txt(`가는 ${a}개, 나는 ${b}개예요. 그래서 가는 나보다 ${answer}`)];
     } else if (pat === 1) {
       const a = rng.int(1, 9);
@@ -213,7 +214,7 @@ const comp1Word: SkillDef = {
       }
       answer = Math.max(a, b);
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
-      promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. 더 많은 것은 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개, ${nj(item2, '이/가')} ${b}개 있어요. 더 많은 것은 몇 개인가요?`;
       explanation = [txt(`${a}개와 ${b}개를 비교하면 ${answer}개가 더 많아요.`)];
     } else if (pat === 1) {
       // 더 적은 쪽 개수
@@ -225,7 +226,7 @@ const comp1Word: SkillDef = {
       }
       answer = Math.min(a, b);
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
-      promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. 더 적은 것은 몇 개인가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개, ${nj(item2, '이/가')} ${b}개 있어요. 더 적은 것은 몇 개인가요?`;
       explanation = [txt(`${a}개와 ${b}개를 비교하면 ${answer}개가 더 적어요.`)];
     } else {
       // 차이
@@ -237,7 +238,7 @@ const comp1Word: SkillDef = {
       }
       answer = b - a;
       const item2 = rng.pick(ITEMS.filter(i => i !== item));
-      promptStr = `${item}가 ${a}개, ${item2}가 ${b}개 있어요. ${item2}는 ${item}보다 몇 개 더 많은가요?`;
+      promptStr = `${nj(item, '이/가')} ${a}개, ${nj(item2, '이/가')} ${b}개 있어요. ${nj(item2, '은/는')} ${item}보다 몇 개 더 많은가요?`;
       explanation = [txt(`${b}개에서 ${a}개를 덜어 내어 비교하면 ${b} - ${a} = ${answer}개 더 많아요.`)];
     }
 

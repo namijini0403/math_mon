@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -126,12 +127,12 @@ const barDiff: SkillDef = {
     const smallVal = Math.min(data.values[i1], data.values[i2]);
 
     const expr: MathExpr = [
-      txt(`${item1}과 ${item2}의 차: `),
+      txt(`${nj(item1, '과/와')} ${item2}의 차: `),
       { kind: 'blank', slot: 0 },
       txt(data.topic.unit),
     ];
 
-    const prompt = `[${data.topic.title}]\n${data.dataText}\n\n${item1}과 ${item2}의 차는 몇 ${data.topic.unit}인가요?`;
+    const prompt = `[${data.topic.title}]\n${data.dataText}\n\n${nj(item1, '과/와')} ${item2}의 차는 몇 ${data.topic.unit}인가요?`;
 
     return {
       id: `${this.id}:${seed}`,
@@ -272,7 +273,7 @@ const barWord: SkillDef = {
       const maxItem = data.selectedItems[data.values.indexOf(maxVal)];
       const minItem = data.selectedItems[data.values.indexOf(minVal)];
       answer = maxVal - minVal;
-      prompt = `[${data.topic.title}]\n${data.dataText}\n\n가장 많은 ${maxItem}은 가장 적은 ${minItem}보다 몇 ${data.topic.unit} 더 많은가요?`;
+      prompt = `[${data.topic.title}]\n${data.dataText}\n\n가장 많은 ${nj(maxItem, '은/는')} 가장 적은 ${minItem}보다 몇 ${data.topic.unit} 더 많은가요?`;
       explanation = [txt(`${maxVal} - ${minVal} = ${answer}${data.topic.unit}`)];
     } else if (pat === 1) {
       // 전체 합에서 한 항목 역산
@@ -281,7 +282,7 @@ const barWord: SkillDef = {
       const knownItem = data.selectedItems[knownIdx];
       const knownVal = data.values[knownIdx];
       answer = total - knownVal;
-      prompt = `[${data.topic.title}]\n${data.dataText}\n\n전체는 ${total}${data.topic.unit}이고 ${knownItem}이 ${knownVal}${data.topic.unit}이라면, 나머지 항목의 합은 몇 ${data.topic.unit}인가요?`;
+      prompt = `[${data.topic.title}]\n${data.dataText}\n\n전체는 ${total}${data.topic.unit}이고 ${nj(knownItem, '이/가')} ${knownVal}${data.topic.unit}이라면, 나머지 항목의 합은 몇 ${data.topic.unit}인가요?`;
       explanation = [txt(`${total} - ${knownVal} = ${answer}${data.topic.unit}`)];
     } else if (pat === 2) {
       // 두 항목 합
@@ -291,7 +292,7 @@ const barWord: SkillDef = {
       answer = data.values[idx1] + data.values[idx2];
       const it1 = data.selectedItems[idx1];
       const it2 = data.selectedItems[idx2];
-      prompt = `[${data.topic.title}]\n${data.dataText}\n\n${it1}과 ${it2}를 합치면 모두 몇 ${data.topic.unit}인가요?`;
+      prompt = `[${data.topic.title}]\n${data.dataText}\n\n${nj(it1, '과/와')} ${nj(it2, '을/를')} 합치면 모두 몇 ${data.topic.unit}인가요?`;
       explanation = [txt(`${data.values[idx1]} + ${data.values[idx2]} = ${answer}${data.topic.unit}`)];
     } else {
       // 전체 합

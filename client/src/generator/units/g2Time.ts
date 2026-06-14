@@ -8,6 +8,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -40,10 +41,10 @@ const time2Read: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `짧은바늘이 ${hour}, 긴바늘이 ${longHandPos}을 가리켜요. 몇 시 몇 분인가요?`,
+      prompt: `짧은바늘이 ${hour}, 긴바늘이 ${nj(longHandPos, '을/를')} 가리켜요. 몇 시 몇 분인가요?`,
       expr,
       blankAnswers: [hour, minute],
-      explanation: [txt(`짧은바늘이 ${hour}을 가리키면 ${hour}시예요. 긴바늘이 ${longHandPos}을 가리키면 5분씩 ${longHandPos}칸이라 ${minute}분이에요. 그래서 ${hour}시 ${minute}분이에요.`)],
+      explanation: [txt(`짧은바늘이 ${nj(hour, '을/를')} 가리키면 ${hour}시예요. 긴바늘이 ${nj(longHandPos, '을/를')} 가리키면 5분씩 ${longHandPos}칸이라 ${minute}분이에요. 그래서 ${hour}시 ${minute}분이에요.`)],
     };
   },
 };
@@ -305,7 +306,7 @@ const time2Word: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${name}이는 ${startH}시 ${startM}분에 ${act}를 시작하여 ${elapsed}분 동안 했어요. ${act}가 끝난 시각은 몇 시 몇 분인가요?`,
+        prompt: `${name}이는 ${startH}시 ${startM}분에 ${nj(act, '을/를')} 시작하여 ${elapsed}분 동안 했어요. ${nj(act, '이/가')} 끝난 시각은 몇 시 몇 분인가요?`,
         expr,
         blankAnswers: [endH, endM],
         explanation: [txt(`${startH}시 ${startM}분 + ${elapsed}분 = ${endH}시 ${endM}분`)],
@@ -329,7 +330,7 @@ const time2Word: SkillDef = {
           skillId: this.id,
           seed,
           format: 'fill-blanks',
-          prompt: `${name}이는 ${act}를 ${h}시간 ${extra}분 했어요. 모두 몇 분인가요?`,
+          prompt: `${name}이는 ${nj(act, '을/를')} ${h}시간 ${extra}분 했어요. 모두 몇 분인가요?`,
           expr,
           blankAnswers,
           explanation: [txt(expl)],
@@ -343,7 +344,7 @@ const time2Word: SkillDef = {
           skillId: this.id,
           seed,
           format: 'fill-blanks',
-          prompt: `${name}이는 ${act}를 ${h}시간 했어요. 모두 몇 분인가요?`,
+          prompt: `${name}이는 ${nj(act, '을/를')} ${h}시간 했어요. 모두 몇 분인가요?`,
           expr,
           blankAnswers,
           explanation: [txt(expl)],

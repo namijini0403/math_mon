@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import type { MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -264,7 +265,7 @@ const ruleInverse: SkillDef = {
       expr,
       blankAnswers: [xVal],
       explanation: [
-        txt(`규칙: 넣은 수 × ${a} 에 ${b}을(를) 더하면 나오는 수예요.`),
+        txt(`규칙: 넣은 수 × ${a} 에 ${nj(b, '을/를')} 더하면 나오는 수예요.`),
         txt(`${yVal} = □ × ${a} + ${b} 이므로, □ = (${yVal} - ${b}) ÷ ${a} = ${xVal}.`),
       ],
     };

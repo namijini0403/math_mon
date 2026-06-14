@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -74,25 +75,25 @@ const div3Rel: SkillDef = {
       answer = q;
       promptStr = `□ × ${b} = ${a}일 때, □를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `어떤 수에 ${b}를 곱해 ${a}가 되었어요. 곱셈을 거꾸로 하면 나눗셈이에요. ${a} ÷ ${b} = ${q}이니 □ = ${q}예요.`;
+      explStr = `어떤 수에 ${nj(b, '을/를')} 곱해 ${nj(a, '이/가')} 되었어요. 곱셈을 거꾸로 하면 나눗셈이에요. ${a} ÷ ${b} = ${q}이니 □ = ${q}예요.`;
     } else if (pat === 1) {
       // q × □ = a (곱셈식에서 □ 다른 위치)
       answer = b;
       promptStr = `${q} × □ = ${a}일 때, □를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `${q}에 어떤 수를 곱해 ${a}가 되었어요. ${a} ÷ ${q} = ${b}이니 □ = ${b}예요.`;
+      explStr = `${q}에 어떤 수를 곱해 ${nj(a, '이/가')} 되었어요. ${a} ÷ ${q} = ${b}이니 □ = ${b}예요.`;
     } else if (pat === 2) {
       // a ÷ □ = q
       answer = b;
       promptStr = `${a} ÷ □ = ${q}일 때, □를 구하세요.`;
       expr = [txt('□ = '), { kind: 'blank', slot: 0 }];
-      explStr = `${a}를 □로 나눠 몫이 ${q}예요. 나눗셈을 곱셈으로 바꾸면 □ × ${q} = ${a}이니, ${a} ÷ ${q} = ${b}, □ = ${b}예요.`;
+      explStr = `${nj(a, '을/를')} □로 나눠 몫이 ${q}예요. 나눗셈을 곱셈으로 바꾸면 □ × ${q} = ${a}이니, ${a} ÷ ${q} = ${b}, □ = ${b}예요.`;
     } else {
       // 나눗셈식 완성: a ÷ b = □
       answer = q;
-      promptStr = `${b} × ${q} = ${a}를 나눗셈식으로 나타낼 때, ${a} ÷ ${b} = □를 구하세요.`;
+      promptStr = `${b} × ${q} = ${nj(a, '을/를')} 나눗셈식으로 나타낼 때, ${a} ÷ ${b} = □를 구하세요.`;
       expr = [txt(`${a} ÷ ${b} = `), { kind: 'blank', slot: 0 }];
-      explStr = `곱셈식 ${b} × ${q} = ${a}는 나눗셈식으로 바꿀 수 있어요. ${a} ÷ ${b} = ${q}예요.`;
+      explStr = `곱셈식 ${b} × ${q} = ${nj(a, '은/는')} 나눗셈식으로 바꿀 수 있어요. ${a} ÷ ${b} = ${q}예요.`;
     }
 
     return {

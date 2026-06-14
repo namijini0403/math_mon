@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -136,7 +137,7 @@ const tbg2Graph: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `그래프를 보고 답하세요.\n[${data.topic.title}] ${graphText}\n\n${questionWord} ${targetItem}은 몇 ${data.topic.unit}인가요?`,
+      prompt: `그래프를 보고 답하세요.\n[${data.topic.title}] ${graphText}\n\n${questionWord} ${nj(targetItem, '은/는')} 몇 ${data.topic.unit}인가요?`,
       expr,
       blankAnswers: [answer],
       explanation: [txt(`${targetItem}의 ○ 수는 ${answer}개예요.`)],
@@ -204,7 +205,7 @@ const tbg2Most: SkillDef = {
       prompt: `표를 보고 ${questionWord} 좋아하는 것을 고르세요.\n[${data.topic.title}] ${tableText}`,
       choices,
       answerIndex,
-      explanation: [txt(`${answer}이 ${targetVal}${data.topic.unit}으로 ${questionWord} 선택받았어요.`)],
+      explanation: [txt(`${nj(answer, '이/가')} ${targetVal}${data.topic.unit}으로 ${questionWord} 선택받았어요.`)],
     };
   },
 };
@@ -246,10 +247,10 @@ const tbg2Word: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `표를 보고 답하세요.\n[${data.topic.title}] ${tableText}\n\n${bigItem}은 ${smallItem}보다 몇 ${data.topic.unit} 더 많은가요?`,
+        prompt: `표를 보고 답하세요.\n[${data.topic.title}] ${tableText}\n\n${nj(bigItem, '은/는')} ${smallItem}보다 몇 ${data.topic.unit} 더 많은가요?`,
         expr,
         blankAnswers: [diff],
-        explanation: [txt(`더 많은 ${Math.max(vA, vB)}${data.topic.unit}에서 더 적은 ${Math.min(vA, vB)}${data.topic.unit}를 빼요. ${Math.max(vA, vB)} − ${Math.min(vA, vB)} = ${diff}${data.topic.unit}예요.`)],
+        explanation: [txt(`더 많은 ${Math.max(vA, vB)}${data.topic.unit}에서 더 적은 ${Math.min(vA, vB)}${nj(data.topic.unit, '을/를')} 빼요. ${Math.max(vA, vB)} − ${Math.min(vA, vB)} = ${diff}${data.topic.unit}예요.`)],
       };
     } else {
       // 합계 문장제

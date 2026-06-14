@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -224,7 +225,7 @@ const quadClassify: SkillDef = {
       expr: [txt(picked.desc)],
       choices,
       answerIndex,
-      explanation: [txt(`${picked.desc}이(가) 바로 ${picked.label}의 정의예요.`)],
+      explanation: [txt(`${nj(picked.desc, '이/가')} 바로 ${picked.label}의 정의예요.`)],
     };
   },
 };

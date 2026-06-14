@@ -138,7 +138,7 @@ const chLineupDist: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fraction-input',
-      prompt: `${people}명이 같은 간격으로 한 줄에 서 있고, 양 끝 사이의 거리가 ${distMixed.whole}과 ${distMixed.n}/${distMixed.d} m입니다. ${fromP}번째 학생과 ${toP}번째 학생 사이의 거리를 기약분수로 나타내세요.`,
+      prompt: `${people}명이 같은 간격으로 한 줄에 서 있고, 양 끝 사이의 거리가 ${nj(distMixed.whole, '과/와')} ${distMixed.n}/${distMixed.d} m입니다. ${fromP}번째 학생과 ${toP}번째 학생 사이의 거리를 기약분수로 나타내세요.`,
       mixed: ansMixed.whole > 0,
       requireIrreducible: true,
       answer,
@@ -215,10 +215,10 @@ const chFracRangeCount: SkillDef = {
     const maxNat = Math.ceil(rhsN / rhsD) - 1;
 
     const explanation: MathExpr = [
-      txt(`좌변: ${lhsWhole}과 ${lhsFN}/${lhsFD} ÷ ${lhsB} × ${lhsC} = `),
+      txt(`좌변: ${nj(lhsWhole, '과/와')} ${lhsFN}/${lhsFD} ÷ ${lhsB} × ${lhsC} = `),
       frT({ n: lhsN, d: lhsD }),
       txt(` ≈ ${lhsVal}. `),
-      txt(`우변: ${rhsWhole}과 ${rhsFN}/${rhsFD} ÷ ${rhsB} × ${rhsC} = `),
+      txt(`우변: ${nj(rhsWhole, '과/와')} ${rhsFN}/${rhsFD} ÷ ${rhsB} × ${rhsC} = `),
       frT({ n: rhsN, d: rhsD }),
       txt(` ≈ ${rhsVal}. `),
       txt(`${lhsVal}... < □ < ${rhsVal}...에서 자연수는 ${minNat}부터 ${maxNat}까지 ${count}개${ida(count)}예요.`),
@@ -229,7 +229,7 @@ const chFracRangeCount: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${lhsWhole}과 ${lhsFN}/${lhsFD} ÷ ${lhsB} × ${lhsC} < □ < ${rhsWhole}과 ${rhsFN}/${rhsFD} ÷ ${rhsB} × ${rhsC}에서 □에 들어갈 수 있는 자연수는 모두 몇 개입니까?`,
+      prompt: `${nj(lhsWhole, '과/와')} ${lhsFN}/${lhsFD} ÷ ${lhsB} × ${lhsC} < □ < ${nj(rhsWhole, '과/와')} ${rhsFN}/${rhsFD} ÷ ${rhsB} × ${rhsC}에서 □에 들어갈 수 있는 자연수는 모두 몇 개입니까?`,
       expr: [txt('자연수의 개수 = '), blank(0), txt(' 개')],
       blankAnswers: [count],
       explanation,
@@ -302,7 +302,7 @@ const chSymbolSub: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fraction-input',
-      prompt: `㉮=${a}, ㉯=${bMixed.whole}과 ${bMixed.n}/${bMixed.d}, ㉰=${c}일 때 (㉯÷㉮)×㉰의 값을 기약분수로 나타내세요.`,
+      prompt: `㉮=${a}, ㉯=${nj(bMixed.whole, '과/와')} ${bMixed.n}/${bMixed.d}, ㉰=${c}일 때 (㉯÷㉮)×㉰의 값을 기약분수로 나타내세요.`,
       mixed: ansMixed.whole > 0,
       requireIrreducible: true,
       answer,
@@ -360,7 +360,7 @@ const chPrismElem: SkillDef = {
       if (qVal <= 0) continue;
 
       const opStr = sc.op === '+' ? '합' : '차';
-      const condStr2 = `${elemsA[sc.e1]}과 ${elemsA[sc.e2]}의 수의 ${opStr}`;
+      const condStr2 = `${nj(elemsA[sc.e1], '과/와')} ${elemsA[sc.e2]}의 수의 ${opStr}`;
 
       nVal = n2; qElem = sc.q;
       cond = cond2; condStr = condStr2; ansVal = qVal;
@@ -369,7 +369,7 @@ const chPrismElem: SkillDef = {
 
     const explanation: MathExpr = [
       txt(`n각기둥의 꼭짓점=2n, 모서리=3n, 면=n+2 공식을 써요. `),
-      txt(`${condStr}이 ${cond}개이므로 n을 구하면 n=${nVal}. `),
+      txt(`${nj(condStr, '이/가')} ${cond}개이므로 n을 구하면 n=${nVal}. `),
       txt(`${nVal}각기둥의 ${elemsA[qElem]} 수 = `),
       txt(`${formulaA[qElem] === 1 ? '' : `${formulaA[qElem]}×`}${nVal}${offsetA[qElem] > 0 ? `+${offsetA[qElem]}` : ''} = ${ansVal}개.`),
     ];
@@ -379,7 +379,7 @@ const chPrismElem: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${condStr}이 ${cond}개인 각기둥의 ${elemsA[qElem]} 수는 몇 개입니까?`,
+      prompt: `${nj(condStr, '이/가')} ${cond}개인 각기둥의 ${elemsA[qElem]} 수는 몇 개입니까?`,
       expr: [txt(`${elemsA[qElem]} 수 = `), blank(0), txt(' 개')],
       blankAnswers: [ansVal],
       explanation,
@@ -608,7 +608,7 @@ const chDecWrong: SkillDef = {
       skillId: this.id,
       seed,
       format: 'decimal-input',
-      prompt: `어떤 수를 ${cDiv}로 나눠야 했는데 잘못하여 ${wDiv}로 나눴더니 ${wrongQuotStr}이 되었습니다. 바르게 계산한 몫을 구하세요.`,
+      prompt: `어떤 수를 ${cDiv}로 나눠야 했는데 잘못하여 ${wDiv}로 나눴더니 ${nj(wrongQuotStr, '이/가')} 되었습니다. 바르게 계산한 몫을 구하세요.`,
       answer: ansVal,
       explanation,
     };
@@ -890,7 +890,7 @@ const chRatioChain: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `우리 ${ctx.group} 중 ${rA}%가 ${ctx.hobby}이고, ${ctx.hobby} 중 ${rB}%가 ${ctx.sport}입니다. ${ctx.sport}이 ${known}명이라면 전체 학생은 몇 명입니까?`,
+      prompt: `우리 ${ctx.group} 중 ${rA}%가 ${ctx.hobby}이고, ${ctx.hobby} 중 ${rB}%가 ${ctx.sport}입니다. ${nj(ctx.sport, '이/가')} ${known}명이라면 전체 학생은 몇 명입니까?`,
       expr: [txt('전체 학생 수 = '), blank(0), txt(' 명')],
       blankAnswers: [total],
       explanation,
@@ -1150,7 +1150,7 @@ const chGraphReverse: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${ctx.group} 중 ${ctx.activity}을 좋아하는 학생이 전체의 ${rate}%이고 ${known}명이라면, 조사한 ${ctx.group}은 모두 몇 명입니까?`,
+      prompt: `${ctx.group} 중 ${nj(ctx.activity, '을/를')} 좋아하는 학생이 전체의 ${rate}%이고 ${known}명이라면, 조사한 ${nj(ctx.group, '은/는')} 모두 몇 명입니까?`,
       expr: [txt('전체 학생 수 = '), blank(0), txt(' 명')],
       blankAnswers: [total],
       explanation,

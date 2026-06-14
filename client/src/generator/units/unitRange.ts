@@ -360,7 +360,7 @@ const roundUpSkill: SkillDef = {
     const placeLabel = PLACE_LABELS[place];
 
     const expr: MathExpr = [
-      txt(`${n}을 올림하여 ${placeLabel}의 자리까지: `),
+      txt(`${nj(n, '을/를')} 올림하여 ${placeLabel}의 자리까지: `),
       { kind: 'blank', slot: 0 },
     ];
 
@@ -420,7 +420,7 @@ const roundDownSkill: SkillDef = {
     const placeLabel = PLACE_LABELS[place];
 
     const expr: MathExpr = [
-      txt(`${n}을 버림하여 ${placeLabel}의 자리까지: `),
+      txt(`${nj(n, '을/를')} 버림하여 ${placeLabel}의 자리까지: `),
       { kind: 'blank', slot: 0 },
     ];
 
@@ -477,7 +477,7 @@ const roundHalfSkill: SkillDef = {
     const keyDigit = Math.floor(n / digitPlace) % 10;
 
     const expr: MathExpr = [
-      txt(`${n}을 반올림하여 ${placeLabel}의 자리까지: `),
+      txt(`${nj(n, '을/를')} 반올림하여 ${placeLabel}의 자리까지: `),
       { kind: 'blank', slot: 0 },
     ];
 
@@ -648,8 +648,8 @@ const roundPick: SkillDef = {
     const { choices, answerIndex } = buildChoices(dec(answer), candidates, rng);
 
     const explanation: MathExpr = [
-      txt(`반올림하여 ${placeLabel}의 자리까지 나타내면 ${target}이 되려면 `),
-      txt(`${placeLabel} 아래 자리 숫자가 5 이상이면 올려서 ${target}, 5 미만이면 버려서 ${target}이 돼야 해요. `),
+      txt(`반올림하여 ${placeLabel}의 자리까지 나타내면 ${nj(target, '이/가')} 되려면 `),
+      txt(`${placeLabel} 아래 자리 숫자가 5 이상이면 올려서 ${target}, 5 미만이면 버려서 ${nj(target, '이/가')} 돼야 해요. `),
       txt(`그 범위는 ${lo} 이상 ${hi} 이하예요. `),
       txt(`${nj(answer, '이/가')} 이 범위에 속해요.`),
     ];
@@ -659,7 +659,7 @@ const roundPick: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `반올림하여 ${placeLabel}의 자리까지 나타내면 ${target}이 되는 수를 고르세요.`,
+      prompt: `반올림하여 ${placeLabel}의 자리까지 나타내면 ${nj(target, '이/가')} 되는 수를 고르세요.`,
       choices,
       answerIndex,
       explanation,

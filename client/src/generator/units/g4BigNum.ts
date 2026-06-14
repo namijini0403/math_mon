@@ -6,7 +6,7 @@
 
 import { RNG } from '../rng';
 import { buildChoices } from '../choices';
-import { ida } from '../josa';
+import { nj, ida } from '../josa';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
 const txt = (text: string) => ({ kind: 'text' as const, text });
@@ -114,7 +114,7 @@ const bigRead: SkillDef = {
       skillId: this.id,
       seed,
       format: 'choice',
-      prompt: `${nStr}을 읽어 보세요.`,
+      prompt: `${nj(nStr, '을/를')} 읽어 보세요.`,
       expr: [txt(nStr)],
       choices,
       answerIndex,
@@ -248,7 +248,7 @@ const bigPlaceValue: SkillDef = {
     const valueStr = formatKorean(value);
 
     const expr: MathExpr = [
-      txt(`${valueStr}은 ${place.name}이 몇 개인가요? `),
+      txt(`${nj(valueStr, '은/는')} ${nj(place.name, '이/가')} 몇 개인가요? `),
       { kind: 'blank', slot: 0 },
       txt('개'),
     ];
@@ -258,12 +258,12 @@ const bigPlaceValue: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${valueStr}은 ${place.name}이 몇 개인가요?`,
+      prompt: `${nj(valueStr, '은/는')} ${nj(place.name, '이/가')} 몇 개인가요?`,
       expr,
       blankAnswers: [count],
       explanation: [
         txt(`${valueStr} = ${count} × ${formatKorean(place.unit)}`),
-        txt(`따라서 ${place.name}이 ${ida(count)}개예요.`),
+        txt(`따라서 ${nj(place.name, '이/가')} ${ida(count)}개예요.`),
       ],
     };
   },
@@ -361,8 +361,8 @@ const bigCompare: SkillDef = {
       explanation: [
         txt(`${formatKorean(a)} 와(과) ${formatKorean(b)} 의 크기를 비교해요.`),
         txt(sameLen
-          ? `자리 수가 같으니 가장 높은 자리부터 차례로 비교하면 ${formatKorean(bigger)}이(가) 더 큽니다.`
-          : `자리 수가 더 많은 ${formatKorean(bigger)}이(가) 더 큽니다.`),
+          ? `자리 수가 같으니 가장 높은 자리부터 차례로 비교하면 ${nj(formatKorean(bigger), '이/가')} 더 큽니다.`
+          : `자리 수가 더 많은 ${nj(formatKorean(bigger), '이/가')} 더 큽니다.`),
         txt(a > b ? `${formatKorean(a)} > ${formatKorean(b)}` : `${formatKorean(a)} < ${formatKorean(b)}`),
       ],
     };
@@ -408,8 +408,8 @@ const bigWord: SkillDef = {
       prompt = `탐험대 금고에 ${formatKorean(total)}골드가 있어요. ${formatKorean(placeVal)}짜리 금덩이로만 가득 쌓여 있다면 금덩이는 모두 몇 개인가요?`;
       unit = '개';
       explanation = [
-        txt(`${formatKorean(placeVal)}짜리로 ${formatKorean(total)}을 채우려면 ${formatKorean(total)} ÷ ${formatKorean(placeVal)} 을 구해요.`),
-        txt(`${formatKorean(total)}은 ${formatKorean(placeVal)}이 ${ida(digit)}개 모인 수예요.`),
+        txt(`${formatKorean(placeVal)}짜리로 ${nj(formatKorean(total), '을/를')} 채우려면 ${formatKorean(total)} ÷ ${formatKorean(placeVal)} 을 구해요.`),
+        txt(`${nj(formatKorean(total), '은/는')} ${nj(formatKorean(placeVal), '이/가')} ${ida(digit)}개 모인 수예요.`),
       ];
     } else if (pat === 2) {
       // 큰 수 덧셈

@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -65,10 +66,10 @@ const clock1Half: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `짧은바늘이 ${hour}과(와) ${nextHour} 사이, 긴바늘이 6을 가리켜요. 몇 시 몇 분인가요?`,
+      prompt: `짧은바늘이 ${nj(hour, '과/와')} ${nextHour} 사이, 긴바늘이 6을 가리켜요. 몇 시 몇 분인가요?`,
       expr,
       blankAnswers: [hour, 30],
-      explanation: [txt(`긴바늘이 6을 가리키면 30분이에요. 짧은바늘이 ${hour}과(와) ${nextHour} 사이이므로 ${hour}시 30분이에요.`)],
+      explanation: [txt(`긴바늘이 6을 가리키면 30분이에요. 짧은바늘이 ${nj(hour, '과/와')} ${nextHour} 사이이므로 ${hour}시 30분이에요.`)],
     };
   },
 };
@@ -116,7 +117,7 @@ const clock1Pattern: SkillDef = {
       prompt: `${sequence.join(' ')} ?  다음에 올 것은 무엇인가요?`,
       choices,
       answerIndex,
-      explanation: [txt(`${a}, ${b}가 반복되는 규칙이에요. 다음은 ${nextIsA ? a : b}예요.`)],
+      explanation: [txt(`${a}, ${nj(b, '이/가')} 반복되는 규칙이에요. 다음은 ${nextIsA ? a : b}예요.`)],
     };
   },
 };

@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -84,7 +85,7 @@ const len2Unit: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${tool.emoji} ${obj}의 길이를 ${tool.name}으로 재었더니 ${tool.name}이 딱 ${count}번이었어요. ${tool.name}으로 재면 몇 번인가요?`,
+      prompt: `${tool.emoji} ${obj}의 길이를 ${tool.name}으로 재었더니 ${nj(tool.name, '이/가')} 딱 ${count}번이었어요. ${tool.name}으로 재면 몇 번인가요?`,
       expr,
       blankAnswers: [count],
       explanation: [txt(`${tool.name}으로 재면 ${count}번이에요.`)],
@@ -113,10 +114,10 @@ const len2Compare: SkillDef = {
         if (ta !== tb) { a = ta; b = tb; break; }
       }
       const longer = a > b ? 'A' : 'B';
-      const answerVal = txc(`${longer}가 더 길어요`);
+      const answerVal = txc(`${nj(longer, '이/가')} 더 길어요`);
       const other = longer === 'A' ? 'B' : 'A';
       const cands = [
-        txc(`${other}가 더 길어요`),
+        txc(`${nj(other, '이/가')} 더 길어요`),
         txc('같아요'),
         txc('알 수 없어요'),
       ];
@@ -129,7 +130,7 @@ const len2Compare: SkillDef = {
         prompt: `A의 길이는 ${a} cm이고 B의 길이는 ${b} cm예요. 어느 것이 더 긴가요?`,
         choices,
         answerIndex,
-        explanation: [txt(`A는 ${a} cm, B는 ${b} cm예요. ${Math.max(a, b)} cm가 ${Math.min(a, b)} cm보다 더 기니까 ${longer}가 더 길어요.`)],
+        explanation: [txt(`A는 ${a} cm, B는 ${b} cm예요. ${Math.max(a, b)} cm가 ${Math.min(a, b)} cm보다 더 기니까 ${nj(longer, '이/가')} 더 길어요.`)],
       };
     } else {
       // 같은 물건, 다른 임의 단위로 쟀을 때 — 단위가 클수록 횟수가 적다
@@ -193,7 +194,7 @@ const len2Word: SkillDef = {
         skillId: this.id,
         seed,
         format: 'fill-blanks',
-        prompt: `${obj} 두 개의 길이가 각각 ${a} cm와 ${b} cm예요. 두 ${obj}를 이으면 몇 cm인가요?`,
+        prompt: `${obj} 두 개의 길이가 각각 ${a} cm와 ${b} cm예요. 두 ${nj(obj, '을/를')} 이으면 몇 cm인가요?`,
         expr,
         blankAnswers: [ans],
         explanation: [txt(`두 길이를 이으면 더해요. ${a} + ${b} = ${ans}이라서 ${ans} cm예요.`)],

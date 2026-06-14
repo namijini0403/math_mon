@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, SkillDef } from '../types';
 
@@ -183,7 +184,7 @@ const class2Word: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `색깔 공을 분류했어요. ${NAMES2[target]}이 아닌 공은 몇 개인가요?\n${shuffled2.join(' ')}`,
+      prompt: `색깔 공을 분류했어요. ${nj(NAMES2[target], '이/가')} 아닌 공은 몇 개인가요?\n${shuffled2.join(' ')}`,
       expr,
       blankAnswers: [other],
       explanation: [txt(`전체 ${shuffled2.length}개 중 ${NAMES2[target]} ${count}개이므로, 나머지는 ${shuffled2.length} - ${count} = ${other}개`)],

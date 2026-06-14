@@ -4,6 +4,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { gcd, simplify, toMixed, fromMixed, type Frac, type Mixed } from '../fraction';
 import { buildChoices } from '../choices';
 import type { ChoiceValue, MathExpr, MathToken, Problem, SkillDef } from '../types';
@@ -115,7 +116,7 @@ function explainFracNatDiv(f: Frac, nat: number): MathExpr {
   // 분자가 nat으로 나누어떨어짐: n/d ÷ nat = (n÷nat)/d
   const newN = f.n / nat;
   return [
-    txt(`분자 ${f.n}이 ${nat}로 나누어떨어져요. `),
+    txt(`분자 ${nj(f.n, '이/가')} ${nat}로 나누어떨어져요. `),
     frT(f),
     opT('÷'),
     txt(String(nat)),
@@ -188,7 +189,7 @@ function explainFracNat2Div(f: Frac, nat: number): MathExpr {
   const result = simplify({ n: f.n, d: newD });
   const g = gcd(f.n, newD);
   const exprs: MathToken[] = [
-    txt(`÷${nat}는 ×`),
+    txt(`÷${nj(nat, '은/는')} ×`),
     { kind: 'frac', n: 1, d: nat },
     txt(`과 같아요. `),
     frT(f),
@@ -583,7 +584,7 @@ const fdiv1Word: SkillDef = {
       // 해설
       if (f.n % nat === 0) {
         explanation = [
-          txt(`분자 ${f.n}이 ${nat}로 나누어떨어져요. `),
+          txt(`분자 ${nj(f.n, '이/가')} ${nat}로 나누어떨어져요. `),
           frT(f),
           opT('÷'),
           txt(String(nat)),
@@ -597,7 +598,7 @@ const fdiv1Word: SkillDef = {
         const newD = f.d * nat;
         const g = gcd(f.n, newD);
         explanation = [
-          txt(`÷${nat}는 ×`),
+          txt(`÷${nj(nat, '은/는')} ×`),
           { kind: 'frac', n: 1, d: nat },
           txt(`과 같아요. `),
           frT(f),

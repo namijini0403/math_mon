@@ -5,6 +5,7 @@
  */
 
 import { RNG } from '../rng';
+import { nj } from '../josa';
 import { buildChoices } from '../choices';
 import type { MathExpr, SkillDef } from '../types';
 
@@ -65,7 +66,7 @@ const prismCount: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${name}기둥의 ${part.partName}은 모두 몇 개인가요?`,
+      prompt: `${name}기둥의 ${nj(part.partName, '은/는')} 모두 몇 개인가요?`,
       expr,
       blankAnswers: [part.answer],
       explanation,
@@ -113,7 +114,7 @@ const pyramidCount: SkillDef = {
       skillId: this.id,
       seed,
       format: 'fill-blanks',
-      prompt: `${name}뿔의 ${part.partName}은 모두 몇 개인가요?`,
+      prompt: `${name}뿔의 ${nj(part.partName, '은/는')} 모두 몇 개인가요?`,
       expr,
       blankAnswers: [part.answer],
       explanation,
