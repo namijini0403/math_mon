@@ -69,6 +69,9 @@ export function FigureView({ spec }: { spec: FigureSpec }) {
     case 'line-graph':
       svg = <LineGraph labels={spec.labels} values={spec.values} unit={spec.unit} />;
       break;
+    case 'ratio-graph':
+      svg = <RatioGraph variant={spec.variant} labels={spec.labels} percents={spec.percents} />;
+      break;
     default:
       // 미구현 kind 폴백 (타입상 도달 불가지만 방어적으로)
       svg = (
@@ -634,6 +637,91 @@ function LineGraph({ labels, values, unit }: { labels: string[]; values: number[
           <text x={xOf(i)} y={baseY + 13} textAnchor="middle" fontSize="9" fill={LABEL}>{labels[i]}</text>
         </g>
       ))}
+    </svg>
+  );
+}
+
+// 띠/원 그래프 항목 색(다크 배경에서 서로 구분되는 밝은 톤)
+const SEG_COLORS = ['#6366f1', '#f59e0b', '#ec4899', '#22d3ee', '#a3e635', '#fb923c'];
+
+// ── 띠그래프·원그래프: 항목별 백분율(합 100) + 범례 ──
+function RatioGraph({ variant, labels, percents }: {
+  variant: 'band' | 'pie'; labels: string[]; percents: number[];
+}) {
+  const n = labels.length;
+  const color = (i: number) => SEG_COLORS[i % SEG_COLORS.length];
+  const ariaLabel = `${variant === 'band' ? '띠그래프' : '원그래프'}. ${labels.map((l, i) => `${l} ${percents[i]}%`).join(', ')}`;
+  // 범례(아래): 항목당 한 줄
+  const rowH = 15;
+  const legendY0 = variant === 'band' ? 66 : 150;
+  const legend = labels.map((l, i) => (
+    <g key={`lg${i}`}>
+      <rect x={14} y={legendY0 + i * rowH - 8} width={10} height={10} rx={2} fill={color(i)} />
+      <text x={29} y={legendY0 + i * rowH} fontSize="10" fill={LABEL}>{l} {percents[i]}%</text>
+    </g>
+  ));
+
+  if (variant === 'band') {
+    const padL = 14, barW = 232, barH = 30, top = 12;
+    const total = percents.reduce((a, b) => a + b, 0) || 100;
+    let acc = 0;
+    const segs = percents.map((p, i) => {
+      const x = padL + (acc / total) * barW;
+      const w = (p / total) * barW;
+      acc += p;
+      return (
+        <g key={i}>
+          <rect x={x} y={top} width={w} height={barH} fill={color(i)} stroke={EDGE} strokeWidth={0.8} />
+          {w >= 22 && (
+            <text x={x + w / 2} y={top + barH / 2 + 3} textAnchor="middle" fontSize="9" fill="#1e1b4b" fontWeight="bold">{p}</text>
+          )}
+        </g>
+      );
+    });
+    const H = legendY0 + n * rowH;
+    return (
+      <svg viewBox={`0 0 260 ${H}`} width={Math.min(260, 260)} role="img" aria-label={ariaLabel}>
+        {segs}
+        {/* 0~100 눈금 */}
+        {[0, 25, 50, 75, 100].map((t) => (
+          <text key={t} x={padL + (t / 100) * barW} y={top + barH + 11} textAnchor="middle" fontSize="8" fill={LABEL}>{t}</text>
+        ))}
+        {legend}
+      </svg>
+    );
+  }
+
+  // pie
+  const cx = 70, cy = 70, R = 56;
+  const total = percents.reduce((a, b) => a + b, 0) || 100;
+  const ptAt = (frac: number) => {
+    const th = rad(-90 + frac * 360);
+    return { x: cx + R * Math.cos(th), y: cy + R * Math.sin(th) };
+  };
+  let accP = 0;
+  const sectors = percents.map((p, i) => {
+    const f0 = accP / total;
+    accP += p;
+    const f1 = accP / total;
+    const a = ptAt(f0), b = ptAt(f1);
+    const large = (f1 - f0) > 0.5 ? 1 : 0;
+    const d = `M${cx},${cy} L${a.x.toFixed(1)},${a.y.toFixed(1)} A${R},${R} 0 ${large} 1 ${b.x.toFixed(1)},${b.y.toFixed(1)} Z`;
+    // 라벨: 중간각 위치에 백분율
+    const mid = ptAt((f0 + f1) / 2);
+    const lx = cx + (mid.x - cx) * 0.6;
+    const ly = cy + (mid.y - cy) * 0.6;
+    return (
+      <g key={i}>
+        <path d={d} fill={color(i)} stroke={EDGE} strokeWidth={1} />
+        {p >= 8 && <text x={lx} y={ly + 3} textAnchor="middle" fontSize="9" fill="#1e1b4b" fontWeight="bold">{p}</text>}
+      </g>
+    );
+  });
+  const H = legendY0 + n * rowH;
+  return (
+    <svg viewBox={`0 0 200 ${H}`} width={Math.min(200, 200)} role="img" aria-label={ariaLabel}>
+      {sectors}
+      {legend}
     </svg>
   );
 }

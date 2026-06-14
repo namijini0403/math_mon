@@ -110,6 +110,21 @@ describe('FigureView 렌더 스모크', () => {
     expect(html).toContain('<polyline');
     expect(html).toContain('9시');
   });
+
+  it('ratio-graph band: 띠그래프·범례·눈금을 그린다', () => {
+    const html = renderFigure({ kind: 'ratio-graph', variant: 'band', labels: ['사과', '포도', '귤', '수박'], percents: [40, 25, 20, 15] });
+    expect(html).toContain('<svg');
+    expect(html).toContain('띠그래프');
+    expect(html).toContain('사과 40%');
+    expect(html).toContain('<rect');
+  });
+
+  it('ratio-graph pie: 원그래프·부채꼴(path)·범례를 그린다', () => {
+    const html = renderFigure({ kind: 'ratio-graph', variant: 'pie', labels: ['봄', '여름', '가을', '겨울'], percents: [30, 35, 20, 15] });
+    expect(html).toContain('원그래프');
+    expect(html).toContain('<path');
+    expect(html).toContain('겨울 15%');
+  });
 });
 
 describe('그림 연결 스킬의 figure 스펙 일관성', () => {
@@ -312,6 +327,23 @@ describe('그림 연결 스킬의 figure 스펙 일관성', () => {
       const p = skill!.generate(seed);
       // 값을 가린 자료는 "9시: ?도"처럼 ': ?' 패턴을 포함(문장 끝 '인가요?'와 구별)
       if (p.prompt.includes(': ?')) expect(p.figure).toBeUndefined();
+    }
+  });
+
+  it('띠/원그래프 스킬(graph-read·graph-most·graph-times): percents 합 100, variant가 그래프 이름과 일치', () => {
+    for (const id of ['graph-read', 'graph-most', 'graph-times']) {
+      const skill = SKILLS.find((s) => s.id === id);
+      expect(skill, id).toBeDefined();
+      for (let seed = 0; seed < 120; seed++) {
+        const p = skill!.generate(seed);
+        const f = p.figure as Extract<FigureSpec, { kind: 'ratio-graph' }>;
+        expect(f.kind, id).toBe('ratio-graph');
+        expect(f.labels.length).toBe(f.percents.length);
+        expect(f.percents.reduce((a, b) => a + b, 0)).toBe(100);
+        // 원그래프면 pie, 띠그래프면 band
+        const wantPie = p.prompt.includes('원그래프');
+        expect(f.variant).toBe(wantPie ? 'pie' : 'band');
+      }
     }
   });
 });

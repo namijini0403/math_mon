@@ -45,7 +45,9 @@ export type FigureSpec =
   /** 막대그래프 — 항목별 세로 막대. values는 문제 수치와 같은 배열. highlight 인덱스는 강조색 */
   | { kind: 'bar-graph'; labels: string[]; values: number[]; unit: string; highlight?: number[] }
   /** 꺾은선그래프 — 시점별 점을 선으로 이음. values는 문제 수치와 같은 배열 */
-  | { kind: 'line-graph'; labels: string[]; values: number[]; unit: string };
+  | { kind: 'line-graph'; labels: string[]; values: number[]; unit: string }
+  /** 띠그래프(band)·원그래프(pie) — 항목별 백분율(합 100). percents는 문제 수치와 같은 배열 */
+  | { kind: 'ratio-graph'; variant: 'band' | 'pie'; labels: string[]; percents: number[] };
 
 /** 보기·매칭 카드에 들어가는 값 */
 export type ChoiceValue =

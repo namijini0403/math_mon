@@ -58,6 +58,9 @@ const TOPICS: TopicData[] = [
 
 const GRAPH_NAMES = ['띠그래프', '원그래프'] as const;
 
+/** 그래프 이름 → 도해 종류 */
+const ratioVariant = (name: string): 'band' | 'pie' => (name === '원그래프' ? 'pie' : 'band');
+
 /**
  * 공통 자료 생성기:
  * - 주제에서 항목 4개 선택
@@ -156,6 +159,7 @@ const graphRead: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${ida(d.graphName)}. [${d.dataText}] ${nj(targetItem, '을/를')} 좋아하는 학생은 몇 ${d.topic.unit}인가요?`,
+      figure: { kind: 'ratio-graph', variant: ratioVariant(d.graphName), labels: d.items, percents: d.percents },
       expr,
       blankAnswers: [answer],
       explanation,
@@ -210,6 +214,7 @@ const graphMost: SkillDef = {
       seed,
       format: 'choice',
       prompt: `다음은 ${nj(d.topic.title, '을/를')} 나타낸 ${ida(d.graphName)}. [${d.dataText}] ${isMost ? '가장 많은' : '가장 적은'} 학생이 좋아하는 것은 무엇인가요?`,
+      figure: { kind: 'ratio-graph', variant: ratioVariant(d.graphName), labels: d.items, percents: d.percents },
       choices: shuffled,
       answerIndex,
       explanation,
@@ -409,6 +414,7 @@ const graphTimes: SkillDef = {
       seed,
       format: 'fill-blanks',
       prompt: `다음은 ${nj(topic.title, '을/를')} 나타낸 ${ida(graphName)}. [${dataText}] ${nj(largerItem, '을/를')} 좋아하는 학생 수는 ${nj(smallerItem, '을/를')} 좋아하는 학생 수의 몇 배인가요?`,
+      figure: { kind: 'ratio-graph', variant: ratioVariant(graphName), labels: items, percents },
       expr,
       blankAnswers: [k],
       explanation,
