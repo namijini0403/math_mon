@@ -331,6 +331,7 @@ export interface PendingAssignment {
     count: number;
     mix: { low: number; mid: number; high: number };
     weakWeight?: boolean;
+    focusSkillIds?: string[];
   };
   seed: number;
   created_at: string;

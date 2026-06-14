@@ -111,6 +111,27 @@ describe('buildAssignment', () => {
     expect(buildAssignment({ unitIds: ['__nope__'], count: 10, mix: { low: 1, mid: 0, high: 0 } }, 1)).toEqual([]);
   });
 
+  it('focusSkillIds는 weakWeight 없이도 해당 스킬을 더 자주 뽑는다', () => {
+    const lowSkills = SKILLS.filter((s) => s.unitId === UNIT_WITH_CHALLENGE && tierOf(s) === 'low');
+    expect(lowSkills.length).toBeGreaterThan(1);
+    const focusId = lowSkills[0].id;
+    const cfg: AssignmentConfig = {
+      unitIds: [UNIT_WITH_CHALLENGE],
+      count: 12,
+      mix: { low: 1, mid: 0, high: 0 },
+      focusSkillIds: [focusId],
+    };
+    let focusHits = 0;
+    let total = 0;
+    for (let seed = 0; seed < 40; seed++) {
+      for (const it of buildAssignment(cfg, seed)) {
+        total++;
+        if (it.skillId === focusId) focusHits++;
+      }
+    }
+    expect(focusHits / total).toBeGreaterThan(1 / lowSkills.length);
+  });
+
   it('weakWeight=true면 자주 틀린 스킬을 더 자주 뽑는다', () => {
     const lowSkills = SKILLS.filter((s) => s.unitId === UNIT_WITH_CHALLENGE && tierOf(s) === 'low');
     expect(lowSkills.length).toBeGreaterThan(1);

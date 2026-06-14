@@ -320,6 +320,9 @@ export default function AssignmentPanel({ classCode, teacherKey, students }: Pro
   const [weakWeight, setWeakWeight] = useState(false);
   const [targetType, setTargetType] = useState<'class' | 'student'>('class');
   const [targetNickname, setTargetNickname] = useState('');
+  // 「길잡이 별」 집중 출제 — 반이 도움 많이 청한 유형
+  const [focusSkillIds, setFocusSkillIds] = useState<string[]>([]);
+  const [helpTotals, setHelpTotals] = useState<{ skill_id: string | null; unit_id: string | null; n: number }[]>([]);
 
   // ── 미리보기 ──
   const [showPreview, setShowPreview] = useState(false);
@@ -355,15 +358,47 @@ export default function AssignmentPanel({ classCode, teacherKey, students }: Pro
     });
   };
 
+  // 집중 출제는 선택된 단원에 속한 유형만 (엔진 풀과 일치)
+  const activeFocus = focusSkillIds.filter((id) => {
+    try {
+      return selectedUnitIds.has(getSkill(id).unitId);
+    } catch {
+      return false;
+    }
+  });
+
   const currentConfig: AssignmentConfig = {
     unitIds: [...selectedUnitIds],
     count,
     mix,
     weakWeight,
+    focusSkillIds: activeFocus,
   };
 
   const alloc = allocate(mix, count);
   const canPublish = selectedUnitIds.size > 0 && count >= 5 && count <= 20;
+
+  // 「길잡이 별」 추천 반영 — 도움 많이 청한 유형의 단원을 자동 선택 + 집중 출제 설정
+  const applyHelpRecommendation = () => {
+    const top = helpTotals.filter((h) => h.skill_id && h.unit_id).slice(0, 10) as {
+      skill_id: string;
+      unit_id: string;
+      n: number;
+    }[];
+    if (top.length === 0) return;
+    // 가장 많이 도움 청한 유닛들이 속한 학기로 전환
+    const semScore = new Map<string, number>();
+    for (const h of top) {
+      const sem = SEMESTERS.find((s) => s.units.includes(h.unit_id));
+      if (sem) semScore.set(sem.id, (semScore.get(sem.id) ?? 0) + h.n);
+    }
+    const bestSem = [...semScore.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? selectedSemesterId;
+    setSelectedSemesterId(bestSem);
+    const sem = SEMESTERS.find((s) => s.id === bestSem);
+    const units = new Set(top.map((h) => h.unit_id).filter((u) => sem?.units.includes(u)));
+    setSelectedUnitIds(units);
+    setFocusSkillIds(top.filter((h) => units.has(h.unit_id)).map((h) => h.skill_id));
+  };
 
   // ── 결과 보드 로드 ──
   const loadBoard = useCallback(async () => {
@@ -386,6 +421,21 @@ export default function AssignmentPanel({ classCode, teacherKey, students }: Pro
   useEffect(() => {
     if (panelTab === 'board') loadBoard();
   }, [panelTab, loadBoard]);
+
+  // 반 「길잡이 별」 집계 로드 (시험 작성 추천용)
+  useEffect(() => {
+    if (!classCode || !teacherKey) return;
+    let alive = true;
+    fetch(`/api/teacher/${classCode}/help`, { headers: { 'X-Teacher-Key': teacherKey } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { classTotals?: typeof helpTotals } | null) => {
+        if (alive && d?.classTotals) setHelpTotals(d.classTotals);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [classCode, teacherKey]);
 
   // ── 발행 ──
   const handlePublish = async () => {
@@ -468,6 +518,32 @@ export default function AssignmentPanel({ classCode, teacherKey, students }: Pro
               className="rounded-xl border-2 border-night-700 bg-night-800 px-3 py-2 focus:border-mana focus:outline-none text-sm"
             />
           </label>
+
+          {/* 「길잡이 별」 추천 */}
+          {helpTotals.filter((h) => h.skill_id).length > 0 && (
+            <div className="rounded-2xl bg-night-900 border border-coin/40 p-3">
+              <div className="text-sm font-bold text-coin mb-1.5">🌟 우리 반이 도움을 많이 청한 유형</div>
+              <div className="flex flex-wrap gap-1.5 mb-2.5">
+                {helpTotals
+                  .filter((h) => h.skill_id)
+                  .slice(0, 8)
+                  .map((h, i) => (
+                    <span
+                      key={i}
+                      className="rounded-full bg-night-800 border border-night-700 px-2.5 py-0.5 text-xs"
+                    >
+                      {skillLabel(h.skill_id!)} <span className="text-coin font-bold">{h.n}</span>
+                    </span>
+                  ))}
+              </div>
+              <button
+                onClick={applyHelpRecommendation}
+                className="btn-3d rounded-xl bg-coin/20 border border-coin/40 border-b-coin/50 px-3 py-1.5 text-xs text-coin"
+              >
+                이 유형 자동 포함 (단원 선택 + 집중 출제)
+              </button>
+            </div>
+          )}
 
           {/* 학기 선택 */}
           <div>
@@ -564,9 +640,22 @@ export default function AssignmentPanel({ classCode, teacherKey, students }: Pro
                 onChange={(e) => setWeakWeight(e.target.checked)}
                 className="accent-mana w-4 h-4"
               />
-              자주 틀린 유형 더 내기
+              학생별 자주 틀린 유형 더 내기
             </label>
           </div>
+
+          {/* 집중 출제(길잡이 별) 활성 표시 */}
+          {activeFocus.length > 0 && (
+            <div className="flex items-center gap-2 text-xs rounded-xl bg-coin/10 text-coin px-3 py-2">
+              <span>🌟 집중 출제: {activeFocus.length}개 유형(길잡이 별 반영) — 이 유형이 더 자주 출제돼요.</span>
+              <button
+                onClick={() => setFocusSkillIds([])}
+                className="ml-auto rounded-full bg-night-800 border border-night-700 px-2 py-0.5 hover:text-hurt"
+              >
+                해제
+              </button>
+            </div>
+          )}
 
           {/* 대상 */}
           <div>

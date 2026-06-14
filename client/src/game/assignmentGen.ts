@@ -36,6 +36,11 @@ export interface AssignmentConfig {
   mix: DifficultyMix;
   /** 약점 가중 출제 — skillStats/helpLog로 자주 틀린 유형을 더 자주 낸다 */
   weakWeight?: boolean;
+  /**
+   * 집중 출제할 스킬 id들 — 이 유형은 풀 안에서 더 자주 뽑힌다(×3 가중).
+   * 교사가 발행 시 「반 길잡이 별(도움 요청)」 많은 유형으로 채운다 → '우리 반이 어려워한 유형 중심'.
+   */
+  focusSkillIds?: string[];
 }
 
 export interface AssignmentItem {
@@ -110,19 +115,25 @@ function redistribute(
 }
 
 /**
- * 약점 가중 픽 (결정적, RNG 사용).
- * 정답률이 낮을수록(틀린 비율↑) + 길잡이 별을 띄울수록 더 자주 뽑는다.
+ * 가중 픽 (결정적, RNG 사용).
+ * useStats=true면 정답률 낮을수록(+길잡이 별 띄울수록) 가중. focusSet에 든 스킬은 ×3 추가 가중.
  */
 function pickWeighted(
   pool: SkillDef[],
   rng: RNG,
   stats: SkillStats,
   helpLog: Record<string, number>,
+  focusSet: Set<string>,
+  useStats: boolean,
 ): SkillDef {
   const entries = pool.map((s) => {
-    const st = stats[s.id];
-    const base = !st || st.c + st.w === 0 ? 1 : 1 + 2 * (st.w / (st.c + st.w));
-    const w = base + Math.min(3, (helpLog[s.id] ?? 0) * 1.5);
+    let w = 1;
+    if (useStats) {
+      const st = stats[s.id];
+      const base = !st || st.c + st.w === 0 ? 1 : 1 + 2 * (st.w / (st.c + st.w));
+      w = base + Math.min(3, (helpLog[s.id] ?? 0) * 1.5);
+    }
+    if (focusSet.has(s.id)) w *= 3;
     return { s, w };
   });
   const totalW = entries.reduce((a, e) => a + e.w, 0);
@@ -152,13 +163,15 @@ export function buildAssignment(
   const alloc = redistribute(allocate(config.mix, count), pools);
   const rng = new RNG(seed >>> 0);
   const items: AssignmentItem[] = [];
+  const focusSet = new Set(config.focusSkillIds ?? []);
+  const useWeighted = config.weakWeight === true || focusSet.size > 0;
 
   for (const tier of ['low', 'mid', 'high'] as DifficultyTier[]) {
     const pool = pools[tier];
     if (pool.length === 0) continue;
     for (let i = 0; i < alloc[tier]; i++) {
-      const skill = config.weakWeight
-        ? pickWeighted(pool, rng, stats, helpLog)
+      const skill = useWeighted
+        ? pickWeighted(pool, rng, stats, helpLog, focusSet, config.weakWeight === true)
         : pool[rng.int(0, pool.length - 1)];
       items.push({ skillId: skill.id, seed: rng.int(1, 0x7fffffff) });
     }

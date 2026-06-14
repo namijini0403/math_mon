@@ -539,7 +539,10 @@ app.post('/api/teacher/:classCode/assignments', async (c) => {
   const rawMix = (rawCfg.mix && typeof rawCfg.mix === 'object' ? rawCfg.mix : {}) as Record<string, unknown>;
   const num = (v: unknown) => (typeof v === 'number' && v >= 0 && Number.isFinite(v) ? v : 0);
   const mix = { low: num(rawMix.low), mid: num(rawMix.mid), high: num(rawMix.high) };
-  const config = { unitIds, count, mix, weakWeight: rawCfg.weakWeight === true };
+  const focusSkillIds = Array.isArray(rawCfg.focusSkillIds)
+    ? rawCfg.focusSkillIds.filter((x): x is string => typeof x === 'string').slice(0, 50)
+    : [];
+  const config = { unitIds, count, mix, weakWeight: rawCfg.weakWeight === true, focusSkillIds };
 
   const seed =
     typeof body.seed === 'number' && Number.isFinite(body.seed)
