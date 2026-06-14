@@ -26,6 +26,7 @@ import { FractionInputView } from '../components/problem/FractionInputView';
 import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
+import { GuidingStarButton } from '../components/GuidingStarButton';
 import { track } from '../analytics';
 
 const TOTAL = 10;
@@ -356,6 +357,7 @@ export default function ExamPage() {
                   >
                     확인
                   </button>
+                  <GuidingStarButton skillId={problem.skillId} problemId={problem.id} />
                 </motion.div>
               )
             )}

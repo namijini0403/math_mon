@@ -34,6 +34,16 @@ function extractBearer(authHeader: string | undefined): string | null {
   return m ? m[1] : null;
 }
 
+/** 교사 키 검증 (X-Teacher-Key 헤더) */
+function teacherAuthorized(key: string | undefined): boolean {
+  return !!process.env.TEACHER_KEY && key === process.env.TEACHER_KEY;
+}
+
+/** 문자열 좌표값을 안전하게 코어스 (없으면 null, 길이 제한) */
+function str(v: unknown, max = 80): string | null {
+  return typeof v === 'string' && v ? v.slice(0, max) : null;
+}
+
 // ── PIN 무차별 대입 방어 (인메모리, fail-open) — SECURITY-PLAN H1 ───────────────
 // 정상 사용자엔 관대(15분 내 10회 실패 시 15분 잠금). 내부 오류는 무조건 통과(로그인 우선).
 const PIN_MAX_FAILS = 10;
@@ -413,6 +423,96 @@ app.get('/api/teacher/:classCode', async (c) => {
     [c.req.param('classCode')],
   );
   return c.json({ students: rows.rows });
+});
+
+/** 「길잡이 별」 도움 요청 — 학생 토큰 필요. 닉네임·반은 토큰에서 신뢰 도출 */
+app.post('/api/help', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  const token = extractBearer(c.req.header('Authorization'));
+  const payload = token ? verifyToken(token) : null;
+  if (!payload || payload.typ === 'refresh') return c.json({ error: 'unauthorized' }, 401);
+  const body = await c.req.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>));
+  const stu = await pool.query('SELECT class_code, nickname FROM students WHERE id = $1', [payload.sid]);
+  if (stu.rowCount === 0) return c.json({ error: 'student not found' }, 404);
+  const { class_code, nickname } = stu.rows[0] as { class_code: string; nickname: string };
+  await pool.query(
+    `INSERT INTO help_requests (student_id, class_code, nickname, skill_id, unit_id, stage_id, problem_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [payload.sid, class_code, nickname, str(body.skillId), str(body.unitId), str(body.stageId), str(body.problemId)],
+  );
+  return c.json({ ok: true });
+});
+
+/** 오류 신고 — 토큰 있으면 학생 귀속, 없으면 클라 식별값 폴백(표시용) */
+app.post('/api/report', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  const body = await c.req.json<Record<string, unknown>>().catch(() => ({} as Record<string, unknown>));
+  const kind = body.kind === 'feature' ? 'feature' : 'problem';
+  const message = typeof body.message === 'string' ? body.message.slice(0, 1000) : null;
+  const context = body.context && typeof body.context === 'object' ? body.context : {};
+  const token = extractBearer(c.req.header('Authorization'));
+  const payload = token ? verifyToken(token) : null;
+  let studentId: string | null = null;
+  let classCode: string | null = null;
+  let nickname: string | null = null;
+  if (payload && payload.typ !== 'refresh') {
+    const stu = await pool.query('SELECT class_code, nickname FROM students WHERE id = $1', [payload.sid]);
+    if (stu.rowCount && stu.rowCount > 0) {
+      studentId = payload.sid as string;
+      classCode = (stu.rows[0] as { class_code: string }).class_code;
+      nickname = (stu.rows[0] as { nickname: string }).nickname;
+    }
+  }
+  if (!classCode) classCode = str(body.classCode, 8);
+  if (!nickname) nickname = str(body.nickname, 20);
+  await pool.query(
+    `INSERT INTO error_reports (student_id, class_code, nickname, kind, message, context)
+     VALUES ($1, $2, $3, $4, $5, $6)`,
+    [studentId, classCode, nickname, kind, message, JSON.stringify(context).slice(0, 4000)],
+  );
+  return c.json({ ok: true });
+});
+
+/** 교사 — 「길잡이 별」 집계 (반 누적 + 학생별 + 최근) */
+app.get('/api/teacher/:classCode/help', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  if (!teacherAuthorized(c.req.header('X-Teacher-Key'))) return c.json({ error: 'forbidden' }, 403);
+  const code = c.req.param('classCode');
+  const [classTotals, byStudent, recent] = await Promise.all([
+    pool.query(
+      `SELECT skill_id, unit_id, count(*)::int AS n FROM help_requests
+       WHERE class_code = $1 GROUP BY skill_id, unit_id ORDER BY n DESC LIMIT 100`, [code]),
+    pool.query(
+      `SELECT nickname, skill_id, unit_id, count(*)::int AS n FROM help_requests
+       WHERE class_code = $1 GROUP BY nickname, skill_id, unit_id ORDER BY nickname ASC, n DESC`, [code]),
+    pool.query(
+      `SELECT nickname, skill_id, unit_id, stage_id, created_at FROM help_requests
+       WHERE class_code = $1 ORDER BY created_at DESC LIMIT 100`, [code]),
+  ]);
+  return c.json({ classTotals: classTotals.rows, byStudent: byStudent.rows, recent: recent.rows });
+});
+
+/** 교사 — 오류 신고 목록 (해당 반 + 익명) */
+app.get('/api/teacher/:classCode/reports', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  if (!teacherAuthorized(c.req.header('X-Teacher-Key'))) return c.json({ error: 'forbidden' }, 403);
+  const code = c.req.param('classCode');
+  const rows = await pool.query(
+    `SELECT id, nickname, kind, message, context, status, created_at FROM error_reports
+     WHERE class_code = $1 OR class_code IS NULL ORDER BY created_at DESC LIMIT 300`, [code]);
+  return c.json({ reports: rows.rows });
+});
+
+/** 교사 — 오류 신고 상태 변경(처리완료 표시) */
+app.post('/api/teacher/:classCode/reports/resolve', async (c) => {
+  if (!pool) return c.json({ error: 'db unavailable' }, 503);
+  if (!teacherAuthorized(c.req.header('X-Teacher-Key'))) return c.json({ error: 'forbidden' }, 403);
+  const body = await c.req.json<{ ids?: string[]; status?: string }>().catch(() => ({} as Record<string, unknown>));
+  const ids = Array.isArray(body.ids) ? body.ids.filter((x) => typeof x === 'string').slice(0, 300) : [];
+  const status = body.status === 'open' ? 'open' : 'resolved';
+  if (ids.length === 0) return c.json({ ok: true, updated: 0 });
+  const res = await pool.query(`UPDATE error_reports SET status = $1 WHERE id = ANY($2::uuid[])`, [status, ids]);
+  return c.json({ ok: true, updated: res.rowCount ?? 0 });
 });
 
 app.get('/api/health', (c) => c.json({ ok: true, db: !!pool }));

@@ -255,6 +255,71 @@ export async function join(classCode: string, nickname: string, pin: string): Pr
   }
 }
 
+// ── 길잡이 별(도움 요청) + 오류 신고 — 베스트에포트 전송 + 오프라인 큐 ──────────
+const LS_HELP_QUEUE = 'mathmon-help-queue';
+const LS_REPORT_QUEUE = 'mathmon-report-queue';
+
+function readQueue(key: string): unknown[] {
+  try {
+    const v = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+function writeQueue(key: string, arr: unknown[]): void {
+  try { localStorage.setItem(key, JSON.stringify(arr.slice(-50))); } catch { /* noop */ }
+}
+
+/** 인증 토큰 갱신 후 POST. 성공 여부(boolean) 반환 */
+async function postAuthed(path: string, body: unknown): Promise<boolean> {
+  await ensureFreshToken().catch(() => undefined);
+  const res = await post(path, body, _accessToken ? { bearerToken: _accessToken } : undefined);
+  return res !== null;
+}
+
+export interface HelpPayload {
+  skillId?: string;
+  unitId?: string;
+  stageId?: string;
+  problemId?: string;
+}
+
+/** 「길잡이 별」 도움 요청 전송 — 실패 시 로컬 큐에 보관해 다음에 재전송 */
+export async function sendHelpRequest(p: HelpPayload): Promise<boolean> {
+  const ok = await postAuthed('/api/help', p);
+  if (!ok) writeQueue(LS_HELP_QUEUE, [...readQueue(LS_HELP_QUEUE), p]);
+  return ok;
+}
+
+export interface ReportPayload {
+  kind: 'problem' | 'feature';
+  message?: string;
+  context?: Record<string, unknown>;
+  classCode?: string | null;
+  nickname?: string | null;
+}
+
+/** 오류 신고 전송 — 실패 시 로컬 큐에 보관 */
+export async function sendErrorReport(p: ReportPayload): Promise<boolean> {
+  const ok = await postAuthed('/api/report', p);
+  if (!ok) writeQueue(LS_REPORT_QUEUE, [...readQueue(LS_REPORT_QUEUE), p]);
+  return ok;
+}
+
+/** 앱 시작 시 호출 — 큐에 쌓인 도움 요청/오류 신고를 재전송 */
+export async function flushReportQueues(): Promise<void> {
+  for (const [key, path] of [[LS_HELP_QUEUE, '/api/help'], [LS_REPORT_QUEUE, '/api/report']] as const) {
+    const q = readQueue(key);
+    if (q.length === 0) continue;
+    const remaining: unknown[] = [];
+    for (const item of q) {
+      if (!(await postAuthed(path, item))) remaining.push(item);
+    }
+    writeQueue(key, remaining);
+  }
+}
+
 /** 진도 스냅샷 + 전체 세이브 업로드 */
 export async function pushProgress(s: {
   studentId: string | null;

@@ -20,6 +20,7 @@ import { type RewardCardDef } from '../game/rewardCards';
 import { TreasureReveal } from '../components/TreasureReveal';
 import { ItemGachaReveal } from '../components/ItemGachaReveal';
 import { SolutionReveal } from '../components/SolutionReveal';
+import { GuidingStarButton } from '../components/GuidingStarButton';
 import type { DragonItemDef } from '../game/dragon';
 import { MedalView } from '../components/MedalView';
 import { answerToText } from '../generator/render-text';
@@ -765,6 +766,7 @@ function LessonRunner({ stageId }: { stageId: string }) {
                   >
                     확인
                   </button>
+                  <GuidingStarButton skillId={problem.skillId} stageId={stage.id} problemId={problem.id} />
                 </motion.div>
               )
             )}

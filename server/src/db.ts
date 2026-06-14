@@ -66,5 +66,37 @@ export async function bootstrap() {
   // pin_scrypt: scrypt 방식 PIN 해시 (기존 sha256 pin_hash 폴백 유지)
   await pool.query(`ALTER TABLE students ADD COLUMN IF NOT EXISTS pin_scrypt TEXT`);
 
+  // ── 「길잡이 별」 도움 요청 — 학생이 어려운 문제에 띄운 신호 (교사 현황판 누적) ──
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS help_requests (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+      class_code TEXT NOT NULL,
+      nickname TEXT NOT NULL,
+      skill_id TEXT,
+      unit_id TEXT,
+      stage_id TEXT,
+      problem_id TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS help_requests_class_idx ON help_requests(class_code, created_at DESC);
+  `);
+
+  // ── 오류 신고 — '이 문제 이상해요'/'기능이 안 돼요' 반자동 수집(교사 트리아지) ──
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS error_reports (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      student_id UUID REFERENCES students(id) ON DELETE SET NULL,
+      class_code TEXT,
+      nickname TEXT,
+      kind TEXT NOT NULL,
+      message TEXT,
+      context JSONB NOT NULL DEFAULT '{}',
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    );
+    CREATE INDEX IF NOT EXISTS error_reports_class_idx ON error_reports(class_code, created_at DESC);
+  `);
+
   console.log('DB 스키마 준비 완료');
 }

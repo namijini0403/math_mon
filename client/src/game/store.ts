@@ -102,9 +102,15 @@ interface GameState {
   };
   /** 만보기 — 오늘 걸음·2000보 달성 누적일 */
   steps: StepState;
+  /** 연속 정답/오답 run — 미니미 응원 트리거용(맞히면 wrong=0, 틀리면 correct=0) */
+  answerRun: { correct: number; wrong: number };
+  /** 미니미 응원 신호(전역 오버레이가 소비 후 clearCompanionCue). cheer=5연속정답 축하 / cheerup=2연속오답 응원 */
+  companionCue: { kind: 'cheer' | 'cheerup'; id: number } | null;
 
   setProfile: (p: { nickname: string; classCode?: string; studentId?: string }) => void;
   recordAnswer: (skillId: string, correct: boolean, seed?: number) => void;
+  /** 미니미 응원 신호 소비(오버레이가 표시 후 호출) */
+  clearCompanionCue: () => void;
   /** XP 추가 + 레벨업 카드 발급. 새로 얻은 카드 목록 반환 */
   addXp: (amount: number) => EarnedCard[];
   /** 보스 격파 카드 발급 */
@@ -206,6 +212,8 @@ export const useGame = create<GameState>()(
         challengeSets: 0,
       },
       steps: emptySteps(),
+      answerRun: { correct: 0, wrong: 0 },
+      companionCue: null,
 
       setProfile: ({ nickname, classCode, studentId }) =>
         set({ nickname, classCode: classCode ?? null, studentId: studentId ?? null }),
@@ -238,6 +246,17 @@ export const useGame = create<GameState>()(
                 : pushWrong(wrongLog, unitId, skillId, seed, Date.now());
             }
           }
+          // 연속 정답/오답 run → 미니미 응원 신호. 5연속 정답마다 축하, 정확히 2연속 오답에 응원(과도 방지).
+          const prevRun = s.answerRun ?? { correct: 0, wrong: 0 };
+          const answerRun = correct
+            ? { correct: prevRun.correct + 1, wrong: 0 }
+            : { correct: 0, wrong: prevRun.wrong + 1 };
+          let companionCue = s.companionCue;
+          if (correct && answerRun.correct % 5 === 0) {
+            companionCue = { kind: 'cheer', id: Date.now() };
+          } else if (!correct && answerRun.wrong === 2) {
+            companionCue = { kind: 'cheerup', id: Date.now() };
+          }
           return {
             skillStats: {
               ...s.skillStats,
@@ -246,8 +265,12 @@ export const useGame = create<GameState>()(
             daily: { ...daily, solved: daily.solved + (correct ? 1 : 0) },
             recentWrong,
             wrongLog,
+            answerRun,
+            companionCue,
           };
         }),
+
+      clearCompanionCue: () => set({ companionCue: null }),
 
       addXp: (amount) => {
         const prevXp = get().xp;

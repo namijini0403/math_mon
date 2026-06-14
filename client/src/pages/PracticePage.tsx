@@ -23,6 +23,7 @@ import { FractionInputView } from '../components/problem/FractionInputView';
 import { DecimalInputView } from '../components/problem/DecimalInputView';
 import { FillBlanksView } from '../components/problem/FillBlanksView';
 import { MatchingView } from '../components/problem/MatchingView';
+import { GuidingStarButton } from '../components/GuidingStarButton';
 import { track } from '../analytics';
 
 /** 선택한 단원의 스킬만 (선행/누적 없음 — '이 단원'만 정확히) */
@@ -292,6 +293,7 @@ function PracticeRunner({ mode, unitId }: { mode: PracticeMode; unitId: string }
                   >
                     확인
                   </button>
+                  <GuidingStarButton skillId={problem.skillId} problemId={problem.id} />
                 </motion.div>
               )
             )}
