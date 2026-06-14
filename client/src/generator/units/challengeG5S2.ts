@@ -279,8 +279,8 @@ const chFracIneqNat: SkillDef = {
     const explanation: MathExpr = [
       txt(`${lWholePart}과 ${lFracN}/${lowerD} < □ × ${p}/${q} < ${uWholePart}과 ${uFracN}/${upperD}에서 `),
       txt(`각 변을 ${p}/${q}로 나눠요 (= ${q}/${p}를 곱해요). `),
-      txt(`${lowerN}/${lowerD} × ${q}/${p} = ${lowerN * q}/${lowerD * p} = ${(lowerN / lowerD) * (q / p)}... `),
-      txt(`${upperN}/${upperD} × ${q}/${p} = ${upperN * q}/${upperD * p} = ${(upperN / upperD) * (q / p)}... `),
+      txt(`${lowerN}/${lowerD} × ${q}/${p} = ${lowerN * q}/${lowerD * p},  ${upperN}/${upperD} × ${q}/${p} = ${upperN * q}/${upperD * p}이에요. `),
+      txt(`따라서 □는 ${lowerN * q}/${lowerD * p}보다 크고 ${upperN * q}/${upperD * p}보다 작은 자연수예요. `),
       txt(`만족하는 자연수는 ${minAns}부터 ${maxAns}까지예요. `),
       txt(`가장 작은 자연수는 ${minAns}, 가장 큰 자연수는 ${maxAns}${ida(maxAns)}에요.`),
     ];
@@ -1011,7 +1011,7 @@ const chPaintCut: SkillDef = {
     const explanation: MathExpr = [
       txt(`한 모서리 ${big} cm를 ${small} cm로 자르면 한 방향에 ${n}개씩 총 ${n}×${n}×${n} = ${n * n * n}개예요. `),
       txt(`한 면만 색칠된 것은 각 면의 중앙 부분이에요. `),
-      txt(`각 면에서 모서리와 꼭짓점을 제외한 중앙: (${n}−2)² = ${(n - 2) * (n - 2)}개. `),
+      txt(`각 면에서 모서리와 꼭짓점을 제외한 중앙: (${n}−2)×(${n}−2) = ${(n - 2) * (n - 2)}개. `),
       txt(`6면 × ${(n - 2) * (n - 2)}개 = ${ans}개.`),
     ];
 

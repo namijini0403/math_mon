@@ -119,7 +119,8 @@ interface TextRule {
 const TEXT_RULES: TextRule[] = [
   { pattern: /×/, minGrade: 2, label: '곱셈기호(×)' },
   { pattern: /÷/, minGrade: 3, label: '나눗셈기호(÷)' },
-  { pattern: /[0-9]\s*[²³⁴⁵⁶⁷⁸⁹]/, minGrade: 99, label: '숫자 거듭제곱(예: 2²)' },
+  // 숫자 또는 닫는 괄호 뒤 위첨자 = 거듭제곱(중등). cm²·m³ 등 '단위'(글자+위첨자)는 제외.
+  { pattern: /[0-9)]\s*[²³⁴⁵⁶⁷⁸⁹]/, minGrade: 99, label: '거듭제곱(예: 2², (n-2)²)' },
   { pattern: /[0-9]\s*\^\s*[0-9]/, minGrade: 99, label: '거듭제곱(^) 표기' },
   { pattern: /√/, minGrade: 99, label: '제곱근(√)' },
 ];

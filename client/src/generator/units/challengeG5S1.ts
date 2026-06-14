@@ -247,9 +247,9 @@ const chIneq: SkillDef = {
     const explanation: MathExpr = [
       txt(`먼저 좌변을 계산해요. `),
       txt(`(${A}−${B})÷${C}×${D} = ${A - B}÷${C}×${D} = ${(A - B) / C}×${D} = ${lhs}. `),
-      txt(`부등식은 ${lhs} > ${E}×□가 되어요. `),
-      txt(`□ < ${lhs}÷${E} = ${lhs / E}이므로 `),
-      txt(`□에 들어갈 수 있는 가장 큰 자연수는 ${ans}${ida(ans)}예요.`),
+      txt(`부등식은 ${lhs} > ${E}×□가 돼요. ${E}×□가 ${lhs}보다 작아야 해요. `),
+      txt(`${E}×${ans} = ${E * ans}(은)는 ${lhs}보다 작고, ${E}×${ans + 1} = ${E * (ans + 1)}(은)는 ${lhs}보다 작지 않아요. `),
+      txt(`따라서 □에 들어갈 수 있는 가장 큰 자연수는 ${ans}${ida(ans)}예요.`),
     ];
 
     return {
@@ -528,10 +528,11 @@ const chAge: SkillDef = {
     const futureB = B + x;
 
     const explanation: MathExpr = [
-      txt(`x년 후 아빠 나이: ${A}+x, 아이 나이: ${B}+x라 해요. `),
-      txt(`조건: ${A}+x = ${n}×(${B}+x). `),
-      txt(`풀면: ${A}+x = ${n * B}+${n}x → ${A}-${n * B} = ${n - 1}x → x = ${A - n * B}÷${n - 1} = ${x}. `),
-      txt(`${x}년 후 아빠 나이 ${futureA}세, 아이 나이 ${futureB}세 → ${futureA}÷${futureB} = ${n}(배) ✓`),
+      txt(`구하는 햇수를 □라고 해요. □년 후 아빠 나이는 ${A}+□, 아이 나이는 ${B}+□가 돼요. `),
+      txt(`조건: ${A}+□ = ${n}×(${B}+□). `),
+      txt(`괄호를 풀면 ${A}+□ = ${n * B}+${n}×□이고, 정리하면 ${n - 1}×□ = ${A}−${n * B} = ${A - n * B}. `),
+      txt(`□ = ${A - n * B}÷${n - 1} = ${x}. `),
+      txt(`${x}년 후 아빠 ${futureA}세, 아이 ${futureB}세 → ${futureA}는 ${futureB}의 ${n}배가 맞아요.`),
     ];
 
     return {
@@ -570,12 +571,10 @@ const chArith: SkillDef = {
     const prevVal = f + (ans - 2) * d;
 
     const explanation: MathExpr = [
-      txt(`수열: ${f}, ${f + d}, ${f + 2 * d}, … (첫째 항 ${f}, 공차 ${d}). `),
-      txt(`n번째 항 = ${f}+(n−1)×${d} > ${X}. `),
-      txt(`(n−1) > (${X}−${f})÷${d} = ${(X - f) / d}. `),
-      txt(`n−1 ≥ ${ans - 1}이므로 n ≥ ${ans}. `),
-      txt(`${ans - 1}번째: ${prevVal} ≤ ${X},  ${ans}번째: ${ansVal} > ${X}. `),
-      txt(`처음으로 ${X}보다 커지는 수는 ${ans}번째${ida(ans)}예요.`),
+      txt(`수열: ${f}, ${f + d}, ${f + 2 * d}, … (첫째 항 ${f}, 일정하게 ${d}씩 커져요). `),
+      txt(`□번째 항 = ${f}+(□−1)×${d}예요. 이 값이 ${X}보다 처음 커지는 □를 찾아요. `),
+      txt(`${ans - 1}번째 항은 ${prevVal}(으)로 아직 ${X}보다 크지 않고, ${ans}번째 항은 ${ansVal}(으)로 ${X}보다 커요. `),
+      txt(`따라서 처음으로 ${X}보다 커지는 수는 ${ans}번째${ida(ans)}예요.`),
     ];
 
     return {
