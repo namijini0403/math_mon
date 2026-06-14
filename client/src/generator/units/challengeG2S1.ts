@@ -300,7 +300,7 @@ const chCond: SkillDef = {
  * ㉠(도형)의 변의 수 + ㉡(도형)의 꼭짓점의 수 − ㉢(도형)의 변의 수
  */
 const chSide: SkillDef = {
-  id: 'ch22-side',
+  id: 'ch21-side',
   unitId: 'unitFigure2',
   title: '다각형 변·꼭짓점 수 사칙 조합',
   note: '삼각형3·사각형4·오각형5·육각형6, 결과 양의 정수',
@@ -364,7 +364,7 @@ const chSide: SkillDef = {
  * n=3~6, 답 = n(n+1)/2
  */
 const chSquareRow: SkillDef = {
-  id: 'ch22-square-row',
+  id: 'ch21-squarerow',
   unitId: 'unitFigure2',
   title: '이어 붙인 정사각형의 사각형 개수',
   note: 'n=3~6, 답=n(n+1)/2',
@@ -406,7 +406,7 @@ const chSquareRow: SkillDef = {
  * n=2~4번 접고 선 따라 자르면 사각형 2ⁿ개
  */
 const chFold: SkillDef = {
-  id: 'ch22-fold',
+  id: 'ch21-fold',
   unitId: 'unitFigure2',
   title: '색종이 접어 자르기 사각형 개수',
   note: 'n=2~4, 답=2ⁿ (4,8,16)',
@@ -453,7 +453,7 @@ const chFold: SkillDef = {
  * (A+B)보다 크고 (C−D)보다 작은 두 자리 수 개수
  */
 const chBetween: SkillDef = {
-  id: 'ch23-between',
+  id: 'ch21-between',
   unitId: 'unitAddSub2',
   title: '두 식 사이 두 자리 수 개수',
   note: '좌=A+B, 우=C-D, 답=우-좌-1, 2~9개',
@@ -512,7 +512,7 @@ const chBetween: SkillDef = {
  * 완전한 식 먼저 만들고, 두 자리(㉠,㉡)를 가려서 복원
  */
 const chVertical: SkillDef = {
-  id: 'ch23-vertical',
+  id: 'ch21-vertical',
   unitId: 'unitAddSub2',
   title: '세로셈 빈칸 복원',
   note: '받아내림/올림 있는 두 자리 ± 두 자리, 2칸 복원',
@@ -592,7 +592,7 @@ const chVertical: SkillDef = {
  * ▲+●+●=S, ◆−▲=D, ●=p → ◆ 구하기
  */
 const chSymbol: SkillDef = {
-  id: 'ch23-symbol',
+  id: 'ch21-symbol',
   unitId: 'unitAddSub2',
   title: '기호 연립 대입',
   note: '●=p → ▲=S-2p → ◆=▲+D, 모두 양의 정수 두 자리 이내',
@@ -644,7 +644,7 @@ const chSymbol: SkillDef = {
  * A 1개의 길이가 B로 m번, A k개의 길이는 B로 몇 번?
  */
 const chIterate: SkillDef = {
-  id: 'ch24-iterate',
+  id: 'ch21-iterate',
   unitId: 'unitLength2',
   title: '단위 반복 길이 환산',
   note: 'm,k=2~9, 곱≤81',
@@ -696,7 +696,7 @@ const chIterate: SkillDef = {
  * 두 사람의 걸음 길이 차이 또는 1cm 횟수 차이
  */
 const chDiff: SkillDef = {
-  id: 'ch24-diff',
+  id: 'ch21-diff',
   unitId: 'unitLength2',
   title: '반복 길이의 차',
   note: '걸음 변형 또는 cm 횟수 변형 랜덤, 결과 양수',
@@ -778,7 +778,7 @@ const chDiff: SkillDef = {
  * 가로 a cm, 세로 b cm, 사용한 철사 = a+b+a+b
  */
 const chWire: SkillDef = {
-  id: 'ch24-wire',
+  id: 'ch21-wire',
   unitId: 'unitLength2',
   title: '철사로 직사각형 만들기',
   note: 'a,b=2~12, 답=2(a+b)',
@@ -832,7 +832,7 @@ const EMOJI_SETS: Record<string, string[]> = {
  * 12~16개 이모지, 3~4종류 중 무작위 배치
  */
 const chCountDiff: SkillDef = {
-  id: 'ch25-count-diff',
+  id: 'ch21-countdiff',
   unitId: 'unitClassify',
   title: '분류 후 최다−최소 개수 차',
   note: '이모지 12~16개, 3~4종류, 차≥1',
@@ -929,7 +929,7 @@ const chCountDiff: SkillDef = {
  * 항목마다 (모양, 색) 두 속성, 두 조건 교집합
  */
 const chTwoAttr: SkillDef = {
-  id: 'ch25-two-attr',
+  id: 'ch21-twoattr',
   unitId: 'unitClassify',
   title: '두 기준 동시 만족 개수',
   note: '색+모양 두 속성 교집합, 답≥1',
@@ -1013,7 +1013,7 @@ const chTwoAttr: SkillDef = {
  * 다리 없음 x마리, 2개 y마리, 4개 z마리. 전체=N, 어떤 두 그룹 차=k
  */
 const chRelation: SkillDef = {
-  id: 'ch25-relation',
+  id: 'ch21-relation',
   unitId: 'unitClassify',
   title: '분류표 관계식으로 미지수 구하기',
   note: '합+차 조건, 정수해 유일',
@@ -1083,7 +1083,7 @@ const chRelation: SkillDef = {
  * (b) 역산: g개씩 묶으면 몇 묶음?
  */
 const chArray: SkillDef = {
-  id: 'ch26-array',
+  id: 'ch21-array',
   unitId: 'unitMulIntro',
   title: '배열 곱셈 / 묶음 역산',
   note: '정방향 r×c×b 또는 역산 T/g, 각 ≤6, 답 양수',
@@ -1164,7 +1164,7 @@ const chArray: SkillDef = {
  * 사탕 p×q개에서 r×s개 나눠 주고 남은 것
  */
 const chLeftover: SkillDef = {
-  id: 'ch26-leftover',
+  id: 'ch21-leftover',
   unitId: 'unitMulIntro',
   title: '만들고 나눠 주고 남은 수',
   note: 'p×q − r×s > 0, 두 곱 모두 두 자리 이하',
@@ -1218,7 +1218,7 @@ const chLeftover: SkillDef = {
  * 윗옷 m가지 × 치마 n가지 = m×n가지
  */
 const chCombo: SkillDef = {
-  id: 'ch26-combo',
+  id: 'ch21-combo',
   unitId: 'unitMulIntro',
   title: '옷 조합 경우의 수',
   note: 'm,n=2~6, 답=m×n',
