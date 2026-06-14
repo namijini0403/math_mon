@@ -74,6 +74,7 @@ import { unitRound3dSkills } from './units/unitRound3d';
 import { challengeG2S1Skills } from './units/challengeG2S1';
 import { challengeG2S2Skills } from './units/challengeG2S2';
 import { challengeG3S1Skills } from './units/challengeG3S1';
+import { challengeG3S2Skills } from './units/challengeG3S2';
 import { challengeG5S1Skills } from './units/challengeG5S1';
 import { challengeG5S2Skills } from './units/challengeG5S2';
 import { challengeG6S1Skills } from './units/challengeG6S1';
@@ -169,6 +170,7 @@ export const SKILLS: SkillDef[] = [
   ...challengeG2S1Skills,
   ...challengeG2S2Skills,
   ...challengeG3S1Skills,
+  ...challengeG3S2Skills,
   ...challengeG5S1Skills,
   ...challengeG5S2Skills,
   ...challengeG6S1Skills,
